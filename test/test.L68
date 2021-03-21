@@ -1,0 +1,41 @@
+00000000 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 14/03/2021 17:32:57
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00000000                             7      ORG    $0
+00000000                             8  START:   
+00000000= FFFFFFFF                   9  SP DC.L $FFFFFFFF          ; Stack pointer
+00000004= 00000400                  10  PC DC.L $00000400          ; Program counter
+00000400                            11     ORG $400
+00000400  4E71                      12     NOP
+00000402  103C 0000                 13     MOVE.B #0,D0            ; first instruction
+00000406                            14  INC:
+00000406  4E71                      15      NOP
+00000408  D138 0001                 16      ADD.B D0,1
+0000040C  4EF8 0406                 17      JMP INC
+00000410                            18      
+00000410                            19  * Put program code here
+00000410                            20  
+00000410  FFFF FFFF                 21      SIMHALT             ; halt simulator
+00000414                            22  
+00000414                            23  * Put variables and constants here
+00000414                            24  
+00000414                            25      END    START        ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+INC                 406
+PC                  4
+SP                  0
+START               0
