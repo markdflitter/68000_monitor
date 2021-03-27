@@ -1,2 +1,2 @@
-..\..\srec\srec_cat first.s68 -split 2 0 -o first.bin.high -binary
-..\..\srec\srec_cat first.s68 -split 2 1 -o first.bin.low -binary
+"..\..\..\..\68000 utils\srec\srec_cat" first.s68 -split 2 0 -o first.bin.high -binary
+"..\..\..\..\68000 utils\srec\srec_cat" first.s68 -split 2 1 -o first.bin.low -binary

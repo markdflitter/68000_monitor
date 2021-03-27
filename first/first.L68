@@ -1,28 +1,51 @@
-00000008 Starting Address
+00000018 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 21/03/2021 10:38:03
+Created On: 27/03/2021 15:59:30
 
-00000000                             1      ORG    $0
-00000000= 00000000                   2      DC.L $00000000
-00000004= 00000000                   3      DC.L $00000000 
-00000008                             4  START:                  ; first instruction of program
-00000008  207C 00FFFFFF              5      MOVE.L #$FFFFFF,A0
-0000000E  7209                       6      MOVE.L #9,D1
-00000010  7400                       7      MOVE.L #$0,D2
-00000012                             8  LOOP:
-00000012  1082                       9      MOVE.B D2,(A0)
-00000014  5202                      10      ADD.B #1,D2
-00000016  70FF                      11      MOVE.L #$FFFFFFFF,D0
-00000018                            12  WAIT:
-00000018  4E71                      13      NOP
-0000001A  4E71                      14      NOP
-0000001C  4E71                      15      NOP
-0000001E  4E71                      16      NOP
-00000020  4E71                      17      NOP
-00000022  57C8 FFF4                 18      DBEQ D0,WAIT
-00000026  57C9 FFEA                 19      DBEQ D1,LOOP
-0000002A  4EF8 0008                 20      JMP START
-0000002E                            21      END    START        ; last line of source
+00000000                             1  ; constants
+00000000  =00E00000                  2  DISPLAY_BASE        EQU $E00000
+00000000  =00000000                  3  DISPLAY_            EQU $0
+00000000  =00E00000                  4  DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_
+00000000                             5  
+00000000  =00D00000                  6  DUART_BASE          EQU $D00000
+00000000  =00000000                  7  DUART_MR_           EQU $0
+00000000  =0000000D                  8  DUART_OPCR_         EQU $D
+00000000  =0000000E                  9  DUART_SET_OPR_      EQU $E
+00000000  =0000000F                 10  DUART_RESET_OPR_    EQU $F
+00000000  =00D00000                 11  DUART_MR            EQU DUART_BASE+2*DUART_MR_
+00000000  =00D0001A                 12  DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_
+00000000  =00D0001C                 13  DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_
+00000000  =00D0001E                 14  DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_
+00000000                            15  
+00000000                            16  ; start vector
+00000000                            17      ORG    $0
+00000000= 00000000                  18      DC.L $00000000
+00000004= 00000000                  19      DC.L $00000000 
+00000008                            20  ; first instruction of program  
+00000008                            21  INITIALISE:
+00000008  13FC 0000 00D00000        22      MOVE.B #$0,DUART_MR
+00000010  13FC 0000 00D0001A        23      MOVE.B #$0,DUART_OPCR
+00000018                            24  START:
+00000018  7207                      25      MOVE.L #7,D1                    ; loop counter
+0000001A  7400                      26      MOVE.L #$0,D2                   ; output value
+0000001C                            27  LOOP:
+0000001C  13FC 00FF 00D0001E        28      MOVE.B #$FF,DUART_RESET_OPR     ; clear UART output register
+00000024  13C2 00D0001C             29      MOVE.B D2,DUART_SET_OPR         ; set UART outpout register
+0000002A  13C2 00E00000             30      MOVE.B D2,DISPLAY               ; write to the display
+00000030  5202                      31      ADD.B #1,D2                     ; next number
+00000032  70FF                      32      MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
+00000034                            33  WAIT:
+00000034  4E71                      34      NOP
+00000036  4E71                      35      NOP
+00000038  4E71                      36      NOP
+0000003A  4E71                      37      NOP
+0000003C  4E71                      38      NOP
+0000003E  4E71                      39      NOP
+00000040  4E71                      40      NOP
+00000042  57C8 FFF0                 41      DBEQ D0,WAIT                    ; end of wait loop
+00000046  57C9 FFD4                 42      DBEQ D1,LOOP                    ; next number
+0000004A  4EF8 0018                 43      JMP START                       ; ...and from the top
+0000004E                            44      END    START                    ; last line of source
 
 No errors detected
 No warnings generated
@@ -31,6 +54,19 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-LOOP                12
-START               8
-WAIT                18
+DISPLAY             E00000
+DISPLAY_            0
+DISPLAY_BASE        E00000
+DUART_BASE          D00000
+DUART_MR            D00000
+DUART_MR_           0
+DUART_OPCR          D0001A
+DUART_OPCR_         D
+DUART_RESET_OPR     D0001E
+DUART_RESET_OPR_    F
+DUART_SET_OPR       D0001C
+DUART_SET_OPR_      E
+INITIALISE          8
+LOOP                1C
+START               18
+WAIT                34
