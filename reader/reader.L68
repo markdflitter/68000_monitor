@@ -1,6 +1,6 @@
 00000068 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 28/03/2021 12:44:24
+Created On: 28/03/2021 13:06:21
 
 00000000                             1  ; constants
 00000000  =00E00000                  2  DISPLAY_BASE        EQU $E00000
@@ -78,15 +78,15 @@ Created On: 28/03/2021 12:44:24
 0000007A  5202                      74      ADD.B #1,D2                     ; next number
 0000007C  70FF                      75      MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
 0000007E                            76  WAIT:
-0000007E  3639 00D00002             77      MOVE.W DUART_SRA,D3
-00000084  0803 0000                 78      BTST #$0,D3
+0000007E  3639 00D00002             77      MOVE.W DUART_SRA,D3             ; read status register
+00000084  0803 0000                 78      BTST #$0,D3                     ; check for character
 00000088  6700 0018                 79      BEQ CONTINUE
-0000008C  3639 00D00006             80      MOVE.W DUART_RXA,D3
-00000092  13C3 00D00006             81      MOVE.B D3,DUART_TXA    
-00000098  0243 000F                 82      ANDI #$0F,D3        
+0000008C  3639 00D00006             80      MOVE.W DUART_RXA,D3             ; read it
+00000092  13C3 00D00006             81      MOVE.B D3,DUART_TXA             ; echo it back
+00000098  0403 0030                 82      SUB.B #48,D3                    ; ASCII -> binary        
 0000009C  13C3 00E00000             83      MOVE.B D3,DISPLAY               ; write to the display
 000000A2                            84  CONTINUE:
-000000A2  023C 00FB                 85      ANDI #$FB,CCR                   ; clear the Z bit if set
+000000A2  023C 00FB                 85      ANDI #$FB,CCR                   ; clear the Z bit if set (from the BEQ above)
 000000A6  57C8 FFD6                 86      DBEQ D0,WAIT                    ; end of wait loop
 000000AA  57C9 FFC0                 87      DBEQ D1,LOOP                    ; next number
 000000AE  4EF8 0068                 88      JMP START                       ; ...and from the top

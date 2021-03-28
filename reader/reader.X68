@@ -74,15 +74,15 @@ LOOP:
     ADD.B #1,D2                     ; next number
     MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
 WAIT:
-    MOVE.W DUART_SRA,D3
-    BTST #$0,D3
+    MOVE.W DUART_SRA,D3             ; read status register
+    BTST #$0,D3                     ; check for character
     BEQ CONTINUE
-    MOVE.W DUART_RXA,D3
-    MOVE.B D3,DUART_TXA    
-    ANDI #$0F,D3        
+    MOVE.W DUART_RXA,D3             ; read it
+    MOVE.B D3,DUART_TXA             ; echo it back
+    SUB.B #48,D3                    ; ASCII -> binary        
     MOVE.B D3,DISPLAY               ; write to the display
 CONTINUE:
-    ANDI #$FB,CCR                   ; clear the Z bit if set
+    ANDI #$FB,CCR                   ; clear the Z bit if set (from the BEQ above)
     DBEQ D0,WAIT                    ; end of wait loop
     DBEQ D1,LOOP                    ; next number
     JMP START                       ; ...and from the top
