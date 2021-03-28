@@ -23,26 +23,26 @@ DUART_OPCR_         EQU $D
 DUART_SET_OPR_      EQU $E
 DUART_RESET_OPR_    EQU $F
 
-DUART_MRA           EQU DUART_BASE+2*DUART_MRA_
-DUART_SRA           EQU DUART_BASE+2*DUART_SRA_
-DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_
-DUART_CRA           EQU DUART_BASE+2*DUART_CRA_
-DUART_TXA           EQU DUART_BASE+2*DUART_TXA_
-DUART_RXA           EQU DUART_BASE+2*DUART_RXA_
+DUART_MRA           EQU DUART_BASE+2*DUART_MRA_+1
+DUART_SRA           EQU DUART_BASE+2*DUART_SRA_+1
+DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_+1
+DUART_CRA           EQU DUART_BASE+2*DUART_CRA_+1
+DUART_TXA           EQU DUART_BASE+2*DUART_TXA_+1
+DUART_RXA           EQU DUART_BASE+2*DUART_RXA_+1
 
-DUART_MRB           EQU DUART_BASE+2*DUART_MRB_
-DUART_SRB           EQU DUART_BASE+2*DUART_SRB_
-DUART_CSRB          EQU DUART_BASE+2*DUART_CSRB_
-DUART_CRB           EQU DUART_BASE+2*DUART_CRB_
-DUART_TXB           EQU DUART_BASE+2*DUART_TXB_
-DUART_RXB           EQU DUART_BASE+2*DUART_RXB_
+DUART_MRB           EQU DUART_BASE+2*DUART_MRB_+1
+DUART_SRB           EQU DUART_BASE+2*DUART_SRB_+1
+DUART_CSRB          EQU DUART_BASE+2*DUART_CSRB_+1
+DUART_CRB           EQU DUART_BASE+2*DUART_CRB_+1
+DUART_TXB           EQU DUART_BASE+2*DUART_TXB_+1
+DUART_RXB           EQU DUART_BASE+2*DUART_RXB_+1
 
-DUART_ACR           EQU DUART_BASE+2*DUART_ACR_
-DUART_IMR           EQU DUART_BASE+2*DUART_IMR_
-DUART_IVR           EQU DUART_BASE+2*DUART_IVR_
-DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_
-DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_
-DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_
+DUART_ACR           EQU DUART_BASE+2*DUART_ACR_+1
+DUART_IMR           EQU DUART_BASE+2*DUART_IMR_+1
+DUART_IVR           EQU DUART_BASE+2*DUART_IVR_+1
+DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_+1
+DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_+1
+DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_+1
 
 ; start vector
     ORG    $0
@@ -74,10 +74,10 @@ LOOP:
     ADD.B #1,D2                     ; next number
     MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
 WAIT:
-    MOVE.W DUART_SRA,D3             ; read status register
+    MOVE.B DUART_SRA,D3             ; read status register
     BTST #$0,D3                     ; check for character
     BEQ CONTINUE
-    MOVE.W DUART_RXA,D3             ; read it
+    MOVE.B DUART_RXA,D3             ; read it
     MOVE.B D3,DUART_TXA             ; echo it back
     SUB.B #48,D3                    ; ASCII -> binary        
     MOVE.B D3,DISPLAY               ; write to the display
@@ -87,6 +87,7 @@ CONTINUE:
     DBEQ D1,LOOP                    ; next number
     JMP START                       ; ...and from the top
     END    START                    ; last line of source
+
 
 
 
