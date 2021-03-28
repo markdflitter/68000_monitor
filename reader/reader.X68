@@ -35,7 +35,7 @@ DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_
 ; first instruction of program  
 INITIALISE:
     MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
-    MOVE.B #$07,DUART_MRA           ; auto echo and 1 stop bit
+    MOVE.B #$47,DUART_MRA           ; auto echo and 1 stop bit
     MOVE.B #$BB,DUART_CSRA          ; 9600 baud
     MOVE.B #$5,DUART_CRA            ; enable rx & tx
     MOVE.B #$0,DUART_ACR            

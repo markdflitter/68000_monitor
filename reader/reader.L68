@@ -1,6 +1,6 @@
 00000040 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 28/03/2021 09:36:05
+Created On: 28/03/2021 09:46:35
 
 00000000                             1  ; constants
 00000000  =00E00000                  2  DISPLAY_BASE        EQU $E00000
@@ -39,7 +39,7 @@ Created On: 28/03/2021 09:36:05
 00000008                            35  ; first instruction of program  
 00000008                            36  INITIALISE:
 00000008  13FC 0003 00D00000        37      MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
-00000010  13FC 0007 00D00000        38      MOVE.B #$07,DUART_MRA           ; auto echo and 1 stop bit
+00000010  13FC 0047 00D00000        38      MOVE.B #$47,DUART_MRA           ; auto echo and 1 stop bit
 00000018  13FC 00BB 00D00002        39      MOVE.B #$BB,DUART_CSRA          ; 9600 baud
 00000020  13FC 0005 00D00004        40      MOVE.B #$5,DUART_CRA            ; enable rx & tx
 00000028  13FC 0000 00D00008        41      MOVE.B #$0,DUART_ACR            
