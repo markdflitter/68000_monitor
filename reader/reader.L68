@@ -1,6 +1,6 @@
-00000040 Starting Address
+00000060 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 28/03/2021 09:46:35
+Created On: 28/03/2021 09:53:59
 
 00000000                             1  ; constants
 00000000  =00E00000                  2  DISPLAY_BASE        EQU $E00000
@@ -9,71 +9,91 @@ Created On: 28/03/2021 09:46:35
 00000000                             5  
 00000000  =00D00000                  6  DUART_BASE          EQU $D00000
 00000000  =00000000                  7  DUART_MRA_          EQU $0
-00000000  =00000001                  8  DUART_SRA_          EQU $1
-00000000  =00000001                  9  DUART_CSRA_         EQU $1
+00000000  =00000001                  8  DUART_CSRA_         EQU $1
+00000000  =00000001                  9  DUART_SRA_          EQU $1
 00000000  =00000002                 10  DUART_CRA_          EQU $2
 00000000  =00000003                 11  DUART_TXA_          EQU $3
 00000000  =00000003                 12  DUART_RXA_          EQU $3
 00000000  =00000004                 13  DUART_ACR_          EQU $4
 00000000  =00000005                 14  DUART_IMR_          EQU $5
-00000000  =0000000D                 15  DUART_OPCR_         EQU $D
-00000000  =0000000E                 16  DUART_SET_OPR_      EQU $E
-00000000  =0000000F                 17  DUART_RESET_OPR_    EQU $F
-00000000  =00D00000                 18  DUART_MRA           EQU DUART_BASE+2*DUART_MRA_
-00000000  =00D00002                 19  DUART_SRA           EQU DUART_BASE+2*DUART_SRA_
-00000000  =00D00002                 20  DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_
-00000000  =00D00004                 21  DUART_CRA           EQU DUART_BASE+2*DUART_CRA_
-00000000  =00D00006                 22  DUART_TXA           EQU DUART_BASE+2*DUART_TXA_
-00000000  =00D00006                 23  DUART_RXA           EQU DUART_BASE+2*DUART_RXA_
-00000000  =00D00008                 24  DUART_ACR           EQU DUART_BASE+2*DUART_ACR_
-00000000  =00D0000A                 25  DUART_IMR           EQU DUART_BASE+2*DUART_IMR_
-00000000  =00D0001A                 26  DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_
-00000000  =00D0001C                 27  DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_
-00000000  =00D0001E                 28  DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_
-00000000                            29  
-00000000                            30  
-00000000                            31  ; start vector
-00000000                            32      ORG    $0
-00000000= 00000000                  33      DC.L $00000000
-00000004= 00000000                  34      DC.L $00000000 
-00000008                            35  ; first instruction of program  
-00000008                            36  INITIALISE:
-00000008  13FC 0003 00D00000        37      MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
-00000010  13FC 0047 00D00000        38      MOVE.B #$47,DUART_MRA           ; auto echo and 1 stop bit
-00000018  13FC 00BB 00D00002        39      MOVE.B #$BB,DUART_CSRA          ; 9600 baud
-00000020  13FC 0005 00D00004        40      MOVE.B #$5,DUART_CRA            ; enable rx & tx
-00000028  13FC 0000 00D00008        41      MOVE.B #$0,DUART_ACR            
-00000030  13FC 0000 00D0000A        42      MOVE.B #$0,DUART_IMR            ; no interrupts, please            
-00000038  13FC 0000 00D0001A        43      MOVE.B #$0,DUART_OPCR           ; enable all outputs
-00000040                            44  START:
-00000040  7207                      45      MOVE.L #7,D1                    ; loop counter
-00000042  7400                      46      MOVE.L #$0,D2                   ; output value
-00000044                            47  LOOP:
-00000044  13FC 00FF 00D0001E        48      MOVE.B #$FF,DUART_RESET_OPR     ; clear UART output register
-0000004C  13C2 00D0001C             49      MOVE.B D2,DUART_SET_OPR         ; set UART output register
-00000052  5202                      50      ADD.B #1,D2                     ; next number
-00000054  70FF                      51      MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
-00000056                            52  WAIT:
-00000056  4E71                      53      NOP
-00000058  4E71                      54      NOP
-0000005A  4E71                      55      NOP
-0000005C  4E71                      56      NOP
-0000005E  4E71                      57      NOP
-00000060  4E71                      58      NOP
-00000062  4E71                      59      NOP
-00000064                            60      ;MOVE.B DUART_SRA,D3
-00000064                            61      ;MOVE.B D3,DISPLAY               ; write to the display
-00000064                            62      ;BTST #$0,D3
-00000064                            63      ;BEQ CONTINUE
-00000064                            64      ;MOVE.B DUART_RXA,D3
-00000064                            65      ;SUB.B #48,D3                   ; ...back to a number
-00000064                            66      ;MOVE.B D3,DISPLAY              ; write to the display
-00000064                            67  CONTINUE:
-00000064                            68      ;ANDI #$FB,CCR                   ; clear the Z bit if set
-00000064  57C8 FFF0                 69      DBEQ D0,WAIT                    ; end of wait loop
-00000068  57C9 FFDA                 70      DBEQ D1,LOOP                    ; next number
-0000006C  4EF8 0040                 71      JMP START                       ; ...and from the top
-00000070                            72      END    START                    ; last line of source
+00000000  =00000008                 15  DUART_MRB_          EQU $8
+00000000  =00000009                 16  DUART_CSRB_         EQU $9
+00000000  =00000009                 17  DUART_SRB_          EQU $9
+00000000  =0000000A                 18  DUART_CRB_          EQU $A
+00000000  =0000000B                 19  DUART_TXB_          EQU $B
+00000000  =0000000B                 20  DUART_RXB_          EQU $B
+00000000  =0000000D                 21  DUART_OPCR_         EQU $D
+00000000  =0000000E                 22  DUART_SET_OPR_      EQU $E
+00000000  =0000000F                 23  DUART_RESET_OPR_    EQU $F
+00000000                            24  
+00000000  =00D00000                 25  DUART_MRA           EQU DUART_BASE+2*DUART_MRA_
+00000000  =00D00002                 26  DUART_SRA           EQU DUART_BASE+2*DUART_SRA_
+00000000  =00D00002                 27  DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_
+00000000  =00D00004                 28  DUART_CRA           EQU DUART_BASE+2*DUART_CRA_
+00000000  =00D00006                 29  DUART_TXA           EQU DUART_BASE+2*DUART_TXA_
+00000000  =00D00006                 30  DUART_RXA           EQU DUART_BASE+2*DUART_RXA_
+00000000                            31  
+00000000  =00D00010                 32  DUART_MRB           EQU DUART_BASE+2*DUART_MRB_
+00000000  =00D00012                 33  DUART_SRB           EQU DUART_BASE+2*DUART_SRB_
+00000000  =00D00012                 34  DUART_CSRB          EQU DUART_BASE+2*DUART_CSRB_
+00000000  =00D00014                 35  DUART_CRB           EQU DUART_BASE+2*DUART_CRB_
+00000000  =00D00016                 36  DUART_TXB           EQU DUART_BASE+2*DUART_TXB_
+00000000  =00D00016                 37  DUART_RXB           EQU DUART_BASE+2*DUART_RXB_
+00000000                            38  
+00000000  =00D00008                 39  DUART_ACR           EQU DUART_BASE+2*DUART_ACR_
+00000000  =00D0000A                 40  DUART_IMR           EQU DUART_BASE+2*DUART_IMR_
+00000000  =00D0001A                 41  DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_
+00000000  =00D0001C                 42  DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_
+00000000  =00D0001E                 43  DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_
+00000000                            44  
+00000000                            45  ; start vector
+00000000                            46      ORG    $0
+00000000= 00000000                  47      DC.L $00000000
+00000004= 00000000                  48      DC.L $00000000 
+00000008                            49  ; first instruction of program  
+00000008                            50  INITIALISE:
+00000008  13FC 0003 00D00000        51      MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
+00000010  13FC 0047 00D00000        52      MOVE.B #$47,DUART_MRA           ; auto echo and 1 stop bit
+00000018  13FC 00BB 00D00002        53      MOVE.B #$BB,DUART_CSRA          ; 9600 baud
+00000020  13FC 0005 00D00004        54      MOVE.B #$5,DUART_CRA            ; enable rx & tx
+00000028                            55  
+00000028  13FC 0003 00D00010        56      MOVE.B #$03,DUART_MRB           ; no flow control, no parity, 8 data bits
+00000030  13FC 0047 00D00010        57      MOVE.B #$47,DUART_MRB           ; auto echo and 1 stop bit
+00000038  13FC 00BB 00D00012        58      MOVE.B #$BB,DUART_CSRB          ; 9600 baud
+00000040  13FC 0005 00D00014        59      MOVE.B #$5,DUART_CRB            ; enable rx & tx
+00000048                            60  
+00000048  13FC 0000 00D00008        61      MOVE.B #$0,DUART_ACR            
+00000050  13FC 0000 00D0000A        62      MOVE.B #$0,DUART_IMR            ; no interrupts, please            
+00000058  13FC 0000 00D0001A        63      MOVE.B #$0,DUART_OPCR           ; enable all outputs
+00000060                            64  START:
+00000060  7207                      65      MOVE.L #7,D1                    ; loop counter
+00000062  7400                      66      MOVE.L #$0,D2                   ; output value
+00000064                            67  LOOP:
+00000064  13FC 00FF 00D0001E        68      MOVE.B #$FF,DUART_RESET_OPR     ; clear UART output register
+0000006C  13C2 00D0001C             69      MOVE.B D2,DUART_SET_OPR         ; set UART output register
+00000072  5202                      70      ADD.B #1,D2                     ; next number
+00000074  70FF                      71      MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
+00000076                            72  WAIT:
+00000076  4E71                      73      NOP
+00000078  4E71                      74      NOP
+0000007A  4E71                      75      NOP
+0000007C  4E71                      76      NOP
+0000007E  4E71                      77      NOP
+00000080  4E71                      78      NOP
+00000082  4E71                      79      NOP
+00000084                            80      ;MOVE.B DUART_SRA,D3
+00000084                            81      ;MOVE.B D3,DISPLAY               ; write to the display
+00000084                            82      ;BTST #$0,D3
+00000084                            83      ;BEQ CONTINUE
+00000084                            84      ;MOVE.B DUART_RXA,D3
+00000084                            85      ;SUB.B #48,D3                   ; ...back to a number
+00000084                            86      ;MOVE.B D3,DISPLAY              ; write to the display
+00000084                            87  CONTINUE:
+00000084                            88      ;ANDI #$FB,CCR                   ; clear the Z bit if set
+00000084  57C8 FFF0                 89      DBEQ D0,WAIT                    ; end of wait loop
+00000088  57C9 FFDA                 90      DBEQ D1,LOOP                    ; next number
+0000008C  4EF8 0060                 91      JMP START                       ; ...and from the top
+00000090                            92      END    START                    ; last line of source
 
 No errors detected
 No warnings generated
@@ -82,7 +102,7 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-CONTINUE            64
+CONTINUE            84
 DISPLAY             E00000
 DISPLAY_            0
 DISPLAY_BASE        E00000
@@ -91,25 +111,37 @@ DUART_ACR_          4
 DUART_BASE          D00000
 DUART_CRA           D00004
 DUART_CRA_          2
+DUART_CRB           D00014
+DUART_CRB_          A
 DUART_CSRA          D00002
 DUART_CSRA_         1
+DUART_CSRB          D00012
+DUART_CSRB_         9
 DUART_IMR           D0000A
 DUART_IMR_          5
 DUART_MRA           D00000
 DUART_MRA_          0
+DUART_MRB           D00010
+DUART_MRB_          8
 DUART_OPCR          D0001A
 DUART_OPCR_         D
 DUART_RESET_OPR     D0001E
 DUART_RESET_OPR_    F
 DUART_RXA           D00006
 DUART_RXA_          3
+DUART_RXB           D00016
+DUART_RXB_          B
 DUART_SET_OPR       D0001C
 DUART_SET_OPR_      E
 DUART_SRA           D00002
 DUART_SRA_          1
+DUART_SRB           D00012
+DUART_SRB_          9
 DUART_TXA           D00006
 DUART_TXA_          3
+DUART_TXB           D00016
+DUART_TXB_          B
 INITIALISE          8
-LOOP                44
-START               40
-WAIT                56
+LOOP                64
+START               60
+WAIT                76

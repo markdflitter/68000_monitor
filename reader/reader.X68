@@ -5,28 +5,42 @@ DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_
 
 DUART_BASE          EQU $D00000
 DUART_MRA_          EQU $0
-DUART_SRA_          EQU $1
 DUART_CSRA_         EQU $1
+DUART_SRA_          EQU $1
 DUART_CRA_          EQU $2
 DUART_TXA_          EQU $3
 DUART_RXA_          EQU $3
 DUART_ACR_          EQU $4
 DUART_IMR_          EQU $5
+DUART_MRB_          EQU $8
+DUART_CSRB_         EQU $9
+DUART_SRB_          EQU $9
+DUART_CRB_          EQU $A
+DUART_TXB_          EQU $B
+DUART_RXB_          EQU $B
 DUART_OPCR_         EQU $D
 DUART_SET_OPR_      EQU $E
 DUART_RESET_OPR_    EQU $F
+
 DUART_MRA           EQU DUART_BASE+2*DUART_MRA_
 DUART_SRA           EQU DUART_BASE+2*DUART_SRA_
 DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_
 DUART_CRA           EQU DUART_BASE+2*DUART_CRA_
 DUART_TXA           EQU DUART_BASE+2*DUART_TXA_
 DUART_RXA           EQU DUART_BASE+2*DUART_RXA_
+
+DUART_MRB           EQU DUART_BASE+2*DUART_MRB_
+DUART_SRB           EQU DUART_BASE+2*DUART_SRB_
+DUART_CSRB          EQU DUART_BASE+2*DUART_CSRB_
+DUART_CRB           EQU DUART_BASE+2*DUART_CRB_
+DUART_TXB           EQU DUART_BASE+2*DUART_TXB_
+DUART_RXB           EQU DUART_BASE+2*DUART_RXB_
+
 DUART_ACR           EQU DUART_BASE+2*DUART_ACR_
 DUART_IMR           EQU DUART_BASE+2*DUART_IMR_
 DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_
 DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_
 DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_
-
 
 ; start vector
     ORG    $0
@@ -38,6 +52,12 @@ INITIALISE:
     MOVE.B #$47,DUART_MRA           ; auto echo and 1 stop bit
     MOVE.B #$BB,DUART_CSRA          ; 9600 baud
     MOVE.B #$5,DUART_CRA            ; enable rx & tx
+
+    MOVE.B #$03,DUART_MRB           ; no flow control, no parity, 8 data bits
+    MOVE.B #$47,DUART_MRB           ; auto echo and 1 stop bit
+    MOVE.B #$BB,DUART_CSRB          ; 9600 baud
+    MOVE.B #$5,DUART_CRB            ; enable rx & tx
+
     MOVE.B #$0,DUART_ACR            
     MOVE.B #$0,DUART_IMR            ; no interrupts, please            
     MOVE.B #$0,DUART_OPCR           ; enable all outputs
