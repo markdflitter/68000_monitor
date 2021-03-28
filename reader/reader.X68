@@ -80,12 +80,16 @@ LOOP:
     ;MOVE.B D3,DUART_TXA               
     ;SUB.B #48,D3                    ; ...back to a number
     MOVE.W DUART_SRA,D3
+    BTST #$0,D3
+    BEQ CONTINUE
+    MOVE.W DUART_RXA,D3
+    MOVE.B D3,DUART_TXA    
     ANDI #$0F,D3        
     MOVE.B D3,DISPLAY               ; write to the display
-    ADD.B #48,D3                    ; ...back to a number
-    MOVE.B D3,DUART_TXA               
+    ;ADD.B #48,D3                    ; ...back to a number
+    ;MOVE.B D3,DUART_TXA               
 
-
+CONTINUE:
     ;MOVE.W DUART_RXA,D3
     ;MOVE.B D3,DUART_TXA               
 WAIT:
@@ -111,7 +115,6 @@ WAIT:
            
     ;SUB.B #48,D3                    ; ...back to a number
     ;MOVE.B D3,DISPLAY               ; write to the display
-CONTINUE:
     ANDI #$FB,CCR                   ; clear the Z bit if set
     DBEQ D0,WAIT                    ; end of wait loop
     DBEQ D1,LOOP                    ; next number
