@@ -73,12 +73,7 @@ LOOP:
     MOVE.B D2,DUART_SET_OPR         ; set UART output register
     ADD.B #1,D2                     ; next number
     MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
-    ;MOVE.W DUART_IVR,D3   
-    ;ANDI #$0F,D3        
-    ;MOVE.B D3,DISPLAY               ; write to the display
-    ;ADD.B #48,D3                    ; ...back to a number
-    ;MOVE.B D3,DUART_TXA               
-    ;SUB.B #48,D3                    ; ...back to a number
+WAIT:
     MOVE.W DUART_SRA,D3
     BTST #$0,D3
     BEQ CONTINUE
@@ -86,40 +81,13 @@ LOOP:
     MOVE.B D3,DUART_TXA    
     ANDI #$0F,D3        
     MOVE.B D3,DISPLAY               ; write to the display
-    ;ADD.B #48,D3                    ; ...back to a number
-    ;MOVE.B D3,DUART_TXA               
-
 CONTINUE:
-    ;MOVE.W DUART_RXA,D3
-    ;MOVE.B D3,DUART_TXA               
-WAIT:
-    NOP
-    NOP
-    NOP
-    NOP
-    ;MOVE.W DUART_SRA,D3
-    NOP
-    NOP
-    NOP
-    NOP    
-    ;MOVE.B D3,DISPLAY              ; write to the display
-    ;BTST #$0,D3
-    ;BEQ CONTINUE
-    NOP
-    NOP
-    NOP
-    NOP
-    ;MOVE.W DUART_RXA,D3
-    ;MOVE.B D3,DUART_TXA               
-    ;MOVE.B D3,DUART_TXA               
-           
-    ;SUB.B #48,D3                    ; ...back to a number
-    ;MOVE.B D3,DISPLAY               ; write to the display
     ANDI #$FB,CCR                   ; clear the Z bit if set
     DBEQ D0,WAIT                    ; end of wait loop
     DBEQ D1,LOOP                    ; next number
     JMP START                       ; ...and from the top
     END    START                    ; last line of source
+
 
 
 

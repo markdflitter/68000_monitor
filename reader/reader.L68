@@ -1,6 +1,6 @@
 00000068 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 28/03/2021 12:33:32
+Created On: 28/03/2021 12:44:24
 
 00000000                             1  ; constants
 00000000  =00E00000                  2  DISPLAY_BASE        EQU $E00000
@@ -77,53 +77,20 @@ Created On: 28/03/2021 12:33:32
 00000074  13C2 00D0001C             73      MOVE.B D2,DUART_SET_OPR         ; set UART output register
 0000007A  5202                      74      ADD.B #1,D2                     ; next number
 0000007C  70FF                      75      MOVE.L #$FFFFFFFF,D0            ; wait for a bit...
-0000007E                            76      ;MOVE.W DUART_IVR,D3   
-0000007E                            77      ;ANDI #$0F,D3        
-0000007E                            78      ;MOVE.B D3,DISPLAY               ; write to the display
-0000007E                            79      ;ADD.B #48,D3                    ; ...back to a number
-0000007E                            80      ;MOVE.B D3,DUART_TXA               
-0000007E                            81      ;SUB.B #48,D3                    ; ...back to a number
-0000007E  3639 00D00002             82      MOVE.W DUART_SRA,D3
-00000084  0803 0000                 83      BTST #$0,D3
-00000088  6700 0018                 84      BEQ CONTINUE
-0000008C  3639 00D00006             85      MOVE.W DUART_RXA,D3
-00000092  13C3 00D00006             86      MOVE.B D3,DUART_TXA    
-00000098  0243 000F                 87      ANDI #$0F,D3        
-0000009C  13C3 00E00000             88      MOVE.B D3,DISPLAY               ; write to the display
-000000A2                            89      ;ADD.B #48,D3                    ; ...back to a number
-000000A2                            90      ;MOVE.B D3,DUART_TXA               
-000000A2                            91  
-000000A2                            92  CONTINUE:
-000000A2                            93      ;MOVE.W DUART_RXA,D3
-000000A2                            94      ;MOVE.B D3,DUART_TXA               
-000000A2                            95  WAIT:
-000000A2  4E71                      96      NOP
-000000A4  4E71                      97      NOP
-000000A6  4E71                      98      NOP
-000000A8  4E71                      99      NOP
-000000AA                           100      ;MOVE.W DUART_SRA,D3
-000000AA  4E71                     101      NOP
-000000AC  4E71                     102      NOP
-000000AE  4E71                     103      NOP
-000000B0  4E71                     104      NOP    
-000000B2                           105      ;MOVE.B D3,DISPLAY              ; write to the display
-000000B2                           106      ;BTST #$0,D3
-000000B2                           107      ;BEQ CONTINUE
-000000B2  4E71                     108      NOP
-000000B4  4E71                     109      NOP
-000000B6  4E71                     110      NOP
-000000B8  4E71                     111      NOP
-000000BA                           112      ;MOVE.W DUART_RXA,D3
-000000BA                           113      ;MOVE.B D3,DUART_TXA               
-000000BA                           114      ;MOVE.B D3,DUART_TXA               
-000000BA                           115             
-000000BA                           116      ;SUB.B #48,D3                    ; ...back to a number
-000000BA                           117      ;MOVE.B D3,DISPLAY               ; write to the display
-000000BA  023C 00FB                118      ANDI #$FB,CCR                   ; clear the Z bit if set
-000000BE  57C8 FFE2                119      DBEQ D0,WAIT                    ; end of wait loop
-000000C2  57C9 FFA8                120      DBEQ D1,LOOP                    ; next number
-000000C6  4EF8 0068                121      JMP START                       ; ...and from the top
-000000CA                           122      END    START                    ; last line of source
+0000007E                            76  WAIT:
+0000007E  3639 00D00002             77      MOVE.W DUART_SRA,D3
+00000084  0803 0000                 78      BTST #$0,D3
+00000088  6700 0018                 79      BEQ CONTINUE
+0000008C  3639 00D00006             80      MOVE.W DUART_RXA,D3
+00000092  13C3 00D00006             81      MOVE.B D3,DUART_TXA    
+00000098  0243 000F                 82      ANDI #$0F,D3        
+0000009C  13C3 00E00000             83      MOVE.B D3,DISPLAY               ; write to the display
+000000A2                            84  CONTINUE:
+000000A2  023C 00FB                 85      ANDI #$FB,CCR                   ; clear the Z bit if set
+000000A6  57C8 FFD6                 86      DBEQ D0,WAIT                    ; end of wait loop
+000000AA  57C9 FFC0                 87      DBEQ D1,LOOP                    ; next number
+000000AE  4EF8 0068                 88      JMP START                       ; ...and from the top
+000000B2                            89      END    START                    ; last line of source
 
 No errors detected
 No warnings generated
@@ -176,4 +143,4 @@ DUART_TXB_          B
 INITIALISE          8
 LOOP                6C
 START               68
-WAIT                A2
+WAIT                7E
