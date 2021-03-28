@@ -79,8 +79,15 @@ LOOP:
     ;ADD.B #48,D3                    ; ...back to a number
     ;MOVE.B D3,DUART_TXA               
     ;SUB.B #48,D3                    ; ...back to a number
-    MOVE.W DUART_RXA,D3
+    MOVE.W DUART_SRA,D3
+    ANDI #$0F,D3        
+    MOVE.B D3,DISPLAY               ; write to the display
+    ADD.B #48,D3                    ; ...back to a number
     MOVE.B D3,DUART_TXA               
+
+
+    ;MOVE.W DUART_RXA,D3
+    ;MOVE.B D3,DUART_TXA               
 WAIT:
     NOP
     NOP
