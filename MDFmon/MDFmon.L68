@@ -1,0 +1,199 @@
+00000008 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 29/03/2021 12:26:17
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      : MDFmon 
+00000000                             3  * Written by : Mark Flitter
+00000000                             4  * Date       : March 2021
+00000000                             5  * Description: 68000 monitor program
+00000000                             6  *-----------------------------------------------------------
+00000000                             7  ; constants
+00000000  =00E00000                  8  DISPLAY_BASE        EQU $E00000
+00000000  =00000000                  9  DISPLAY_            EQU $0
+00000000  =00E00000                 10  DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_
+00000000                            11  
+00000000  =00D00000                 12  DUART_BASE          EQU $D00000
+00000000  =00000000                 13  DUART_MRA_          EQU $0
+00000000  =00000001                 14  DUART_CSRA_         EQU $1
+00000000  =00000001                 15  DUART_SRA_          EQU $1
+00000000  =00000002                 16  DUART_CRA_          EQU $2
+00000000  =00000003                 17  DUART_TXA_          EQU $3
+00000000  =00000003                 18  DUART_RXA_          EQU $3
+00000000  =00000004                 19  DUART_ACR_          EQU $4
+00000000  =00000005                 20  DUART_IMR_          EQU $5
+00000000  =00000008                 21  DUART_MRB_          EQU $8
+00000000  =00000009                 22  DUART_CSRB_         EQU $9
+00000000  =00000009                 23  DUART_SRB_          EQU $9
+00000000  =0000000A                 24  DUART_CRB_          EQU $A
+00000000  =0000000B                 25  DUART_TXB_          EQU $B
+00000000  =0000000B                 26  DUART_RXB_          EQU $B
+00000000  =0000000C                 27  DUART_IVR_          EQU $C
+00000000  =0000000D                 28  DUART_OPCR_         EQU $D
+00000000  =0000000E                 29  DUART_SET_OPR_      EQU $E
+00000000  =0000000F                 30  DUART_RESET_OPR_    EQU $F
+00000000                            31  
+00000000  =00D00001                 32  DUART_MRA           EQU DUART_BASE+2*DUART_MRA_+1
+00000000  =00D00003                 33  DUART_SRA           EQU DUART_BASE+2*DUART_SRA_+1
+00000000  =00D00003                 34  DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_+1
+00000000  =00D00005                 35  DUART_CRA           EQU DUART_BASE+2*DUART_CRA_+1
+00000000  =00D00007                 36  DUART_TXA           EQU DUART_BASE+2*DUART_TXA_+1
+00000000  =00D00007                 37  DUART_RXA           EQU DUART_BASE+2*DUART_RXA_+1
+00000000                            38  
+00000000  =00D00011                 39  DUART_MRB           EQU DUART_BASE+2*DUART_MRB_+1
+00000000  =00D00013                 40  DUART_SRB           EQU DUART_BASE+2*DUART_SRB_+1
+00000000  =00D00013                 41  DUART_CSRB          EQU DUART_BASE+2*DUART_CSRB_+1
+00000000  =00D00015                 42  DUART_CRB           EQU DUART_BASE+2*DUART_CRB_+1
+00000000  =00D00017                 43  DUART_TXB           EQU DUART_BASE+2*DUART_TXB_+1
+00000000  =00D00017                 44  DUART_RXB           EQU DUART_BASE+2*DUART_RXB_+1
+00000000                            45  
+00000000  =00D00009                 46  DUART_ACR           EQU DUART_BASE+2*DUART_ACR_+1
+00000000  =00D0000B                 47  DUART_IMR           EQU DUART_BASE+2*DUART_IMR_+1
+00000000  =00D00019                 48  DUART_IVR           EQU DUART_BASE+2*DUART_IVR_+1
+00000000  =00D0001B                 49  DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_+1
+00000000  =00D0001D                 50  DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_+1
+00000000  =00D0001F                 51  DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_+1
+00000000                            52  
+00000000                            53  ;MACROs
+00000000                            54  PRINT_CHAR MACRO                  ; \1 = register to use for status poll, \2 = char to send
+00000000                            55  WAIT_FOR_READY\@                  ; wait until the there is space to send
+00000000                            56    MOVE.B DUART_SRA,\1             ; read status register
+00000000                            57    BTST #2,\1                      ; check for space to send
+00000000                            58    BEQ WAIT_FOR_READY\@            ; no space, check again
+00000000                            59    MOVE.B \2,DUART_TXA             ; send the next character
+00000000                            60    ENDM
+00000000                            61  
+00000000                            62  PRINT_STR MACRO                   ; \1 = register to use for status poll, \2 = register containing address of zero terminated string
+00000000                            63  LOOP\@
+00000000                            64    CMP.B #0,(\2)                   ; 0 -> done
+00000000                            65    BEQ EXIT\@
+00000000                            66    PRINT_CHAR \1,(\2)+
+00000000                            67    JMP LOOP\@
+00000000                            68  EXIT\@
+00000000                            69    ENDM
+00000000                            70  
+00000000                            71  ; start vector
+00000000                            72      ORG  $0
+00000000= 00000000                  73      DC.L $00000000
+00000004= 00000000                  74      DC.L $00000000 
+00000008                            75      
+00000008                            76  ; start of program  
+00000008                            77  START
+00000008  13FC 0000 00E00000        78      MOVE.B #0,DISPLAY
+00000010                            79  
+00000010                            80  ;initialise UART
+00000010  13FC 0000 00D00009        81      MOVE.B #$0,DUART_ACR            
+00000018  13FC 0000 00D0000B        82      MOVE.B #$0,DUART_IMR            ; no interrupts, please            
+00000020  13FC 0000 00D0001B        83      MOVE.B #$0,DUART_OPCR           ; enable all outputs
+00000028                            84  
+00000028                            85  ; channel A
+00000028  13FC 0003 00D00001        86      MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
+00000030  13FC 0007 00D00001        87      MOVE.B #$07,DUART_MRA           ; auto echo and 1 stop bit
+00000038  13FC 00BB 00D00003        88      MOVE.B #$BB,DUART_CSRA          ; 9600 baud
+00000040  13FC 0005 00D00005        89      MOVE.B #$5,DUART_CRA            ; enable rx & tx
+00000048                            90  
+00000048                            91  ; channel B
+00000048  13FC 0003 00D00011        92      MOVE.B #$03,DUART_MRB           ; no flow control, no parity, 8 data bits
+00000050  13FC 0047 00D00011        93      MOVE.B #$47,DUART_MRB           ; auto echo and 1 stop bit
+00000058  13FC 00BB 00D00013        94      MOVE.B #$BB,DUART_CSRB          ; 9600 baud
+00000060  13FC 0005 00D00015        95      MOVE.B #$5,DUART_CRB            ; enable rx & tx
+00000068                            96  
+00000068  13FC 0001 00E00000        97      MOVE.B #1,DISPLAY
+00000070                            98      
+00000070                            99      
+00000070  41F9 00000150            100      LEA VERSION,A0
+00000076                           101m     PRINT_STR D0,A0                       
+00000094                           102m     PRINT_CHAR D0,#13               ; CR
+000000A8                           103m     PRINT_CHAR D0,#10               ; LF
+000000BC                           104  
+000000BC  13FC 0002 00E00000       105      MOVE.B #2,DISPLAY
+000000C4                           106  MAIN_LOOP
+000000C4  13FC 0003 00E00000       107      MOVE.B #3,DISPLAY
+000000CC                           108  
+000000CC                           109m     PRINT_CHAR D0,#62               ; prompt
+000000E0                           110m     PRINT_CHAR D0,#32               ; space
+000000F4                           111  
+000000F4                           112  WAIT_FOR_INPUT
+000000F4  13FC 0004 00E00000       113      MOVE.B #4,DISPLAY
+000000FC                           114  
+000000FC  1039 00D00003            115      MOVE.B DUART_SRA,D0             ; read status register
+00000102  0800 0000                116      BTST #0,D0                      ; check for character
+00000106  67EC                     117      BEQ WAIT_FOR_INPUT              ; nothing, check again
+00000108                           118  
+00000108  1239 00D00007            119      MOVE.B DUART_RXA,D1             ; got a character, read it
+0000010E                           120m     PRINT_CHAR D0,D1                ; echo it back
+00000120                           121m     PRINT_CHAR D0,#13               ; CR
+00000134                           122m     PRINT_CHAR D0,#10               ; LF
+00000148                           123      
+00000148  4EF8 00C4                124      JMP MAIN_LOOP
+0000014C                           125      
+0000014C  FFFF FFFF                126      SIMHALT                         ; halt simulator
+00000150                           127  
+00000150                           128  ; strings
+00000150= 4D 44 46 6D 6F 6E ...    129  VERSION DC.B 'MDFmon V1.0',13,10,0
+0000015E                           130      
+0000015E                           131      END    START                    ; last line of source
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+DISPLAY             E00000
+DISPLAY_            0
+DISPLAY_BASE        E00000
+DUART_ACR           D00009
+DUART_ACR_          4
+DUART_BASE          D00000
+DUART_CRA           D00005
+DUART_CRA_          2
+DUART_CRB           D00015
+DUART_CRB_          A
+DUART_CSRA          D00003
+DUART_CSRA_         1
+DUART_CSRB          D00013
+DUART_CSRB_         9
+DUART_IMR           D0000B
+DUART_IMR_          5
+DUART_IVR           D00019
+DUART_IVR_          C
+DUART_MRA           D00001
+DUART_MRA_          0
+DUART_MRB           D00011
+DUART_MRB_          8
+DUART_OPCR          D0001B
+DUART_OPCR_         D
+DUART_RESET_OPR     D0001F
+DUART_RESET_OPR_    F
+DUART_RXA           D00007
+DUART_RXA_          3
+DUART_RXB           D00017
+DUART_RXB_          B
+DUART_SET_OPR       D0001D
+DUART_SET_OPR_      E
+DUART_SRA           D00003
+DUART_SRA_          1
+DUART_SRB           D00013
+DUART_SRB_          9
+DUART_TXA           D00007
+DUART_TXA_          3
+DUART_TXB           D00017
+DUART_TXB_          B
+EXIT_1              94
+LOOP_1              76
+MAIN_LOOP           C4
+PRINT_CHAR          0
+PRINT_STR           142
+START               8
+VERSION             150
+WAIT_FOR_INPUT      F4
+WAIT_FOR_READY_2    7E
+WAIT_FOR_READY_3    94
+WAIT_FOR_READY_4    A8
+WAIT_FOR_READY_5    CC
+WAIT_FOR_READY_6    E0
+WAIT_FOR_READY_7    10E
+WAIT_FOR_READY_8    120
+WAIT_FOR_READY_9    134
