@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 29/03/2021 12:26:17
+Created On: 29/03/2021 12:36:02
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : MDFmon 
@@ -101,7 +101,7 @@ Created On: 29/03/2021 12:26:17
 00000068  13FC 0001 00E00000        97      MOVE.B #1,DISPLAY
 00000070                            98      
 00000070                            99      
-00000070  41F9 00000150            100      LEA VERSION,A0
+00000070  41F9 000001D4            100      LEA VERSION,A0
 00000076                           101m     PRINT_STR D0,A0                       
 00000094                           102m     PRINT_CHAR D0,#13               ; CR
 000000A8                           103m     PRINT_CHAR D0,#10               ; LF
@@ -125,14 +125,33 @@ Created On: 29/03/2021 12:26:17
 00000120                           121m     PRINT_CHAR D0,#13               ; CR
 00000134                           122m     PRINT_CHAR D0,#10               ; LF
 00000148                           123      
-00000148  4EF8 00C4                124      JMP MAIN_LOOP
-0000014C                           125      
-0000014C  FFFF FFFF                126      SIMHALT                         ; halt simulator
-00000150                           127  
-00000150                           128  ; strings
-00000150= 4D 44 46 6D 6F 6E ...    129  VERSION DC.B 'MDFmon V1.0',13,10,0
-0000015E                           130      
-0000015E                           131      END    START                    ; last line of source
+00000148  B23C 0056                124      CMP.B #'V',D1
+0000014C  6700 0032                125      BEQ V
+00000150                           126  
+00000150  B23C 0048                127      CMP.B #'H',D1
+00000154  6700 0052                128      BEQ H
+00000158                           129      
+00000158  41F9 000001F6            130      LEA HUH,A0
+0000015E                           131m     PRINT_STR D0,A0                       
+0000017C                           132  
+0000017C  4EF8 00C4                133      JMP MAIN_LOOP
+00000180                           134  
+00000180  41F9 000001D4            135  V   LEA VERSION,A0
+00000186                           136m     PRINT_STR D0,A0       
+000001A4  4EF8 00C4                137      JMP MAIN_LOOP
+000001A8                           138      
+000001A8  41F9 000001E2            139  H   LEA HELP,A0
+000001AE                           140m     PRINT_STR D0,A0       
+000001CC  4EF8 00C4                141      JMP MAIN_LOOP
+000001D0                           142      
+000001D0  FFFF FFFF                143      SIMHALT                         ; halt simulator
+000001D4                           144  
+000001D4                           145  ; strings
+000001D4= 4D 44 46 6D 6F 6E ...    146  VERSION DC.B 'MDFmon V1.0',13,10,0
+000001E2= 48 28 65 6C 70 29 ...    147  HELP    DC.B 'H(elp)',13,10,'V(ersion)',13,10,0
+000001F6= 48 75 68 3F 0D 0A 00     148  HUH     DC.B 'Huh?',13,10,0
+000001FD                           149      
+000001FD                           150      END    START                    ; last line of source
 
 No errors detected
 No warnings generated
@@ -182,13 +201,26 @@ DUART_TXA_          3
 DUART_TXB           D00017
 DUART_TXB_          B
 EXIT_1              94
+EXIT_10             17C
+EXIT_12             1A4
+EXIT_14             1CC
+H                   1A8
+HELP                1E2
+HUH                 1F6
 LOOP_1              76
+LOOP_10             15E
+LOOP_12             186
+LOOP_14             1AE
 MAIN_LOOP           C4
 PRINT_CHAR          0
 PRINT_STR           142
 START               8
-VERSION             150
+V                   180
+VERSION             1D4
 WAIT_FOR_INPUT      F4
+WAIT_FOR_READY_11   166
+WAIT_FOR_READY_13   18E
+WAIT_FOR_READY_15   1B6
 WAIT_FOR_READY_2    7E
 WAIT_FOR_READY_3    94
 WAIT_FOR_READY_4    A8

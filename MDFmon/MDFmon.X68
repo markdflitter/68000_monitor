@@ -121,12 +121,31 @@ WAIT_FOR_INPUT
     PRINT_CHAR D0,#13               ; CR
     PRINT_CHAR D0,#10               ; LF
     
+    CMP.B #'V',D1
+    BEQ V
+
+    CMP.B #'H',D1
+    BEQ H
+    
+    LEA HUH,A0
+    PRINT_STR D0,A0                       
+
+    JMP MAIN_LOOP
+
+V   LEA VERSION,A0
+    PRINT_STR D0,A0       
+    JMP MAIN_LOOP
+    
+H   LEA HELP,A0
+    PRINT_STR D0,A0       
     JMP MAIN_LOOP
     
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDFmon V1.0',13,10,0
+VERSION DC.B 'MDFmon V1.1',13,10,0
+HELP    DC.B 'H(elp)',13,10,'V(ersion)',13,10,0
+HUH     DC.B 'Huh?',13,10,0
     
     END    START                    ; last line of source
 
