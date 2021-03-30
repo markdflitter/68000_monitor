@@ -4,12 +4,16 @@
 * Date       : March 2021
 * Description: 68000 monitor program
 *-----------------------------------------------------------
+; to do
+
+DEBUG               EQU 0
+
 ; constants
 DISPLAY_BASE        EQU $E00000
 DISPLAY_            EQU $0
 DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_
 
-DUART_BASE          EQU $D00000
+DUART_BASE          EQU $D30000
 DUART_MRA_          EQU $0
 DUART_CSRA_         EQU $1
 DUART_SRA_          EQU $1
@@ -50,97 +54,118 @@ DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_+1
 DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_+1
 DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_+1
 
-;MACROs
-PRINT_CHAR MACRO                  ; \1 = register to use for status poll, \2 = char to send
+; macros
+; convert top 4 bits of input register from binary to a single hex digit
+; the input register is changed during the process
+; \1 input data register containing binary number,  \2 data register for return value, \3 working address register
+BIN2HEX MACRO
+  LEA BIN2HEX_LUT,\3                ; load the lookup table
+  ROL.L #4,\1                       ; shift the top 4 bits down to bottom of the register the and mask off everything else
+  MOVE.B \1,\2
+  ANDI.B #$F,\2
+  MOVE.B 0(\3,\2),\2                ; use that as an index into the LUT
+  ENDM
+
+; convert single hex digit to 4 bit binary number in LSbits
+; the input register is changed during the process
+; \1 data register containing hex character, \2 data register for return value, \3 working address register
+HEX2BIN MACRO
+  LEA HEX2BIN_LUT,\3                  ; load the lookup table
+  SUB.B #'0',\1                       ; work out offset and mask off anything rogue
+  MOVE.B 0(\3,\1),\2                  ; use that as an index into the LUT      
+  ENDM
+
+; send a single char to the serial port
+; \1 = char to send, \2 = data register to use for status poll
+; will stamp on D3 and D2 in debug mode
+PRINT_CHAR MACRO
 WAIT_FOR_READY\@                  ; wait until the there is space to send
-  MOVE.B DUART_SRA,\1             ; read status register
-  BTST #2,\1                      ; check for space to send
-  BEQ WAIT_FOR_READY\@            ; no space, check again
-  MOVE.B \2,DUART_TXA             ; send the next character
-  ENDM
+    IFEQ DEBUG
+      MOVE.B DUART_SRA,\2           ; read status register
+      BTST #2,\2                    ; check for space to send
+      BEQ WAIT_FOR_READY\@          ; no space, check again
+      MOVE.B \1,DUART_TXA           ; send the next character
+    ENDC
+    
+    IFNE DEBUG
+      MOVE.B \1,D1
+      MOVE.L #6,D0   
+      TRAP #15                      ; write to terminal in simulator
+    ENDC
 
-PRINT_STR MACRO                   ; \1 = register to use for status poll, \2 = register containing address of zero terminated string
+    ENDM
+
+; send CR,LF to the serial port
+; \1 = data register to use for status poll
+PRINT_CRLF MACRO                  
+    PRINT_CHAR #13,\1             ; CR
+    PRINT_CHAR #10,\1             ; LF
+    ENDM
+
+; send C-style, zero terminated string to the serial port
+; \1 = address register containing address of zero terminated string, \2 = data register to use for status poll, 
+PRINT_STR MACRO
 LOOP\@
-  CMP.B #0,(\2)                   ; 0 -> done
-  BEQ EXIT\@
-  PRINT_CHAR \1,(\2)+
-  JMP LOOP\@
+    CMP.B #0,(\1)                 ; 0 -> done
+    BEQ EXIT\@
+    PRINT_CHAR (\1)+,\2
+    JMP LOOP\@
 EXIT\@
-  ENDM
+    ENDM
   
-PRINT_REG MACRO                ; \1 = register to use for status poll, \2 = register containing binary number - will be destroyed!, \3 = working data register, \4 working address register
-  LEA LUT,\4
+; send the contents of a data register to the serial port as a 8 digit hex number
+; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register, 
+PRINT_REG MACRO
+    MOVE.L #7,\4                ; loop round all 8 hex characters of 4 bits each
+LOOP\@
+    BIN2HEX \1,\3,\5
+    PRINT_CHAR \3,\2
+    DBEQ \4,LOOP\@
+    ENDM
+  
+; read a char from the serial port
+; \ 1= data register for read char, \2 = register to use for status poll
+; will stamp on D3 and D2 in debug mode
+READ_CHAR MACRO
+WAIT_FOR_READY\@                  ; wait until the there is space to send
 
-  MOVE.L \2,\3
-  LSR.L #8,\3
-  LSR.L #8,\3
-  LSR.L #8,\3
-  LSR.L #4,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
+    IFEQ DEBUG
+      MOVE.B DUART_SRA,\2         ; read status register
+      BTST #0,\2                    ; check for character
+      BEQ WAIT_FOR_READY\@          ; nothing, check again
+    ENDC
 
-  MOVE.L \2,\3
-  LSR.L #8,\3
-  LSR.L #8,\3
-  LSR.L #8,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
-  
-  MOVE.L \2,\3
-  LSR.L #8,\3
-  LSR.L #8,\3
-  LSR.L #4,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
-  
-  MOVE.L \2,\3
-  LSR.L #8,\3
-  LSR.L #8,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
+    IFEQ DEBUG
+      MOVE.B DUART_RXA,\1         ; got a character, read it
+    ENDC
+    IFNE DEBUG
+      MOVE.L #5,D0    
+      TRAP #15                    ; read from keyboard in simulator
+      MOVE.L D1,\1
+    ENDC
+     
+    CMP.B #$1B,\1                 ; check for escape and go to start
+    BEQ RESTART
 
-  MOVE.L \2,\3
-  LSR.L #8,\3
-  LSR.L #4,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
+    IFEQ DEBUG
+      PRINT_CHAR \1,\2            ; echo it back
+    ENDC
+    ENDM
 
-  MOVE.L \2,\3
-  LSR.L #8,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
-
-  MOVE.L \2,\3
-  LSR.L #4,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
-
-  MOVE.L \2,\3
-  ANDI #$F,\3
-  
-  MOVE.B 0(\4,\3),\3
-  PRINT_CHAR \1,\3
-
-  ENDM
+; register catalogue
+; D0 - used for simulator I/O
+; D1 - used for simulator I/O
+; D3 - serial port status poll / task for TRAP in simulator
+; D4 - read character
+; D5 - byte to W
+; D6 - working register used in R/W
+; D7 - address accumulator
+; A0 - address of string to print / address for R or W
 
 ; start vector
     ORG  $0
-    DC.L $00000000
-    DC.L $00000000 
+    DC.L $00000000              ; PC
+    DC.L $00000000              ; SP
     
 ; start of program  
 START
@@ -166,196 +191,149 @@ START
     MOVE.B #1,DISPLAY
        
     LEA VERSION,A0
-    PRINT_STR D0,A0                       
-    PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
+    PRINT_STR A0,D3
+    PRINT_CRLF D3
+    PRINT_CHAR #7,D3
     
-    MOVE #0,D2                      ; address accumuulator
+    MOVE.L #0,D7                    ; address accumulator
 
     MOVE.B #2,DISPLAY
 MAIN_LOOP
     MOVE.B #3,DISPLAY
 
-WAIT_FOR_INPUT
+    PRINT_CHAR #'>',D3               ; prompt
+    PRINT_CHAR #32,D3                ; space
+    
+GET_INPUT
     MOVE.B #4,DISPLAY
 
-    MOVE.B DUART_SRA,D0             ; read status register
-    BTST #0,D0                      ; check for character
-    BEQ WAIT_FOR_INPUT              ; nothing, check again
-
-    MOVE.B DUART_RXA,D1             ; got a character, read it
-    PRINT_CHAR D0,D1                ; echo it back
-
-    CMP.B #'H',D1
-    BEQ H
-
-    CMP.B #'V',D1
-    BEQ V
+    READ_CHAR D4,D3                  ; fetch character from serial port -> D4
     
-    CMP.B #'R',D1
-    BEQ R
-
-    CMP.B #'W',D1
+    CMP.B #'0',D4
+    BEQ HEX_DIGIT
+    CMP.B #'1',D4
+    BEQ HEX_DIGIT
+    CMP.B #'2',D4
+    BEQ HEX_DIGIT
+    CMP.B #'3',D4
+    BEQ HEX_DIGIT
+    CMP.B #'4',D4
+    BEQ HEX_DIGIT
+    CMP.B #'5',D4
+    BEQ HEX_DIGIT
+    CMP.B #'6',D4
+    BEQ HEX_DIGIT
+    CMP.B #'7',D4
+    BEQ HEX_DIGIT
+    CMP.B #'8',D4
+    BEQ HEX_DIGIT
+    CMP.B #'9',D4
+    BEQ HEX_DIGIT
+    CMP.B #'A',D4
+    BEQ HEX_DIGIT
+    CMP.B #'B',D4
+    BEQ HEX_DIGIT
+    CMP.B #'C',D4
+    BEQ HEX_DIGIT
+    CMP.B #'D',D4
+    BEQ HEX_DIGIT
+    CMP.B #'E',D4
+    BEQ HEX_DIGIT
+    CMP.B #'F',D4
+    BEQ HEX_DIGIT
+    
+    CMP.B #'W',D4
     BEQ W
 
-    CMP.B #'S',D1
+    PRINT_CRLF D3
+ 
+    CMP.B #'?',D4
+    BEQ H
+
+    CMP.B #'V',D4
+    BEQ V
+    
+    CMP.B #'R',D4
+    BEQ R
+
+    CMP.B #'S',D4
     BEQ S
 
-    CMP.B #'G',D1
-    BEQ G
+    CMP.B #'G',D4
+    BEQ G   
 
-    CMP.B #'0',D1
-    BEQ DIGIT
-    CMP.B #'1',D1
-    BEQ DIGIT
-    CMP.B #'2',D1
-    BEQ DIGIT
-    CMP.B #'3',D1
-    BEQ DIGIT
-    CMP.B #'4',D1
-    BEQ DIGIT
-    CMP.B #'5',D1
-    BEQ DIGIT
-    CMP.B #'6',D1
-    BEQ DIGIT
-    CMP.B #'7',D1
-    BEQ DIGIT
-    CMP.B #'8',D1
-    BEQ DIGIT
-    CMP.B #'9',D1
-    BEQ DIGIT
-    
-    CMP.B #'A',D1
-    BEQ HEX_DIGIT
-    CMP.B #'B',D1
-    BEQ HEX_DIGIT
-    CMP.B #'C',D1
-    BEQ HEX_DIGIT
-    CMP.B #'D',D1
-    BEQ HEX_DIGIT
-    CMP.B #'E',D1
-    BEQ HEX_DIGIT
-    CMP.B #'F',D1
-    BEQ HEX_DIGIT
-
-    PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
     LEA HUH,A0
-    PRINT_STR D0,A0
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
+    PRINT_STR A0,D3
                        
     JMP MAIN_LOOP
 
+RESTART
+    PRINT_CRLF D3
+    JMP START
+
 ; commands
-H   PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF       
-    LEA HELP,A0
-    PRINT_STR D0,A0
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
+H   LEA HELP,A0
+    PRINT_STR A0,D3
     JMP MAIN_LOOP
 
-V   PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    LEA VERSION,A0
-    PRINT_STR D0,A0       
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
+V   LEA VERSION,A0
+    PRINT_STR A0,D3       
     JMP MAIN_LOOP
     
-R   PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    MOVE.L D2,A0
-    MOVE.L (A0),D1
-    PRINT_REG D0,D1,D2,A0
-    MOVE #0,A0
-    MOVE #0,D2
-    PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
+R   MOVE.L D7,A0                    ; address accumulator -> address register
+    MOVE.L (A0),D4                  ; read the memory and print it
+    PRINT_REG D4,D3,D7,D6,A0
+    PRINT_CRLF D3
+    MOVE.L #0,D7                    ; clear the now used address accumulator
+    JMP MAIN_LOOP
+
+W   MOVE.L #0,D5                    ; D5 will be the value to write            
+
+    READ_CHAR D4,D3                 ; read most significant character -> D4
+    HEX2BIN D4,D4,A0                ; convert to binary -> D4
+    MOVE.B D4,D5                    ; put at bottom of D5
+
+    MOVE #6,D6                      ; 7 bytes left to read
     
-    JMP MAIN_LOOP
-
-W   PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    MOVE.L #0,D3                
-READ_DIGIT1
-    MOVE.B DUART_SRA,D0             ; read status register
-    BTST #0,D0                      ; check for character
-    BEQ READ_DIGIT1                 ; nothing, check again
-
-    MOVE.B DUART_RXA,D1             ; got a character, read it
-    PRINT_CHAR D0,D1                ; echo it back
-    SUB.B #'0',D1
-    ANDI #$F,D1
-    OR.B D1,D3
-READ_DIGIT2
-    MOVE.B DUART_SRA,D0             ; read status register
-    BTST #0,D0                      ; check for character
-    BEQ READ_DIGIT2                 ; nothing, check again
-
-    MOVE.B DUART_RXA,D1             ; got a character, read it
-    PRINT_CHAR D0,D1                ; echo it back
-    LSL.L #4,D2                     ; add the next digit in the next 4 bits
-    SUB.B #'0',D1
-    ANDI #$F,D1
-    OR.B D1,D3
-
-    MOVE.L D0,A0
-    MOVE (A0),D0
-    MOVE #0,A0
-    MOVE #0,D0
-
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
-    JMP MAIN_LOOP
-
-S   PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    LEA UNIMP,A0
-    PRINT_STR D0,A0       
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
-    JMP MAIN_LOOP
-
-G   PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    LEA UNIMP,A0
-    PRINT_STR D0,A0
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
-    JMP MAIN_LOOP
+READ_DATA
+    LSL.L #4,D5                     ; make what we have so far more significant
+    READ_CHAR D4,D3                 ; next character -> D4
+    HEX2BIN D4,D4,A0                ; convert to binary -> D4
+    OR.B D4,D5
+    ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
+    DBEQ D6,READ_DATA
     
-DIGIT
-    LSL.L #4,D2             ; add the next digit in the next 4 bits
-    SUB.B #'0',D1
-    ANDI #$F,D1
-    OR.B D1,D2
+    MOVE.L D7,A0                    ; address accumulator -> address register
+    MOVE.L #0,D7                    ; clear the now used address accumulator
+    MOVE.L D5,(A0)                  ; write the byte
+
+    PRINT_CRLF D3
     JMP MAIN_LOOP
-    
+
+S   READ_CHAR D4,D3                  ; fetch character from serial port -> D4
+    JMP S
+
+G   MOVE.L D7,A0                    ; address accumulator -> address register
+    MOVE #0,D7                      ; clear the now used address accumulator
+    JMP (A0)                        ; jump to it!
+        
 HEX_DIGIT
-    LSL.L #4,D2
-    SUB.B #'A',D1
-    ADD.B #10,D1
-    ANDI #$F,D1
-    OR.B D1,D2
-    JMP MAIN_LOOP
+    LSL.L #4,D7                    ; add the next digit in the next 4 bits
+    HEX2BIN D4,D4,A0
+    OR.L D4,D7
+    JMP GET_INPUT
 
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.2 (29/03/2021)',13,10,0
-HELP    DC.B 'H(elp)',13,10,'V(ersion)',13,10,'nnnnnnnnR(ead)',13,10,'nnnnnnnnW(rite)nn',13,10,'S(records)',13,10,'nnnnnnnnG(o)',13,10,0
+VERSION DC.B 'MDF-mon V1.3 (30/03/2021)',13,10,0
+HELP    DC.B '?',13,10,'V(ersion)',13,10,'nnnnnnnnR(ead)',13,10,'nnnnnnnnW(rite)nn',13,10,'S(records)',13,10,'nnnnnnnnG(o)',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
-LUT     DC.B '0123456789ABCDEF'
+BIN2HEX_LUT DC.B '0123456789ABCDEF'
+HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
-
 
 
 
