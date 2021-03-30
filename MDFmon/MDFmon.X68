@@ -5,6 +5,8 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; WRITE doesn't seem to work for reals - it writes to the correct place, but the wrong data
+; can do WWWWW in the input loop - it doesn't validate
 
 DEBUG               EQU 0
 
@@ -170,7 +172,7 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
 ; start of program  
 START
     MOVE.B #0,DISPLAY
-
+   
 ;initialise UART
     MOVE.B #$0,DUART_ACR            
     MOVE.B #$0,DUART_IMR            ; no interrupts, please            
@@ -188,25 +190,22 @@ START
     MOVE.B #$BB,DUART_CSRB          ; 9600 baud
     MOVE.B #$5,DUART_CRB            ; enable rx & tx
 
+WARM_START
     MOVE.B #1,DISPLAY
        
     LEA VERSION,A0
     PRINT_STR A0,D3
     PRINT_CRLF D3
     PRINT_CHAR #7,D3
-    
+
     MOVE.L #0,D7                    ; address accumulator
 
     MOVE.B #2,DISPLAY
 MAIN_LOOP
-    MOVE.B #3,DISPLAY
-
     PRINT_CHAR #'>',D3               ; prompt
     PRINT_CHAR #32,D3                ; space
     
 GET_INPUT
-    MOVE.B #4,DISPLAY
-
     READ_CHAR D4,D3                  ; fetch character from serial port -> D4
     
     CMP.B #'0',D4
@@ -269,7 +268,7 @@ GET_INPUT
 
 RESTART
     PRINT_CRLF D3
-    JMP START
+    JMP WARM_START
 
 ; commands
 H   LEA HELP,A0
@@ -305,7 +304,7 @@ READ_DATA
     
     MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE.L #0,D7                    ; clear the now used address accumulator
-    MOVE.L D5,(A0)                  ; write the byte
+    MOVE.L D5,(A0)                  ; write the data
 
     PRINT_CRLF D3
     JMP MAIN_LOOP
@@ -326,8 +325,8 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.3 (30/03/2021)',13,10,0
-HELP    DC.B '?',13,10,'V(ersion)',13,10,'nnnnnnnnR(ead)',13,10,'nnnnnnnnW(rite)nn',13,10,'S(records)',13,10,'nnnnnnnnG(o)',13,10,0
+VERSION DC.B 'MDF-mon V1.4 (30/03/2021)',13,10,0
+HELP    DC.B '? Help',13,10,'V Version',13,10,'nnnnnnnnR Read',13,10,'nnnnnnnnWnn Write',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
