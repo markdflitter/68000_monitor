@@ -67,6 +67,75 @@ LOOP\@
   JMP LOOP\@
 EXIT\@
   ENDM
+  
+PRINT_REG MACRO                ; \1 = register to use for status poll, \2 = register containing binary number - will be destroyed!, \3 = working data register, \4 working address register
+  LEA LUT,\4
+
+  MOVE.L \2,\3
+  LSR.L #8,\3
+  LSR.L #8,\3
+  LSR.L #8,\3
+  LSR.L #4,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+
+  MOVE.L \2,\3
+  LSR.L #8,\3
+  LSR.L #8,\3
+  LSR.L #8,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+  
+  MOVE.L \2,\3
+  LSR.L #8,\3
+  LSR.L #8,\3
+  LSR.L #4,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+  
+  MOVE.L \2,\3
+  LSR.L #8,\3
+  LSR.L #8,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+
+  MOVE.L \2,\3
+  LSR.L #8,\3
+  LSR.L #4,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+
+  MOVE.L \2,\3
+  LSR.L #8,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+
+  MOVE.L \2,\3
+  LSR.L #4,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+
+  MOVE.L \2,\3
+  ANDI #$F,\3
+  
+  MOVE.B 0(\4,\3),\3
+  PRINT_CHAR \1,\3
+
+  ENDM
 
 ; start vector
     ORG  $0
@@ -95,19 +164,19 @@ START
     MOVE.B #$5,DUART_CRB            ; enable rx & tx
 
     MOVE.B #1,DISPLAY
-    
-    
+       
     LEA VERSION,A0
     PRINT_STR D0,A0                       
     PRINT_CHAR D0,#13               ; CR
     PRINT_CHAR D0,#10               ; LF
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
+    
+    MOVE #0,D2                      ; address accumuulator
 
     MOVE.B #2,DISPLAY
 MAIN_LOOP
     MOVE.B #3,DISPLAY
-
-    PRINT_CHAR D0,#62               ; prompt
-    PRINT_CHAR D0,#32               ; space
 
 WAIT_FOR_INPUT
     MOVE.B #4,DISPLAY
@@ -118,36 +187,178 @@ WAIT_FOR_INPUT
 
     MOVE.B DUART_RXA,D1             ; got a character, read it
     PRINT_CHAR D0,D1                ; echo it back
-    PRINT_CHAR D0,#13               ; CR
-    PRINT_CHAR D0,#10               ; LF
-    
-    CMP.B #'V',D1
-    BEQ V
 
     CMP.B #'H',D1
     BEQ H
+
+    CMP.B #'V',D1
+    BEQ V
     
+    CMP.B #'R',D1
+    BEQ R
+
+    CMP.B #'W',D1
+    BEQ W
+
+    CMP.B #'S',D1
+    BEQ S
+
+    CMP.B #'G',D1
+    BEQ G
+
+    CMP.B #'0',D1
+    BEQ DIGIT
+    CMP.B #'1',D1
+    BEQ DIGIT
+    CMP.B #'2',D1
+    BEQ DIGIT
+    CMP.B #'3',D1
+    BEQ DIGIT
+    CMP.B #'4',D1
+    BEQ DIGIT
+    CMP.B #'5',D1
+    BEQ DIGIT
+    CMP.B #'6',D1
+    BEQ DIGIT
+    CMP.B #'7',D1
+    BEQ DIGIT
+    CMP.B #'8',D1
+    BEQ DIGIT
+    CMP.B #'9',D1
+    BEQ DIGIT
+    
+    CMP.B #'A',D1
+    BEQ HEX_DIGIT
+    CMP.B #'B',D1
+    BEQ HEX_DIGIT
+    CMP.B #'C',D1
+    BEQ HEX_DIGIT
+    CMP.B #'D',D1
+    BEQ HEX_DIGIT
+    CMP.B #'E',D1
+    BEQ HEX_DIGIT
+    CMP.B #'F',D1
+    BEQ HEX_DIGIT
+
+    PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
     LEA HUH,A0
-    PRINT_STR D0,A0                       
-
+    PRINT_STR D0,A0
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
+                       
     JMP MAIN_LOOP
 
-V   LEA VERSION,A0
+; commands
+H   PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF       
+    LEA HELP,A0
+    PRINT_STR D0,A0
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
+    JMP MAIN_LOOP
+
+V   PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
+    LEA VERSION,A0
     PRINT_STR D0,A0       
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
     JMP MAIN_LOOP
     
-H   LEA HELP,A0
+R   PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
+    MOVE.L D2,A0
+    MOVE.L (A0),D1
+    PRINT_REG D0,D1,D2,A0
+    MOVE #0,A0
+    MOVE #0,D2
+    PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
+    
+    JMP MAIN_LOOP
+
+W   PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
+    MOVE.L #0,D3                
+READ_DIGIT1
+    MOVE.B DUART_SRA,D0             ; read status register
+    BTST #0,D0                      ; check for character
+    BEQ READ_DIGIT1                 ; nothing, check again
+
+    MOVE.B DUART_RXA,D1             ; got a character, read it
+    PRINT_CHAR D0,D1                ; echo it back
+    SUB.B #'0',D1
+    ANDI #$F,D1
+    OR.B D1,D3
+READ_DIGIT2
+    MOVE.B DUART_SRA,D0             ; read status register
+    BTST #0,D0                      ; check for character
+    BEQ READ_DIGIT2                 ; nothing, check again
+
+    MOVE.B DUART_RXA,D1             ; got a character, read it
+    PRINT_CHAR D0,D1                ; echo it back
+    LSL.L #4,D2                     ; add the next digit in the next 4 bits
+    SUB.B #'0',D1
+    ANDI #$F,D1
+    OR.B D1,D3
+
+    MOVE.L D0,A0
+    MOVE (A0),D0
+    MOVE #0,A0
+    MOVE #0,D0
+
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
+    JMP MAIN_LOOP
+
+S   PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
+    LEA UNIMP,A0
     PRINT_STR D0,A0       
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
+    JMP MAIN_LOOP
+
+G   PRINT_CHAR D0,#13               ; CR
+    PRINT_CHAR D0,#10               ; LF
+    LEA UNIMP,A0
+    PRINT_STR D0,A0
+    PRINT_CHAR D0,#62               ; prompt
+    PRINT_CHAR D0,#32               ; space
     JMP MAIN_LOOP
     
+DIGIT
+    LSL.L #4,D2             ; add the next digit in the next 4 bits
+    SUB.B #'0',D1
+    ANDI #$F,D1
+    OR.B D1,D2
+    JMP MAIN_LOOP
+    
+HEX_DIGIT
+    LSL.L #4,D2
+    SUB.B #'A',D1
+    ADD.B #10,D1
+    ANDI #$F,D1
+    OR.B D1,D2
+    JMP MAIN_LOOP
+
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDFmon V1.1',13,10,0
-HELP    DC.B 'H(elp)',13,10,'V(ersion)',13,10,0
+VERSION DC.B 'MDF-mon V1.2 (29/03/2021)',13,10,0
+HELP    DC.B 'H(elp)',13,10,'V(ersion)',13,10,'nnnnnnnnR(ead)',13,10,'nnnnnnnnW(rite)nn',13,10,'S(records)',13,10,'nnnnnnnnG(o)',13,10,0
 HUH     DC.B 'Huh?',13,10,0
+UNIMP   DC.B 'Unimplemented',13,10,0
+LUT     DC.B '0123456789ABCDEF'
     
     END    START                    ; last line of source
+
+
+
+
 
 
 
