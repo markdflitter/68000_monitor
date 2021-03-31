@@ -289,8 +289,6 @@ RESTART
     MOVE.B #$BB,DUART_CSRB          ; 9600 baud
     MOVE.B #$5,DUART_CRB            ; enable rx & tx
 
-
-
     JMP WARM_START
 
 ; commands
@@ -303,13 +301,8 @@ V   LEA VERSION,A0
     JMP MAIN_LOOP
     
 R   
-    PRINT_REG D7,D3,D2,D6,A0
-    PRINT_CRLF D3
     MOVE.L D7,A0                    ; address accumulator -> address register
-    MOVE.W (A0),D5                  ; read the memory and print it
-    AND.L #$FFFF,D5
-    PRINT_REG D7,D3,D2,D6,A0
-    PRINT_CRLF D3
+    MOVE.L (A0),D5                  ; read the memory and print it
     PRINT_REG D5,D3,D7,D6,A0
     PRINT_CRLF D3
     MOVE.L #0,D7                    ; clear the now used address accumulator
@@ -321,23 +314,16 @@ W   MOVE.L #0,D5                    ; D5 will be the value to write
     HEX2BIN D4,D4,A0                ; convert to binary -> D4
     MOVE.B D4,D5                    ; put at bottom of D5
 
-    ;MOVE #6,D6                      ; 7 bytes left to read
+    MOVE #6,D6                      ; 7 bytes left to read
     
 READ_DATA
-    ;LSL.L #4,D5                     ; make what we have so far more significant
-    ;READ_CHAR D4,D3                 ; next character -> D4
-    ;HEX2BIN D4,D4,A0                ; convert to binary -> D4
-    ;OR.B D4,D5
-    ;ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
-    ;DBEQ D6,READ_DATA
+    LSL.L #4,D5                     ; make what we have so far more significant
+    READ_CHAR D4,D3                 ; next character -> D4
+    HEX2BIN D4,D4,A0                ; convert to binary -> D4
+    OR.B D4,D5
+    ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
+    DBEQ D6,READ_DATA
     
-    PRINT_CRLF D3
-    PRINT_REG D7,D3,D2,D6,A1
-    PRINT_CRLF D3
-    PRINT_REG D4,D3,D2,D6,A1
-    PRINT_CRLF D3
-    PRINT_REG D5,D3,D2,D6,A1
-
     MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE.L #0,D7                    ; clear the now used address accumulator
     
@@ -355,29 +341,15 @@ G   MOVE.L D7,A0                    ; address accumulator -> address register
         
 HEX_DIGIT
     LSL.L #4,D7                    ; add the next digit in the next 4 bits
-    PRINT_CRLF D3
-    PRINT_REG D7,D3,D2,D6,A1
-   
-    PRINT_CRLF D3
-    PRINT_REG D4,D3,D2,D6,A1
-
     HEX2BIN D4,D4,A0
-
-    PRINT_CRLF D3
-    PRINT_REG D4,D3,D2,D6,A1
-
-    OR.B D4,D7
-    
-    PRINT_CRLF D3
-    PRINT_REG D7,D3,D2,D6,A1
-  
+    OR.B D4,D7  
     JMP GET_INPUT
 
     SIMHALT                         ; halt simulator
 
 ; strings
 VERSION DC.B 'MDF-mon V1.5 (31/03/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'V Version',13,10,'nnnnnnnnR Read',13,10,'nnnnnnnnWnn Write',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
+HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'

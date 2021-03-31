@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 31/03/2021 10:32:05
+Created On: 31/03/2021 10:48:23
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : MDFmon 
@@ -198,7 +198,7 @@ Created On: 31/03/2021 10:32:05
 00000068                           194  WARM_START
 00000068  13FC 0001 00E00001       195      MOVE.B #1,DISPLAY
 00000070                           196         
-00000070  41F9 00000730            197      LEA VERSION,A0
+00000070  41F9 00000486            197      LEA VERSION,A0
 00000076                           198m     PRINT_STR A0,D3
 00000094                           199m     PRINT_CRLF D3
 000000BC                           200m     PRINT_CHAR #7,D3
@@ -214,40 +214,40 @@ Created On: 31/03/2021 10:32:05
 00000102                           210m     READ_CHAR D4,D3                  ; fetch character from serial port -> D4
 0000012E                           211      
 0000012E  B83C 0030                212      CMP.B #'0',D4
-00000132  6700 048C                213      BEQ HEX_DIGIT
+00000132  6700 0332                213      BEQ HEX_DIGIT
 00000136  B83C 0031                214      CMP.B #'1',D4
-0000013A  6700 0484                215      BEQ HEX_DIGIT
+0000013A  6700 032A                215      BEQ HEX_DIGIT
 0000013E  B83C 0032                216      CMP.B #'2',D4
-00000142  6700 047C                217      BEQ HEX_DIGIT
+00000142  6700 0322                217      BEQ HEX_DIGIT
 00000146  B83C 0033                218      CMP.B #'3',D4
-0000014A  6700 0474                219      BEQ HEX_DIGIT
+0000014A  6700 031A                219      BEQ HEX_DIGIT
 0000014E  B83C 0034                220      CMP.B #'4',D4
-00000152  6700 046C                221      BEQ HEX_DIGIT
+00000152  6700 0312                221      BEQ HEX_DIGIT
 00000156  B83C 0035                222      CMP.B #'5',D4
-0000015A  6700 0464                223      BEQ HEX_DIGIT
+0000015A  6700 030A                223      BEQ HEX_DIGIT
 0000015E  B83C 0036                224      CMP.B #'6',D4
-00000162  6700 045C                225      BEQ HEX_DIGIT
+00000162  6700 0302                225      BEQ HEX_DIGIT
 00000166  B83C 0037                226      CMP.B #'7',D4
-0000016A  6700 0454                227      BEQ HEX_DIGIT
+0000016A  6700 02FA                227      BEQ HEX_DIGIT
 0000016E  B83C 0038                228      CMP.B #'8',D4
-00000172  6700 044C                229      BEQ HEX_DIGIT
+00000172  6700 02F2                229      BEQ HEX_DIGIT
 00000176  B83C 0039                230      CMP.B #'9',D4
-0000017A  6700 0444                231      BEQ HEX_DIGIT
+0000017A  6700 02EA                231      BEQ HEX_DIGIT
 0000017E  B83C 0041                232      CMP.B #'A',D4
-00000182  6700 043C                233      BEQ HEX_DIGIT
+00000182  6700 02E2                233      BEQ HEX_DIGIT
 00000186  B83C 0042                234      CMP.B #'B',D4
-0000018A  6700 0434                235      BEQ HEX_DIGIT
+0000018A  6700 02DA                235      BEQ HEX_DIGIT
 0000018E  B83C 0043                236      CMP.B #'C',D4
-00000192  6700 042C                237      BEQ HEX_DIGIT
+00000192  6700 02D2                237      BEQ HEX_DIGIT
 00000196  B83C 0044                238      CMP.B #'D',D4
-0000019A  6700 0424                239      BEQ HEX_DIGIT
+0000019A  6700 02CA                239      BEQ HEX_DIGIT
 0000019E  B83C 0045                240      CMP.B #'E',D4
-000001A2  6700 041C                241      BEQ HEX_DIGIT
+000001A2  6700 02C2                241      BEQ HEX_DIGIT
 000001A6  B83C 0046                242      CMP.B #'F',D4
-000001AA  6700 0414                243      BEQ HEX_DIGIT
+000001AA  6700 02BA                243      BEQ HEX_DIGIT
 000001AE                           244      
 000001AE  B83C 0057                245      CMP.B #'W',D4
-000001B2  6700 0262                246      BEQ W
+000001B2  6700 01B4                246      BEQ W
 000001B6                           247  
 000001B6                           248m     PRINT_CRLF D3
 000001DE                           249   
@@ -261,12 +261,12 @@ Created On: 31/03/2021 10:32:05
 000001F2  6700 0116                257      BEQ R
 000001F6                           258  
 000001F6  B83C 0053                259      CMP.B #'S',D4
-000001FA  6700 038C                260      BEQ S
+000001FA  6700 0232                260      BEQ S
 000001FE                           261  
 000001FE  B83C 0047                262      CMP.B #'G',D4
-00000202  6700 03B4                263      BEQ G   
+00000202  6700 025A                263      BEQ G   
 00000206                           264  
-00000206  41F9 000007A7            265      LEA HUH,A0
+00000206  41F9 000004FD            265      LEA HUH,A0
 0000020C                           266m     PRINT_STR A0,D3
 0000022A                           267                         
 0000022A  4EF8 00DA                268      JMP MAIN_LOOP
@@ -293,101 +293,73 @@ Created On: 31/03/2021 10:32:05
 000002A6  13FC 00BB 00D30013       289      MOVE.B #$BB,DUART_CSRB          ; 9600 baud
 000002AE  13FC 0005 00D30015       290      MOVE.B #$5,DUART_CRB            ; enable rx & tx
 000002B6                           291  
-000002B6                           292  
-000002B6                           293  
-000002B6  4EF8 0068                294      JMP WARM_START
-000002BA                           295  
-000002BA                           296  ; commands
-000002BA  41F9 0000074C            297  H   LEA HELP,A0
-000002C0                           298m     PRINT_STR A0,D3
-000002DE  4EF8 00DA                299      JMP MAIN_LOOP
-000002E2                           300  
-000002E2  41F9 00000730            301  V   LEA VERSION,A0
-000002E8                           302m     PRINT_STR A0,D3       
-00000306  4EF8 00DA                303      JMP MAIN_LOOP
-0000030A                           304      
-0000030A                           305  R   
-0000030A                           306m     PRINT_REG D7,D3,D2,D6,A0
-00000336                           307m     PRINT_CRLF D3
-0000035E  2047                     308      MOVE.L D7,A0                    ; address accumulator -> address register
-00000360  3A10                     309      MOVE.W (A0),D5                  ; read the memory and print it
-00000362  CABC 0000FFFF            310      AND.L #$FFFF,D5
-00000368                           311m     PRINT_REG D7,D3,D2,D6,A0
-00000394                           312m     PRINT_CRLF D3
-000003BC                           313m     PRINT_REG D5,D3,D7,D6,A0
-000003E8                           314m     PRINT_CRLF D3
-00000410  7E00                     315      MOVE.L #0,D7                    ; clear the now used address accumulator
-00000412  4EF8 00DA                316      JMP MAIN_LOOP
-00000416                           317  
-00000416  7A00                     318  W   MOVE.L #0,D5                    ; D5 will be the value to write            
-00000418                           319  
-00000418                           320m     READ_CHAR D4,D3                 ; read most significant character -> D4
-00000444                           321m     HEX2BIN D4,D4,A0                ; convert to binary -> D4
-00000458  1A04                     322      MOVE.B D4,D5                    ; put at bottom of D5
-0000045A                           323  
-0000045A                           324      ;MOVE #6,D6                      ; 7 bytes left to read
-0000045A                           325      
-0000045A                           326  READ_DATA
-0000045A                           327      ;LSL.L #4,D5                     ; make what we have so far more significant
-0000045A                           328      ;READ_CHAR D4,D3                 ; next character -> D4
-0000045A                           329      ;HEX2BIN D4,D4,A0                ; convert to binary -> D4
-0000045A                           330      ;OR.B D4,D5
-0000045A                           331      ;ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
-0000045A                           332      ;DBEQ D6,READ_DATA
-0000045A                           333      
-0000045A                           334m     PRINT_CRLF D3
-00000482                           335m     PRINT_REG D7,D3,D2,D6,A1
-000004AE                           336m     PRINT_CRLF D3
-000004D6                           337m     PRINT_REG D4,D3,D2,D6,A1
-00000502                           338m     PRINT_CRLF D3
-0000052A                           339m     PRINT_REG D5,D3,D2,D6,A1
-00000556                           340  
-00000556  2047                     341      MOVE.L D7,A0                    ; address accumulator -> address register
-00000558  7E00                     342      MOVE.L #0,D7                    ; clear the now used address accumulator
-0000055A                           343      
-0000055A  2084                     344      MOVE.L D4,(A0)                  ; write the data
-0000055C                           345  
-0000055C                           346m     PRINT_CRLF D3
-00000584  4EF8 00DA                347      JMP MAIN_LOOP
-00000588                           348  
-00000588                           349m S   READ_CHAR D4,D3                  ; fetch character from serial port -> D4
-000005B4  4EF8 0588                350      JMP S
-000005B8                           351  
-000005B8  2047                     352  G   MOVE.L D7,A0                    ; address accumulator -> address register
-000005BA  3E3C 0000                353      MOVE #0,D7                      ; clear the now used address accumulator
-000005BE  4ED0                     354      JMP (A0)                        ; jump to it!
-000005C0                           355          
-000005C0                           356  HEX_DIGIT
-000005C0  E98F                     357      LSL.L #4,D7                    ; add the next digit in the next 4 bits
-000005C2                           358m     PRINT_CRLF D3
-000005EA                           359m     PRINT_REG D7,D3,D2,D6,A1
-00000616                           360     
-00000616                           361m     PRINT_CRLF D3
-0000063E                           362m     PRINT_REG D4,D3,D2,D6,A1
-0000066A                           363  
-0000066A                           364m     HEX2BIN D4,D4,A0
-0000067E                           365  
-0000067E                           366m     PRINT_CRLF D3
-000006A6                           367m     PRINT_REG D4,D3,D2,D6,A1
-000006D2                           368  
-000006D2  8E04                     369      OR.B D4,D7
-000006D4                           370      
-000006D4                           371m     PRINT_CRLF D3
-000006FC                           372m     PRINT_REG D7,D3,D2,D6,A1
-00000728                           373    
-00000728  4EF8 0102                374      JMP GET_INPUT
-0000072C                           375  
-0000072C  FFFF FFFF                376      SIMHALT                         ; halt simulator
-00000730                           377  
-00000730                           378  ; strings
-00000730= 4D 44 46 2D 6D 6F ...    379  VERSION DC.B 'MDF-mon V1.5 (31/03/2021)',13,10,0
-0000074C= 3F 20 48 65 6C 70 ...    380  HELP    DC.B '? Help',13,10,'V Version',13,10,'nnnnnnnnR Read',13,10,'nnnnnnnnWnn Write',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
-000007A7= 48 75 68 3F 0D 0A 00     381  HUH     DC.B 'Huh?',13,10,0
-000007AE= 55 6E 69 6D 70 6C ...    382  UNIMP   DC.B 'Unimplemented',13,10,0
-000007BE= 30 31 32 33 34 35 ...    383  BIN2HEX_LUT DC.B '0123456789ABCDEF'
-000007CE= 00 01 02 03 04 05 ...    384  HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-000007E5                           385      
-000007E5                           386      END    START                    ; last line of source
+000002B6  4EF8 0068                292      JMP WARM_START
+000002BA                           293  
+000002BA                           294  ; commands
+000002BA  41F9 000004A2            295  H   LEA HELP,A0
+000002C0                           296m     PRINT_STR A0,D3
+000002DE  4EF8 00DA                297      JMP MAIN_LOOP
+000002E2                           298  
+000002E2  41F9 00000486            299  V   LEA VERSION,A0
+000002E8                           300m     PRINT_STR A0,D3       
+00000306  4EF8 00DA                301      JMP MAIN_LOOP
+0000030A                           302      
+0000030A                           303  R   
+0000030A  2047                     304      MOVE.L D7,A0                    ; address accumulator -> address register
+0000030C  2A10                     305      MOVE.L (A0),D5                  ; read the memory and print it
+0000030E                           306m     PRINT_REG D5,D3,D7,D6,A0
+0000033A                           307m     PRINT_CRLF D3
+00000362  7E00                     308      MOVE.L #0,D7                    ; clear the now used address accumulator
+00000364  4EF8 00DA                309      JMP MAIN_LOOP
+00000368                           310  
+00000368  7A00                     311  W   MOVE.L #0,D5                    ; D5 will be the value to write            
+0000036A                           312  
+0000036A                           313m     READ_CHAR D4,D3                 ; read most significant character -> D4
+00000396                           314m     HEX2BIN D4,D4,A0                ; convert to binary -> D4
+000003AA  1A04                     315      MOVE.B D4,D5                    ; put at bottom of D5
+000003AC                           316  
+000003AC  3C3C 0006                317      MOVE #6,D6                      ; 7 bytes left to read
+000003B0                           318      
+000003B0                           319  READ_DATA
+000003B0  E98D                     320      LSL.L #4,D5                     ; make what we have so far more significant
+000003B2                           321m     READ_CHAR D4,D3                 ; next character -> D4
+000003DE                           322m     HEX2BIN D4,D4,A0                ; convert to binary -> D4
+000003F2  8A04                     323      OR.B D4,D5
+000003F4  023C 00FB                324      ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
+000003F8  57CE FFB6                325      DBEQ D6,READ_DATA
+000003FC                           326      
+000003FC  2047                     327      MOVE.L D7,A0                    ; address accumulator -> address register
+000003FE  7E00                     328      MOVE.L #0,D7                    ; clear the now used address accumulator
+00000400                           329      
+00000400  2084                     330      MOVE.L D4,(A0)                  ; write the data
+00000402                           331  
+00000402                           332m     PRINT_CRLF D3
+0000042A  4EF8 00DA                333      JMP MAIN_LOOP
+0000042E                           334  
+0000042E                           335m S   READ_CHAR D4,D3                  ; fetch character from serial port -> D4
+0000045A  4EF8 042E                336      JMP S
+0000045E                           337  
+0000045E  2047                     338  G   MOVE.L D7,A0                    ; address accumulator -> address register
+00000460  3E3C 0000                339      MOVE #0,D7                      ; clear the now used address accumulator
+00000464  4ED0                     340      JMP (A0)                        ; jump to it!
+00000466                           341          
+00000466                           342  HEX_DIGIT
+00000466  E98F                     343      LSL.L #4,D7                    ; add the next digit in the next 4 bits
+00000468                           344m     HEX2BIN D4,D4,A0
+0000047C  8E04                     345      OR.B D4,D7  
+0000047E  4EF8 0102                346      JMP GET_INPUT
+00000482                           347  
+00000482  FFFF FFFF                348      SIMHALT                         ; halt simulator
+00000486                           349  
+00000486                           350  ; strings
+00000486= 4D 44 46 2D 6D 6F ...    351  VERSION DC.B 'MDF-mon V1.5 (31/03/2021)',13,10,0
+000004A2= 3F 20 48 65 6C 70 ...    352  HELP    DC.B '? Help',13,10,'V Version',13,10,'nnnnnnnnR Read',13,10,'nnnnnnnnWnn Write',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
+000004FD= 48 75 68 3F 0D 0A 00     353  HUH     DC.B 'Huh?',13,10,0
+00000504= 55 6E 69 6D 70 6C ...    354  UNIMP   DC.B 'Unimplemented',13,10,0
+00000514= 30 31 32 33 34 35 ...    355  BIN2HEX_LUT DC.B '0123456789ABCDEF'
+00000524= 00 01 02 03 04 05 ...    356  HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
+0000053B                           357      
+0000053B                           358      END    START                    ; last line of source
 
 No errors detected
 No warnings generated
@@ -397,7 +369,7 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 BIN2HEX             0
-BIN2HEX_LUT         7BE
+BIN2HEX_LUT         514
 DEBUG               0
 DISPLAY             E00001
 DISPLAY_            0
@@ -443,28 +415,19 @@ EXIT_1              94
 EXIT_14             22A
 EXIT_19             2DE
 EXIT_21             306
-G                   5B8
+G                   45E
 GET_INPUT           102
 H                   2BA
-HELP                74C
+HELP                4A2
 HEX2BIN             12B
-HEX2BIN_LUT         7CE
-HEX_DIGIT           5C0
-HUH                 7A7
+HEX2BIN_LUT         524
+HEX_DIGIT           466
+HUH                 4FD
 LOOP_1              76
 LOOP_14             20C
 LOOP_19             2C0
 LOOP_21             2E8
-LOOP_23             30C
-LOOP_29             36A
-LOOP_35             3BE
-LOOP_47             484
-LOOP_53             4D8
-LOOP_59             52C
-LOOP_70             5EC
-LOOP_76             640
-LOOP_83             6A8
-LOOP_89             6FE
+LOOP_23             310
 MAIN_LOOP           DA
 PRINT_CHAR          258
 PRINT_CRLF          451
@@ -472,15 +435,15 @@ PRINT_REG           52D
 PRINT_STR           4AB
 R                   30A
 READ_CHAR           5D1
-READ_DATA           45A
+READ_DATA           3B0
 RESTART             22E
 RRRR                0
-S                   588
+S                   42E
 START               8
-UNIMP               7AE
+UNIMP               504
 V                   2E2
-VERSION             730
-W                   416
+VERSION             486
+W                   368
 WAIT_FOR_READY_10   11C
 WAIT_FOR_READY_12   1B6
 WAIT_FOR_READY_13   1CA
@@ -490,46 +453,21 @@ WAIT_FOR_READY_18   242
 WAIT_FOR_READY_2    7E
 WAIT_FOR_READY_20   2C8
 WAIT_FOR_READY_22   2F0
-WAIT_FOR_READY_25   320
-WAIT_FOR_READY_27   336
-WAIT_FOR_READY_28   34A
-WAIT_FOR_READY_31   37E
-WAIT_FOR_READY_33   394
-WAIT_FOR_READY_34   3A8
-WAIT_FOR_READY_37   3D2
-WAIT_FOR_READY_39   3E8
+WAIT_FOR_READY_25   324
+WAIT_FOR_READY_27   33A
+WAIT_FOR_READY_28   34E
+WAIT_FOR_READY_29   36A
+WAIT_FOR_READY_30   384
+WAIT_FOR_READY_32   3B2
+WAIT_FOR_READY_33   3CC
+WAIT_FOR_READY_36   402
+WAIT_FOR_READY_37   416
+WAIT_FOR_READY_38   42E
+WAIT_FOR_READY_39   448
 WAIT_FOR_READY_4    94
-WAIT_FOR_READY_40   3FC
-WAIT_FOR_READY_41   418
-WAIT_FOR_READY_42   432
-WAIT_FOR_READY_45   45A
-WAIT_FOR_READY_46   46E
-WAIT_FOR_READY_49   498
 WAIT_FOR_READY_5    A8
-WAIT_FOR_READY_51   4AE
-WAIT_FOR_READY_52   4C2
-WAIT_FOR_READY_55   4EC
-WAIT_FOR_READY_57   502
-WAIT_FOR_READY_58   516
 WAIT_FOR_READY_6    BC
-WAIT_FOR_READY_61   540
-WAIT_FOR_READY_63   55C
-WAIT_FOR_READY_64   570
-WAIT_FOR_READY_65   588
-WAIT_FOR_READY_66   5A2
-WAIT_FOR_READY_68   5C2
-WAIT_FOR_READY_69   5D6
 WAIT_FOR_READY_7    DA
-WAIT_FOR_READY_72   600
-WAIT_FOR_READY_74   616
-WAIT_FOR_READY_75   62A
-WAIT_FOR_READY_78   654
 WAIT_FOR_READY_8    EE
-WAIT_FOR_READY_81   67E
-WAIT_FOR_READY_82   692
-WAIT_FOR_READY_85   6BC
-WAIT_FOR_READY_87   6D4
-WAIT_FOR_READY_88   6E8
 WAIT_FOR_READY_9    102
-WAIT_FOR_READY_91   712
 WARM_START          68
