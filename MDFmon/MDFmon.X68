@@ -124,10 +124,10 @@ LOOP\@
     DBEQ \4,LOOP\@
     ENDM
   
-; read a char from the serial port
+; wait for a char from the serial port
 ; \ 1= data register for read char, \2 = register to use for status poll
 ; will stamp on D0 and D1 in debug mode
-READ_CHAR MACRO
+WAIT_CHAR MACRO
 WAIT_FOR_READY\@                  ; wait until the there is space to send
 
     IFEQ DEBUG
@@ -135,7 +135,18 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
       BTST #0,\2                    ; check for character
       BEQ WAIT_FOR_READY\@          ; nothing, check again
     ENDC
+    
+    READ_CHAR \1
 
+    IFEQ DEBUG
+      PRINT_CHAR \1,\2            ; echo it back
+    ENDC
+    ENDM
+    
+; read a char from the serial port - assumes that there is one!
+; \ 1= data register for read char
+; will stamp on D0 and D1 in debug mode
+READ_CHAR MACRO
     IFEQ DEBUG
       MOVE.B DUART_RXA,\1         ; got a character, read it
     ENDC
@@ -147,21 +158,24 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
      
     CMP.B #$1B,\1                 ; check for escape and go to start
     BEQ START
-
-    IFEQ DEBUG
-      PRINT_CHAR \1,\2            ; echo it back
-    ENDC
     ENDM
+    
     
 ; read data from the download serial port
 ; \ 1= data register for read char, \2 = register to use for status poll
 DOWNLOAD MACRO
 WAIT_FOR_READY\@                  ; wait until the there is space to send
 
+    MOVE.B DUART_SRA,\2           ; check for command
+    BTST #0,\2                    ; check for character
+    BEQ CONTINUE\@               ; nothing, continue
+ 
+    READ_CHAR \1
+CONTINUE\@
     MOVE.B DUART_SRB,\2         ; read status register
     BTST #0,\2                  ; check for character
     BEQ WAIT_FOR_READY\@        ; nothing, check again
-
+    
     MOVE.B DUART_RXB,\1         ; got a character, read it
     ENDM
 
@@ -171,10 +185,10 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
 ; D1 - used for simulator I/O
 ; D3 - serial port status poll / task for TRAP in simulator
 ; D4 - read character
-; D5 - data to write / data read
-; D6 - working register used in R/W
-; D7 - address accumulator
-; A0 - address of string to print / address for R or W
+; D5 - data to write / data read / count of Srecords read (reset after)
+; D6 - working register used in R/W and download
+; D7 - address accumulator / reset by download
+; A0 - address of string to print 
 
 ; start vector
     ORG  $0
@@ -244,7 +258,7 @@ MAIN_LOOP
     PRINT_CHAR #32,D3                ; space
     
 GET_INPUT
-    READ_CHAR D4,D3                  ; fetch character from serial port -> D4
+    WAIT_CHAR D4,D3                  ; fetch character from serial port -> D4
     
     CMP.B #'0',D4
     BEQ HEX_DIGIT
@@ -323,7 +337,7 @@ R
 
 W   MOVE.L #0,D5                    ; D5 will be the value to write            
 
-    READ_CHAR D4,D3                 ; read most significant character -> D4
+    WAIT_CHAR D4,D3                 ; read most significant character -> D4
     HEX2BIN D4,D4,A0                ; convert to binary -> D4
     MOVE.B D4,D5                    ; put at bottom of D5
 
@@ -331,7 +345,7 @@ W   MOVE.L #0,D5                    ; D5 will be the value to write
     
 READ_DATA_TO_POKE
     LSL.L #4,D5                     ; make what we have so far more significant
-    READ_CHAR D4,D3                 ; next character -> D4
+    WAIT_CHAR D4,D3                 ; next character -> D4
     HEX2BIN D4,D4,A0                ; convert to binary -> D4
     OR.B D4,D5
     ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
@@ -345,10 +359,28 @@ READ_DATA_TO_POKE
     PRINT_CRLF D3
     JMP MAIN_LOOP
 
-S   DOWNLOAD D4,D3
-    PRINT_CHAR D4,D3
-    JMP S
-
+S   MOVE.L #0,D5                    ; count of records read
+WAIT_FOR_SRECORD
+    DOWNLOAD D4,D3
+    MOVE.B D4,DISPLAY               ; set the display to the byte
+    CMP.B #'S',D4
+    BNE WAIT_FOR_SRECORD
+    
+    ADD.L #1,D5                     ; read another Srecord
+    
+    DOWNLOAD D4,D3
+    MOVE.B D4,DISPLAY               ; set the display to the byte
+    CMP.B #'8',D4                   ; termination record, exit
+    BNE WAIT_FOR_SRECORD
+    
+    PRINT_REG D5,D3,D7,D6,A0        ; print out n Srecords read
+    LEA READ,A0
+    PRINT_STR A0,D3
+    
+    MOVE.L #0,D7                   ; reset address accumulator that we trashed above
+    
+    JMP MAIN_LOOP
+    
 G   MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE #0,D7                      ; clear the now used address accumulator
     JMP (A0)                        ; jump to it!
@@ -366,6 +398,7 @@ VERSION DC.B 'MDF-mon V1.7 (31/03/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
+READ   DC.B ' S records read',13,10,0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
