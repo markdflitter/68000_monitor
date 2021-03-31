@@ -13,7 +13,7 @@ DEBUG               EQU 0
 ; constants
 DISPLAY_BASE        EQU $E00000
 DISPLAY_            EQU $0
-DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_
+DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_+1
 
 DUART_BASE          EQU $D30000
 DUART_MRA_          EQU $0
@@ -34,7 +34,7 @@ DUART_IVR_          EQU $C
 DUART_OPCR_         EQU $D
 DUART_SET_OPR_      EQU $E
 DUART_RESET_OPR_    EQU $F
-
+RRRR
 DUART_MRA           EQU DUART_BASE+2*DUART_MRA_+1
 DUART_SRA           EQU DUART_BASE+2*DUART_SRA_+1
 DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_+1
@@ -64,7 +64,7 @@ BIN2HEX MACRO
   LEA BIN2HEX_LUT,\3                ; load the lookup table
   ROL.L #4,\1                       ; shift the top 4 bits down to bottom of the register the and mask off everything else
   MOVE.B \1,\2
-  ANDI.B #$F,\2
+  ANDI.L #$F,\2
   MOVE.B 0(\3,\2),\2                ; use that as an index into the LUT
   ENDM
 
@@ -74,6 +74,7 @@ BIN2HEX MACRO
 HEX2BIN MACRO
   LEA HEX2BIN_LUT,\3                  ; load the lookup table
   SUB.B #'0',\1                       ; work out offset and mask off anything rogue
+  AND.L #$FF,\1                       ; ignore the top 3 bytes
   MOVE.B 0(\3,\1),\2                  ; use that as an index into the LUT      
   ENDM
 
@@ -159,7 +160,7 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
 ; D1 - used for simulator I/O
 ; D3 - serial port status poll / task for TRAP in simulator
 ; D4 - read character
-; D5 - byte to W
+; D5 - data to write / data read
 ; D6 - working register used in R/W
 ; D7 - address accumulator
 ; A0 - address of string to print / address for R or W
@@ -268,6 +269,28 @@ GET_INPUT
 
 RESTART
     PRINT_CRLF D3
+   
+    MOVE.B #$A,DUART_CRA            ; disable rx & tx
+    MOVE.B #$10,DUART_CRA           ; reset MRA pointer
+
+    MOVE.B #$0,DUART_ACR            
+    MOVE.B #$0,DUART_IMR            ; no interrupts, please            
+    MOVE.B #$0,DUART_OPCR           ; enable all outputs
+
+; channel A
+    MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
+    ;MOVE.B #$07,DUART_MRA           ; auto echo and 1 stop bit
+    MOVE.B #$BB,DUART_CSRA          ; 9600 baud
+    MOVE.B #$5,DUART_CRA            ; enable rx & tx
+
+; channel B
+    MOVE.B #$03,DUART_MRB           ; no flow control, no parity, 8 data bits
+    MOVE.B #$47,DUART_MRB           ; auto echo and 1 stop bit
+    MOVE.B #$BB,DUART_CSRB          ; 9600 baud
+    MOVE.B #$5,DUART_CRB            ; enable rx & tx
+
+
+
     JMP WARM_START
 
 ; commands
@@ -279,9 +302,15 @@ V   LEA VERSION,A0
     PRINT_STR A0,D3       
     JMP MAIN_LOOP
     
-R   MOVE.L D7,A0                    ; address accumulator -> address register
-    MOVE.L (A0),D4                  ; read the memory and print it
-    PRINT_REG D4,D3,D7,D6,A0
+R   
+    PRINT_REG D7,D3,D2,D6,A0
+    PRINT_CRLF D3
+    MOVE.L D7,A0                    ; address accumulator -> address register
+    MOVE.W (A0),D5                  ; read the memory and print it
+    AND.L #$FFFF,D5
+    PRINT_REG D7,D3,D2,D6,A0
+    PRINT_CRLF D3
+    PRINT_REG D5,D3,D7,D6,A0
     PRINT_CRLF D3
     MOVE.L #0,D7                    ; clear the now used address accumulator
     JMP MAIN_LOOP
@@ -292,19 +321,27 @@ W   MOVE.L #0,D5                    ; D5 will be the value to write
     HEX2BIN D4,D4,A0                ; convert to binary -> D4
     MOVE.B D4,D5                    ; put at bottom of D5
 
-    MOVE #6,D6                      ; 7 bytes left to read
+    ;MOVE #6,D6                      ; 7 bytes left to read
     
 READ_DATA
-    LSL.L #4,D5                     ; make what we have so far more significant
-    READ_CHAR D4,D3                 ; next character -> D4
-    HEX2BIN D4,D4,A0                ; convert to binary -> D4
-    OR.B D4,D5
-    ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
-    DBEQ D6,READ_DATA
+    ;LSL.L #4,D5                     ; make what we have so far more significant
+    ;READ_CHAR D4,D3                 ; next character -> D4
+    ;HEX2BIN D4,D4,A0                ; convert to binary -> D4
+    ;OR.B D4,D5
+    ;ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
+    ;DBEQ D6,READ_DATA
     
+    PRINT_CRLF D3
+    PRINT_REG D7,D3,D2,D6,A1
+    PRINT_CRLF D3
+    PRINT_REG D4,D3,D2,D6,A1
+    PRINT_CRLF D3
+    PRINT_REG D5,D3,D2,D6,A1
+
     MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE.L #0,D7                    ; clear the now used address accumulator
-    MOVE.L D5,(A0)                  ; write the data
+    
+    MOVE.L D4,(A0)                  ; write the data
 
     PRINT_CRLF D3
     JMP MAIN_LOOP
@@ -318,14 +355,28 @@ G   MOVE.L D7,A0                    ; address accumulator -> address register
         
 HEX_DIGIT
     LSL.L #4,D7                    ; add the next digit in the next 4 bits
+    PRINT_CRLF D3
+    PRINT_REG D7,D3,D2,D6,A1
+   
+    PRINT_CRLF D3
+    PRINT_REG D4,D3,D2,D6,A1
+
     HEX2BIN D4,D4,A0
-    OR.L D4,D7
+
+    PRINT_CRLF D3
+    PRINT_REG D4,D3,D2,D6,A1
+
+    OR.B D4,D7
+    
+    PRINT_CRLF D3
+    PRINT_REG D7,D3,D2,D6,A1
+  
     JMP GET_INPUT
 
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.4 (30/03/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.5 (31/03/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'nnnnnnnnR Read',13,10,'nnnnnnnnWnn Write',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
@@ -333,6 +384,8 @@ BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
+
+
 
 
 
