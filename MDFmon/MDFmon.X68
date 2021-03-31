@@ -5,8 +5,6 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; WRITE doesn't seem to work for reals - it writes to the correct place, but the wrong data
-; can do WWWWW in the input loop - it doesn't validate
 
 DEBUG               EQU 0
 
@@ -148,7 +146,7 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
     ENDC
      
     CMP.B #$1B,\1                 ; check for escape and go to start
-    BEQ RESTART
+    BEQ START
 
     IFEQ DEBUG
       PRINT_CHAR \1,\2            ; echo it back
@@ -173,7 +171,30 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
 ; start of program  
 START
     MOVE.B #0,DISPLAY
-   
+
+; reset the UART in case of warm start
+    MOVE.B #$A,DUART_CRA            ; disable rx & tx
+    MOVE.B #$50,DUART_CRA           ; reset everyting
+    NOP
+    MOVE.B #$40,DUART_CRA           
+    NOP
+    MOVE.B #$30,DUART_CRA
+    NOP
+    MOVE.B #$20,DUART_CRA
+    NOP
+    MOVE.B #$10,DUART_CRA   
+
+    MOVE.B #$A,DUART_CRB            ; disable rx & tx
+    MOVE.B #$50,DUART_CRB           ; reset everyting
+    NOP
+    MOVE.B #$40,DUART_CRB           
+    NOP
+    MOVE.B #$30,DUART_CRB
+    NOP
+    MOVE.B #$20,DUART_CRB
+    NOP
+    MOVE.B #$10,DUART_CRB   
+
 ;initialise UART
     MOVE.B #$0,DUART_ACR            
     MOVE.B #$0,DUART_IMR            ; no interrupts, please            
@@ -191,9 +212,12 @@ START
     MOVE.B #$BB,DUART_CSRB          ; 9600 baud
     MOVE.B #$5,DUART_CRB            ; enable rx & tx
 
-WARM_START
+    PRINT_CHAR '.',D3               ; give the serial port chance to settle after reset
+
     MOVE.B #1,DISPLAY
        
+    PRINT_CRLF D3
+
     LEA VERSION,A0
     PRINT_STR A0,D3
     PRINT_CRLF D3
@@ -266,31 +290,7 @@ GET_INPUT
     PRINT_STR A0,D3
                        
     JMP MAIN_LOOP
-
-RESTART
-    PRINT_CRLF D3
-   
-    MOVE.B #$A,DUART_CRA            ; disable rx & tx
-    MOVE.B #$10,DUART_CRA           ; reset MRA pointer
-
-    MOVE.B #$0,DUART_ACR            
-    MOVE.B #$0,DUART_IMR            ; no interrupts, please            
-    MOVE.B #$0,DUART_OPCR           ; enable all outputs
-
-; channel A
-    MOVE.B #$03,DUART_MRA           ; no flow control, no parity, 8 data bits
-    ;MOVE.B #$07,DUART_MRA           ; auto echo and 1 stop bit
-    MOVE.B #$BB,DUART_CSRA          ; 9600 baud
-    MOVE.B #$5,DUART_CRA            ; enable rx & tx
-
-; channel B
-    MOVE.B #$03,DUART_MRB           ; no flow control, no parity, 8 data bits
-    MOVE.B #$47,DUART_MRB           ; auto echo and 1 stop bit
-    MOVE.B #$BB,DUART_CSRB          ; 9600 baud
-    MOVE.B #$5,DUART_CRB            ; enable rx & tx
-
-    JMP WARM_START
-
+    
 ; commands
 H   LEA HELP,A0
     PRINT_STR A0,D3
@@ -348,7 +348,7 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.5 (31/03/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.6 (31/03/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
