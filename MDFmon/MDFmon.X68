@@ -78,7 +78,7 @@ HEX2BIN MACRO
 
 ; send a single char to the serial port
 ; \1 = char to send, \2 = data register to use for status poll
-; will stamp on D3 and D2 in debug mode
+; will stamp on D0 and D1 in debug mode
 PRINT_CHAR MACRO
 WAIT_FOR_READY\@                  ; wait until the there is space to send
     IFEQ DEBUG
@@ -126,7 +126,7 @@ LOOP\@
   
 ; read a char from the serial port
 ; \ 1= data register for read char, \2 = register to use for status poll
-; will stamp on D3 and D2 in debug mode
+; will stamp on D0 and D1 in debug mode
 READ_CHAR MACRO
 WAIT_FOR_READY\@                  ; wait until the there is space to send
 

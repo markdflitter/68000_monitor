@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 31/03/2021 11:19:26
+Created On: 31/03/2021 12:28:12
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : MDFmon 
@@ -82,7 +82,7 @@ Created On: 31/03/2021 11:19:26
 00000000                            78  
 00000000                            79  ; send a single char to the serial port
 00000000                            80  ; \1 = char to send, \2 = data register to use for status poll
-00000000                            81  ; will stamp on D3 and D2 in debug mode
+00000000                            81  ; will stamp on D0 and D1 in debug mode
 00000000                            82  PRINT_CHAR MACRO
 00000000                            83  WAIT_FOR_READY\@                  ; wait until the there is space to send
 00000000                            84      IFEQ DEBUG
@@ -130,7 +130,7 @@ Created On: 31/03/2021 11:19:26
 00000000                           126    
 00000000                           127  ; read a char from the serial port
 00000000                           128  ; \ 1= data register for read char, \2 = register to use for status poll
-00000000                           129  ; will stamp on D3 and D2 in debug mode
+00000000                           129  ; will stamp on D0 and D1 in debug mode
 00000000                           130  READ_CHAR MACRO
 00000000                           131  WAIT_FOR_READY\@                  ; wait until the there is space to send
 00000000                           132  
