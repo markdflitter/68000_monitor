@@ -152,6 +152,19 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
       PRINT_CHAR \1,\2            ; echo it back
     ENDC
     ENDM
+    
+; read data from the download serial port
+; \ 1= data register for read char, \2 = register to use for status poll
+DOWNLOAD MACRO
+WAIT_FOR_READY\@                  ; wait until the there is space to send
+
+    MOVE.B DUART_SRB,\2         ; read status register
+    BTST #0,\2                  ; check for character
+    BEQ WAIT_FOR_READY\@        ; nothing, check again
+
+    MOVE.B DUART_RXB,\1         ; got a character, read it
+    ENDM
+
 
 ; register catalogue
 ; D0 - used for simulator I/O
@@ -207,7 +220,7 @@ START
     MOVE.B #$5,DUART_CRA            ; enable rx & tx
 
 ; channel B
-    MOVE.B #$03,DUART_MRB           ; no flow control, no parity, 8 data bits
+    MOVE.B #$13,DUART_MRB           ; rts on, no parity, 8 data bits
     MOVE.B #$47,DUART_MRB           ; auto echo and 1 stop bit
     MOVE.B #$BB,DUART_CSRB          ; 9600 baud
     MOVE.B #$5,DUART_CRB            ; enable rx & tx
@@ -316,13 +329,13 @@ W   MOVE.L #0,D5                    ; D5 will be the value to write
 
     MOVE #6,D6                      ; 7 bytes left to read
     
-READ_DATA
+READ_DATA_TO_POKE
     LSL.L #4,D5                     ; make what we have so far more significant
     READ_CHAR D4,D3                 ; next character -> D4
     HEX2BIN D4,D4,A0                ; convert to binary -> D4
     OR.B D4,D5
     ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
-    DBEQ D6,READ_DATA
+    DBEQ D6,READ_DATA_TO_POKE
     
     MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE.L #0,D7                    ; clear the now used address accumulator
@@ -332,7 +345,8 @@ READ_DATA
     PRINT_CRLF D3
     JMP MAIN_LOOP
 
-S   READ_CHAR D4,D3                  ; fetch character from serial port -> D4
+S   DOWNLOAD D4,D3
+    PRINT_CHAR D4,D3
     JMP S
 
 G   MOVE.L D7,A0                    ; address accumulator -> address register
@@ -348,7 +362,7 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.6 (31/03/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.7 (31/03/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
@@ -356,6 +370,8 @@ BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
+
+
 
 
 
