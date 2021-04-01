@@ -117,6 +117,8 @@ EXIT\@
 ; send the contents of a data register to the serial port as a 8 digit hex number
 ; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register, 
 PRINT_REG MACRO
+    PRINT_CHAR '0',\2           ;0x header
+    PRINT_CHAR 'x',\2
     MOVE.L #7,\4                ; loop round all 8 hex characters of 4 bits each
 LOOP\@
     BIN2HEX \1,\3,\5
@@ -587,7 +589,7 @@ VERSION DC.B 'MDF-mon V1.8 (01/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
-READ    DC.B ' S records read, start address = 0x',0
+READ    DC.B ' S records read, start address = ',0
 UNREC   DC.B 'WARNING: Unrecognised S record type: ',0
 CS_FAILURE   DC.B 'WARNING: Checksum failure for record ',0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
