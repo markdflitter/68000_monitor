@@ -364,6 +364,8 @@ READ_DATA_TO_POKE
 
 
 S   MOVE.L #0,D4                    ; count of records read -> D4
+    MOVE.L 0,A2                     ; start address -> A2
+    
 WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated by 'S'
     DOWNLOAD D2,D3                  
     CMP.B #'S',D2                   ; found S?    
@@ -371,27 +373,23 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
     
     ADD.L #1,D4                     ; read another S record, increment count
     
-    DOWNLOAD D2,D3                  ; read the record digit
+    DOWNLOAD D7,D3                  ; read the record digit
 
-    IF.B D2 <EQ> #'0' THEN.L        ; header, just ignore it
-        JMP WAIT_FOR_SRECORD            
-    ENDI
- 
-    IF.B D2 <EQ> #'1' THEN.L        ; 16 bit data record
-        MOVE.L #0,D6                ; checksum
-    
-        MOVE.L #0,D5                ; read the 2 digit byte count -> D5
-        DOWNLOAD D2,D3              
-        HEX2BIN D2,D2,A0
-        OR.L D2,D5
-        LSL.L #4,D5    
-        DOWNLOAD D2,D3
-        HEX2BIN D2,D2,A0  
-        OR.L D2,D5
+    MOVE.L #0,D6                    ; checksum
+
+    MOVE.L #0,D5                    ; read the 2 digit byte count -> D5
+    DOWNLOAD D2,D3              
+    HEX2BIN D2,D2,A0
+    OR.L D2,D5
+    LSL.L #4,D5    
+    DOWNLOAD D2,D3
+    HEX2BIN D2,D2,A0  
+    OR.L D2,D5
                 
-        ADD.L D5,D6                 ; add byte count into checksum
+    ADD.L D5,D6                     ; add byte count into checksum
 
-        MOVE.L #0,D7                ; read the 16 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
+    IF.B D7 <EQ> #'0' THEN.L        ; header
+        MOVE.L #0,D7                ; read the 16 bit address, just checksum and then ignore
         DOWNLOAD D2,D3              ; top byte
         HEX2BIN D2,D2,A0
         OR.L D2,D7
@@ -415,69 +413,161 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
         MOVE.B D7,D2
         ADD.L D2,D6
         
+        SUB.L #3,D5                 ; subtract three bytes for 16 bit address and 1 byte checksum
+        WHILE.L D5 <GT> #0 DO       ; read the data bytes
+          SUB.L #1,D5
+            
+          MOVE.L #0,D7              ; D7 holds the byte
+            
+          DOWNLOAD D2,D3            ; MS 4 bits
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+          LSL.L #4,D7
+             
+          DOWNLOAD D2,D3            ; LS 4 bits    
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+            
+          ADD.L D7,D6               ; add into checksum
+          
+          PRINT_CHAR D7,D3          ; assume ASCII and print it
+        ENDW
+        PRINT_CRLF D3
+       LEA WAIT_FOR_SRECORD,A1            
+    ELSE
+      IF.B D7 <EQ> #'1' THEN.L        ; 16 bit data record
+        MOVE.L #0,D7                ; read the 16 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
+        DOWNLOAD D2,D3              ; top byte
+        PRINT_CHAR D2,D3
+        HEX2BIN D2,D2,A0
+        OR.L D2,D7
+        LSL.L #4,D7
+        DOWNLOAD D2,D3         
+        PRINT_CHAR D2,D3
+        HEX2BIN D2,D2,A0
+        OR.L D2,D7
+        
+        ADD.L D7,D6                 ; add top byte of address into checksum
+
+        LSL.L #4,D7                 ; bottom byte
+        DOWNLOAD D2,D3
+        PRINT_CHAR D2,D3
+        HEX2BIN D2,D2,A0
+        OR.L D2,D7
+        LSL.L #4,D7        
+        DOWNLOAD D2,D3
+        PRINT_CHAR D2,D3
+        HEX2BIN D2,D2,A0
+        OR.L D2,D7
+        
+        MOVE.L #0,D2                 ; rextract bottom byte of address and add into checksum
+        MOVE.B D7,D2
+        ADD.L D2,D6
+        
         MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
                
         SUB.L #3,D5                 ; subtract three bytes for 16 bit address and 1 byte checksum
         WHILE.L D5 <GT> #0 DO       ; read the data bytes
-            SUB.L #1,D5
+          SUB.L #1,D5
             
-            MOVE.L #0,D7            ; D7 holds the byte
+          MOVE.L #0,D7              ; D7 holds the byte
             
-            DOWNLOAD D2,D3          ; MS 4 bits
-            PRINT_CHAR D2,D3
-            HEX2BIN D2,D2,A0
-            OR.L D2,D7
-            LSL.L #4,D7
+          DOWNLOAD D2,D3            ; MS 4 bits
+          PRINT_CHAR D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+          LSL.L #4,D7
              
-            DOWNLOAD D2,D3          ; LS 4 bits    
-            PRINT_CHAR D2,D3
-            HEX2BIN D2,D2,A0
-            OR.L D2,D7
+          DOWNLOAD D2,D3            ; LS 4 bits    
+          PRINT_CHAR D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
             
-            ADD.L D7,D6             ; add into checksum            
+          ADD.L D7,D6               ; add into checksum            
         ENDW
         PRINT_CRLF D3
+        LEA WAIT_FOR_SRECORD,A1     ; next place to go
+      ELSE
+        IF.B D7 <EQ> #'8' THEN.L    ; termination record, exit
+          MOVE.L #0,D7              ; read the 24 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
+          DOWNLOAD D2,D3            ; top byte
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+          LSL.L #4,D7
+          DOWNLOAD D2,D3         
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
         
-        NOT.L D6                    ; ones complement the checksum
-        ANDI.L #$FF,D6              ; and take the LSByte
+          ADD.L D7,D6               ; add top byte of address into checksum
+
+          LSL.L #4,D7               ; middle byte
+          DOWNLOAD D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+          LSL.L #4,D7        
+          DOWNLOAD D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
         
-        MOVE.L #0,D7                ; read the checksum from the data stream
-        DOWNLOAD D2,D3              ; top byte
-        HEX2BIN D2,D2,A0
-        OR.L D2,D7
-        LSL.L #4,D7
-        DOWNLOAD D2,D3             ; bottom byte
-        HEX2BIN D2,D2,A0
-        OR.L D2,D7
-                
-        IF.B D7 <NE> D6 THEN.L
-            LEA CS_FAILURE,A0       ; warn for mismatched checksum
-            PRINT_STR A0,D3
-            PRINT_REG D4,D3,D6,D7,A0
-            PRINT_CRLF D3
+          MOVE.L #0,D2              ; rextract middle byte of address and add into checksum
+          MOVE.B D7,D2
+          ADD.L D2,D6
+          
+          LSL.L #4,D7               ; bottom byte
+          DOWNLOAD D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+          LSL.L #4,D7        
+          DOWNLOAD D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+        
+          MOVE.L #0,D2              ; rextract bottom byte of address and add into checksum
+          MOVE.B D7,D2
+          ADD.L D2,D6
+          
+          MOVE.L D7,A2              ; start address -> A2
+        
+          LEA DOWNLOAD_DONE,A1      ; next place to go
+        ELSE
+          LEA UNREC,A0              ; warn for unrecognised type
+          PRINT_STR A0,D3
+          PRINT_CHAR D7,D3
+          PRINT_CRLF D3
+    
+          JMP WAIT_FOR_SRECORD      ; ignore any other type    
         ENDI
-     
-        JMP WAIT_FOR_SRECORD            
+      ENDI
     ENDI
     
-    IF.B D2 <EQ> #'8' THEN.S        ; termination record, exit
-        JMP DOWNLOAD_DONE
+    NOT.L D6                        ; ones complement the checksum
+    ANDI.L #$FF,D6                  ; and take the LSByte
+        
+    MOVE.L #0,D7                    ; read the checksum from the data stream
+    DOWNLOAD D2,D3                  ; top byte
+    HEX2BIN D2,D2,A0
+    OR.L D2,D7
+    LSL.L #4,D7
+    DOWNLOAD D2,D3                  ; bottom byte
+    HEX2BIN D2,D2,A0
+    OR.L D2,D7
+                
+    IF.B D7 <NE> D6 THEN.L
+      LEA CS_FAILURE,A0             ; warn for mismatched checksum
+      PRINT_STR A0,D3
+      PRINT_REG D4,D3,D6,D7,A0
+      PRINT_CRLF D3     
     ENDI
     
-    LEA UNREC,A0                    ; warn for unrecognised type
-    PRINT_STR A0,D3
-    PRINT_CHAR D2,D3
-    PRINT_CRLF D3
-    
-    BNE WAIT_FOR_SRECORD            ; ignore any other type
-    
+    JMP (A1)
 DOWNLOAD_DONE
-    PRINT_REG D4,D3,D7,D6,A0        ; print out n Srecords read
+    PRINT_REG D4,D3,D7,D6,A0        ; print out number of Srecords read
     LEA READ,A0
     PRINT_STR A0,D3
-    
-    MOVE.L #0,D7                   ; reset address accumulator that we trashed above
-    
+    MOVE.L A2,D7                    ; set address accumulator to start address
+    PRINT_REG D7,D3,D2,D6,A0        ; print out start address
+    PRINT_CRLF D3     
+        
     JMP MAIN_LOOP
     
 G   MOVE.L D7,A0                    ; address accumulator -> address register
@@ -497,7 +587,7 @@ VERSION DC.B 'MDF-mon V1.8 (01/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
-READ    DC.B ' S records read',13,10,0
+READ    DC.B ' S records read, start address = 0x',0
 UNREC   DC.B 'WARNING: Unrecognised S record type: ',0
 CS_FAILURE   DC.B 'WARNING: Checksum failure for record ',0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
