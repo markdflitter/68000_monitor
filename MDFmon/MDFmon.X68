@@ -5,6 +5,10 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; tidy up layout (indentation and comments)
+; stop using two registers in download
+; add a .W and .B variants of PRINT_REG
+; implement DOWNLOAD_BYTE
 
 DEBUG               EQU 0
 
@@ -594,9 +598,9 @@ UNREC   DC.B 'WARNING: Unrecognised S record type: ',0
 CS_FAILURE   DC.B 'WARNING: Checksum failure for record ',0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-OVERRUN DC.B 'Overrun!',0
     
     END    START                    ; last line of source
+
 
 
 
