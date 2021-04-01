@@ -173,11 +173,6 @@ WAIT_FOR_READY\@                  ; wait until the there is space to send
     READ_CHAR \1
 CONTINUE\@
     MOVE.B DUART_SRB,\2         ; read status register
-    BTST #$10,\2                ; check for overrun
-    BNE OK\@                    ; all OK
-    LEA OVERRUN,A0              ; warn
-    PRINT_STR A0,\2
-OK\@    
     BTST #0,\2                  ; check for character
     BEQ WAIT_FOR_READY\@        ; nothing, check again
     
@@ -242,7 +237,7 @@ START
     MOVE.B #$5,DUART_CRA            ; enable rx & tx
 
 ; channel B
-    MOVE.B #$93,DUART_MRB           ; rts on, no parity, 8 data bits
+    MOVE.B #$13,DUART_MRB           ; no flow control, no parity, 8 data bits
     MOVE.B #$07,DUART_MRB           ; 1 stop bit
     MOVE.B #$BB,DUART_CSRB          ; 9600 baud
     MOVE.B #$5,DUART_CRB            ; enable rx & tx
@@ -397,16 +392,17 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
         ADD.L D5,D6                 ; add byte count into checksum
 
         MOVE.L #0,D7                ; read the 16 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
-        DOWNLOAD D2,D3            
+        DOWNLOAD D2,D3              ; top byte
         HEX2BIN D2,D2,A0
         OR.L D2,D7
         LSL.L #4,D7
         DOWNLOAD D2,D3         
         HEX2BIN D2,D2,A0
         OR.L D2,D7
+        
         ADD.L D7,D6                 ; add top byte of address into checksum
 
-        LSL.L #4,D7    
+        LSL.L #4,D7                 ; bottom byte
         DOWNLOAD D2,D3
         HEX2BIN D2,D2,A0
         OR.L D2,D7
@@ -425,30 +421,32 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
         WHILE.L D5 <GT> #0 DO       ; read the data bytes
             SUB.L #1,D5
             
-            MOVE.L #0,D7
-            DOWNLOAD D2,D3             
+            MOVE.L #0,D7            ; D7 holds the byte
+            
+            DOWNLOAD D2,D3          ; MS 4 bits
             PRINT_CHAR D2,D3
             HEX2BIN D2,D2,A0
             OR.L D2,D7
             LSL.L #4,D7
-            DOWNLOAD D2,D3             
+             
+            DOWNLOAD D2,D3          ; LS 4 bits    
             PRINT_CHAR D2,D3
             HEX2BIN D2,D2,A0
             OR.L D2,D7
             
-            ADD.L D7,D6              ;  checksum            
+            ADD.L D7,D6             ; add into checksum            
         ENDW
         PRINT_CRLF D3
         
         NOT.L D6                    ; ones complement the checksum
         ANDI.L #$FF,D6              ; and take the LSByte
         
-        MOVE.L #0,D7                ; read the checksum
-        DOWNLOAD D2,D3             
+        MOVE.L #0,D7                ; read the checksum from the data stream
+        DOWNLOAD D2,D3              ; top byte
         HEX2BIN D2,D2,A0
         OR.L D2,D7
         LSL.L #4,D7
-        DOWNLOAD D2,D3             
+        DOWNLOAD D2,D3             ; bottom byte
         HEX2BIN D2,D2,A0
         OR.L D2,D7
                 
