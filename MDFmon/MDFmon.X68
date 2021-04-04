@@ -5,12 +5,18 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; try running the monitor in RAM, grr, suddenly uses S2 records
+; make the monitor relocatable, so it can run in RAM and ROM
+; burn the monitor into eeprom from code
+;ram CHECK AT STARTUP??? WIOLL PREVEWNT RUNNIG CODE FROM RAM THOUGH, SO need cold/warm start
+; check for escape during Z
+; fix the DUART base address
 ; tidy up layout (indentation and comments)
 ; stop using two registers in download
 ; add a .W and .B variants of PRINT_REG
 ; implement DOWNLOAD_BYTE
 ; fix being able to enter random chars when W'ing
-; make the monitor relocatable, so it can run in RAM and ROM
+;JMP -> BRA
 
 DEBUG               EQU 0
 
@@ -18,6 +24,8 @@ DEBUG               EQU 0
 DISPLAY_BASE        EQU $E00000
 DISPLAY_            EQU $0
 DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_+1
+
+RAM                 EQU $200000
 
 DUART_BASE          EQU $D30000
 DUART_MRA_          EQU $0
@@ -123,8 +131,8 @@ EXIT\@
 ; send the contents of a data register to the serial port as a 8 digit hex number
 ; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register, 
 PRINT_REG MACRO
-    PRINT_CHAR '0',\2           ;0x header
-    PRINT_CHAR 'x',\2
+    PRINT_CHAR #'0',\2          ;0x header
+    PRINT_CHAR #'x',\2
     MOVE.L #7,\4                ; loop round all 8 hex characters of 4 bits each
 LOOP\@
     BIN2HEX \1,\3,\5
@@ -203,6 +211,7 @@ CONTINUE\@
 
 ; start vector
     ORG  $0
+;    ORG  $200000
     DC.L $00000000              ; PC
     DC.L $00000000              ; SP
     
@@ -323,6 +332,9 @@ GET_INPUT
 
     CMP.B #'G',D2
     BEQ G   
+
+    CMP.B #'Z',D2
+    BEQ Z   
 
     LEA HUH,A0
     PRINT_STR A0,D3
@@ -581,7 +593,51 @@ DOWNLOAD_DONE
 G   MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE #0,D7                      ; clear the now used address accumulator
     JMP (A0)                        ; jump to it!
-        
+    
+Z   MOVE.L #RAM,A0                  ; address of RAM
+    MOVE.L #0,D0                    ; number of bytes
+   
+    WHILE.L D0 <LE> #$40000 DO      ; read the data bytes
+       
+      MOVE.L D0,D1                  ; progress update
+      LSR.L #8,D1 
+      LSR.L #8,D1
+      ANDI.L #$F,D1
+      MOVE.B D1,DISPLAY
+
+      MOVE.L D0,(A0)+ 
+      ADD.L #4,D0
+    ENDW
+ 
+    MOVE.L #RAM,A0              ; address of RAM
+    MOVE.L #0,D0                ; number of bytes
+   
+    WHILE.L D0 <LE> #$40000 DO ; read the data bytes
+
+      MOVE.L D0,D1              ; progress update
+      LSR.L #8,D1
+      LSR.L #8,D1
+      ANDI.L #$F,D1
+      MOVE.B D1,DISPLAY
+
+      MOVE.L (A0)+,D1
+      
+      IF.L D0 <EQ> D1 THEN
+        BRA OK
+      ENDI 
+      
+      LEA RAM_ERROR,A1
+      PRINT_STR A1,D1
+      MOVE.L A0,D1
+      SUB.L #4,D1
+      PRINT_REG D1,D3,D2,D6,A1       ; print out failure address
+      PRINT_CRLF D3
+OK    
+      ADD.L #4,D0
+    ENDW
+    
+    JMP MAIN_LOOP
+  
 HEX_DIGIT
     LSL.L #4,D7                    ; add the next digit in the next 4 bits
     HEX2BIN D2,D2,A0
@@ -591,17 +647,19 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.8 (01/04/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,0
+VERSION DC.B 'MDF-mon V1.10 (04/04/2021)',13,10,0
+HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,'Z zap memory',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
 READ    DC.B ' S records read, start address = ',0
 UNREC   DC.B 'WARNING: Unrecognised S record type: ',0
 CS_FAILURE   DC.B 'WARNING: Checksum failure for record ',0
+RAM_ERROR DC.B 'WARNING: RAM error at: ',0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
+
 
 
 
