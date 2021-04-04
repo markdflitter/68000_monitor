@@ -5,6 +5,8 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; need to think about byte writes / word writes - I can only write whole words...
+; implement write to RAM for S1 record
 ; try running the monitor in RAM, grr, suddenly uses S2 records
 ; make the monitor relocatable, so it can run in RAM and ROM
 ; burn the monitor into eeprom from code
@@ -14,7 +16,7 @@
 ; tidy up layout (indentation and comments)
 ; stop using two registers in download
 ; add a .W and .B variants of PRINT_REG
-; implement DOWNLOAD_BYTE
+; implement DOWNLOAD_BYTE to remove repeated code
 ; fix being able to enter random chars when W'ing
 ;JMP -> BRA
 
@@ -210,8 +212,8 @@ CONTINUE\@
 ; A0 - address of string to print 
 
 ; start vector
-    ORG  $0
-;    ORG  $200000
+    ;ORG  $0
+    ORG  $200000
     DC.L $00000000              ; PC
     DC.L $00000000              ; SP
     
@@ -455,7 +457,7 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
         PRINT_CRLF D3
        LEA WAIT_FOR_SRECORD,A1            
     ELSE
-      IF.B D7 <EQ> #'1' THEN.L        ; 16 bit data record
+      IF.B D7 <EQ> #'1' THEN.L        ; 16 bit address data record
         MOVE.L #0,D7                ; read the 16 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
         DOWNLOAD D2,D3              ; top byte
         PRINT_CHAR D2,D3
@@ -508,54 +510,143 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
         PRINT_CRLF D3
         LEA WAIT_FOR_SRECORD,A1     ; next place to go
       ELSE
-        IF.B D7 <EQ> #'8' THEN.L    ; termination record, exit
-          MOVE.L #0,D7              ; read the 24 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
-          DOWNLOAD D2,D3            ; top byte
+        IF.B D7 <EQ> #'2' THEN.L      ; 24 bit address data record
+          MOVE.L #0,D7                ; read the 24 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
+          DOWNLOAD D2,D3              ; top byte
+          PRINT_CHAR D2,D3
           HEX2BIN D2,D2,A0
           OR.L D2,D7
           LSL.L #4,D7
           DOWNLOAD D2,D3         
+          PRINT_CHAR D2,D3
           HEX2BIN D2,D2,A0
           OR.L D2,D7
         
-          ADD.L D7,D6               ; add top byte of address into checksum
+          ADD.L D7,D6                 ; add top byte of address into checksum
 
-          LSL.L #4,D7               ; middle byte
+          LSL.L #4,D7                 ; middle byte
           DOWNLOAD D2,D3
+          PRINT_CHAR D2,D3
           HEX2BIN D2,D2,A0
           OR.L D2,D7
           LSL.L #4,D7        
           DOWNLOAD D2,D3
+          PRINT_CHAR D2,D3
           HEX2BIN D2,D2,A0
           OR.L D2,D7
         
-          MOVE.L #0,D2              ; rextract middle byte of address and add into checksum
+          MOVE.L #0,D2                 ; rextract middle byte of address and add into checksum
           MOVE.B D7,D2
           ADD.L D2,D6
           
-          LSL.L #4,D7               ; bottom byte
+          LSL.L #4,D7                 ; bottom byte
           DOWNLOAD D2,D3
+          PRINT_CHAR D2,D3
           HEX2BIN D2,D2,A0
           OR.L D2,D7
           LSL.L #4,D7        
           DOWNLOAD D2,D3
+          PRINT_CHAR D2,D3
           HEX2BIN D2,D2,A0
           OR.L D2,D7
         
-          MOVE.L #0,D2              ; rextract bottom byte of address and add into checksum
+          MOVE.L #0,D2                 ; rextract bottom byte of address and add into checksum
           MOVE.B D7,D2
           ADD.L D2,D6
-          
-          MOVE.L D7,A2              ; start address -> A2
         
-          LEA DOWNLOAD_DONE,A1      ; next place to go
-        ELSE
-          LEA UNREC,A0              ; warn for unrecognised type
-          PRINT_STR A0,D3
-          PRINT_CHAR D7,D3
+          MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
+               
+          SUB.L #4,D5                 ; subtract four bytes for 24 bit address and 1 byte checksum
+          LSR.L #1,D5                 ; /2 since we are reading words
+          WHILE.L D5 <GT> #0 DO       ; read the data bytes
+            SUB.L #1,D5
+            
+            MOVE.L #0,D7              ; D7 holds the word
+            
+            DOWNLOAD D2,D3            ; MS 4 bits
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7
+             
+            DOWNLOAD D2,D3            ; LS 4 bits    
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+                        
+            ADD.L D7,D6               ; add into checksum
+            
+            LSL.L #4,D7
+            DOWNLOAD D2,D3            ; MS 4 bits
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+             
+            LSL.L #4,D7
+            DOWNLOAD D2,D3            ; LS 4 bits    
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            
+            MOVE.L #0,D2                 ; rextract bottom byte of address and add into checksum
+            MOVE.B D7,D2
+            ADD.L D2,D6
+            
+            MOVE.W D7,(A1)+             ; store it!
+            
+          ENDW
           PRINT_CRLF D3
+          LEA WAIT_FOR_SRECORD,A1     ; next place to go
+        ELSE
+          IF.B D7 <EQ> #'8' THEN.L    ; termination record, exit
+            MOVE.L #0,D7              ; read the 24 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
+            DOWNLOAD D2,D3            ; top byte
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7
+            DOWNLOAD D2,D3         
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+        
+            ADD.L D7,D6               ; add top byte of address into checksum
+
+            LSL.L #4,D7               ; middle byte
+            DOWNLOAD D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7        
+            DOWNLOAD D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+        
+            MOVE.L #0,D2              ; rextract middle byte of address and add into checksum
+            MOVE.B D7,D2
+            ADD.L D2,D6
+          
+            LSL.L #4,D7               ; bottom byte
+            DOWNLOAD D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7        
+            DOWNLOAD D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+        
+            MOVE.L #0,D2              ; rextract bottom byte of address and add into checksum
+            MOVE.B D7,D2
+            ADD.L D2,D6
+          
+            MOVE.L D7,A2              ; start address -> A2
+        
+            LEA DOWNLOAD_DONE,A1      ; next place to go
+          ELSE
+            LEA UNREC,A0              ; warn for unrecognised type
+            PRINT_STR A0,D3
+            PRINT_CHAR D7,D3
+            PRINT_CRLF D3
     
-          JMP WAIT_FOR_SRECORD      ; ignore any other type    
+            JMP WAIT_FOR_SRECORD      ; ignore any other type    
+          ENDI
         ENDI
       ENDI
     ENDI
@@ -647,7 +738,7 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.10 (04/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.11 (04/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,'Z Zap memory',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
