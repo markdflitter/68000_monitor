@@ -365,7 +365,7 @@ READ_DATA_TO_POKE
     MOVE.L D7,A0                    ; address accumulator -> address register
     MOVE.L #0,D7                    ; clear the now used address accumulator
     
-    MOVE.L D2,(A0)                  ; write the data
+    MOVE.L D5,(A0)                  ; write the data
 
     PRINT_CRLF D3
     JMP MAIN_LOOP
@@ -602,6 +602,7 @@ BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
+
 
 
 
