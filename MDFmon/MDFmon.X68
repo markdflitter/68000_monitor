@@ -648,7 +648,7 @@ HEX_DIGIT
 
 ; strings
 VERSION DC.B 'MDF-mon V1.10 (04/04/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,'Z zap memory',10,13,0
+HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,'Z Zap memory',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
 READ    DC.B ' S records read, start address = ',0
