@@ -5,11 +5,10 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; need to think about byte writes / word writes - I can only write whole words...
-; implement write to RAM for S1 record
-; try running the monitor in RAM, grr, suddenly uses S2 records
-; make the monitor relocatable, so it can run in RAM and ROM
 ; burn the monitor into eeprom from code
+; add LDS and UDS with an OR gate
+; S2 records don't deal well with odd lengths / addresses
+; make the monitor relocatable, so it can run in RAM and ROM
 ;ram CHECK AT STARTUP??? WIOLL PREVEWNT RUNNIG CODE FROM RAM THOUGH, SO need cold/warm start
 ; check for escape during Z
 ; fix the DUART base address
@@ -19,6 +18,10 @@
 ; implement DOWNLOAD_BYTE to remove repeated code
 ; fix being able to enter random chars when W'ing
 ;JMP -> BRA
+
+
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -212,8 +215,6 @@ CONTINUE\@
 ; A0 - address of string to print 
 
 ; start vector
-    ;ORG  $0
-    ORG  $200000
     DC.L $00000000              ; PC
     DC.L $00000000              ; SP
     
@@ -385,7 +386,8 @@ READ_DATA_TO_POKE
     JMP MAIN_LOOP
 
 
-S   MOVE.L #0,D4                    ; count of records read -> D4
+S   MOVE.L D7,A3                    ; grab the address accumulator
+    MOVE.L #0,D4                    ; count of records read -> D4
     MOVE.L 0,A2                     ; start address -> A2
     
 WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated by 'S'
@@ -486,27 +488,100 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
         MOVE.B D7,D2
         ADD.L D2,D6
         
-        MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
-               
+        ADD.L A3,D7                 ; add in the offset
+        
         SUB.L #3,D5                 ; subtract three bytes for 16 bit address and 1 byte checksum
-        WHILE.L D5 <GT> #0 DO       ; read the data bytes
-          SUB.L #1,D5
-            
-          MOVE.L #0,D7              ; D7 holds the byte
-            
-          DOWNLOAD D2,D3            ; MS 4 bits
-          PRINT_CHAR D2,D3
-          HEX2BIN D2,D2,A0
-          OR.L D2,D7
-          LSL.L #4,D7
+        
+        BTST #0,D7                  ; deal with odd addresses
+
+        MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
+        BEQ EVEN
+                
+        SUB.L #1,D5
+        SUB.L #1,A1
+        
+        MOVE.L #0,D7
+        DOWNLOAD D2,D3            ; MS 4 bits
+        PRINT_CHAR D2,D3
+        HEX2BIN D2,D2,A0
+        OR.L D2,D7
+        LSL.L #4,D7
              
-          DOWNLOAD D2,D3            ; LS 4 bits    
-          PRINT_CHAR D2,D3
-          HEX2BIN D2,D2,A0
-          OR.L D2,D7
+        DOWNLOAD D2,D3            ; LS 4 bits    
+        PRINT_CHAR D2,D3
+        HEX2BIN D2,D2,A0
+        OR.L D2,D7
+                        
+        ADD.L D7,D6               ; add into checksum
+                      
+        MOVE.W (A1),D3            ; get the current data and replace the bottom byte
+        
+        ANDI.W #$FF00,D3
+        OR.W D7,D3
+        
+        MOVE.W D3,(A1)           ; store it!
+        ADD.L #2,A1
+EVEN        
+        WHILE.L D5 <GE> #2 DO       ; read the data bytes
+            SUB.L #2,D5
+            MOVE.L #0,D7              ; D7 holds the word
             
-          ADD.L D7,D6               ; add into checksum            
+            DOWNLOAD D2,D3            ; MS 4 bits
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7
+             
+            DOWNLOAD D2,D3            ; LS 4 bits    
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+                        
+            ADD.L D7,D6               ; add into checksum
+            
+            LSL.L #4,D7
+            DOWNLOAD D2,D3            ; MS 4 bits
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+             
+            LSL.L #4,D7
+            DOWNLOAD D2,D3            ; LS 4 bits    
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            
+            MOVE.L #0,D2              ; rextract bottom byte of address and add into checksum
+            MOVE.B D7,D2
+            ADD.L D2,D6
+            
+            MOVE.W D7,(A1)+          ; store it!
         ENDW
+        
+        IF D5 <EQ> #1 THEN
+            MOVE.L #0,D7              ; D7 holds the word
+                    
+            DOWNLOAD D2,D3            ; MS 4 bits
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7
+             
+            DOWNLOAD D2,D3            ; LS 4 bits    
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+                        
+            ADD.L D7,D6               ; add into checksum
+            
+            MOVE.W (A1),D3            ; get the current data and replace the top byte
+            LSL.L #8,D7
+            AND.L #$00FF,D3
+            OR.L D7,D3
+
+            MOVE.W D3,(A1)+          ; store it!
+        ENDI
+  
         PRINT_CRLF D3
         LEA WAIT_FOR_SRECORD,A1     ; next place to go
       ELSE
@@ -555,11 +630,11 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
           ADD.L D2,D6
         
           MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
-               
+          ADD.L A3,A1                 ; add in the offset
+                
           SUB.L #4,D5                 ; subtract four bytes for 24 bit address and 1 byte checksum
-          LSR.L #1,D5                 ; /2 since we are reading words
-          WHILE.L D5 <GT> #0 DO       ; read the data bytes
-            SUB.L #1,D5
+          WHILE.L D5 <GE> #2 DO       ; read the data bytes
+            SUB.L #2,D5
             
             MOVE.L #0,D7              ; D7 holds the word
             
@@ -595,6 +670,29 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
             MOVE.W D7,(A1)+             ; store it!
             
           ENDW
+          
+            
+          IF D5 <EQ> #1 THEN
+            MOVE.L #0,D7              ; D7 holds the word
+                    
+            DOWNLOAD D2,D3            ; MS 4 bits
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+            LSL.L #4,D7
+             
+            DOWNLOAD D2,D3            ; LS 4 bits    
+            PRINT_CHAR D2,D3
+            HEX2BIN D2,D2,A0
+            OR.L D2,D7
+                        
+            ADD.L D7,D6               ; add into checksum
+            
+            MOVE.W D3,(A1)            ; get the current data and replace the bottom byte
+            MOVE.B D2,D3
+
+            MOVE.W D3,(A1)+           ; store it!
+          ENDI
           PRINT_CRLF D3
           LEA WAIT_FOR_SRECORD,A1     ; next place to go
         ELSE
@@ -667,7 +765,8 @@ WAIT_FOR_SRECORD                    ; wait for the start of a record, indicated 
       LEA CS_FAILURE,A0             ; warn for mismatched checksum
       PRINT_STR A0,D3
       PRINT_REG D4,D3,D6,D7,A0
-      PRINT_CRLF D3     
+      PRINT_CRLF D3
+      BRA MAIN_LOOP
     ENDI
     
     JMP (A1)
@@ -738,7 +837,7 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.11 (04/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.14 (05/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,'Z Zap memory',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
@@ -750,6 +849,7 @@ BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
+
 
 
 
