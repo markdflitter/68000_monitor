@@ -5,10 +5,15 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; burn the monitor into eeprom from code
+; FIX RESET VECTOR
+; backspace?
+; use the software protect and then wire up the write and oe lines permanently for the eeprom
+  ; i'd need to write the unprotect pattern and then the reprotect at the end
+  ; and, at that point we shouldn't be anywhere near ROM, so it shouldn't get corrupted: the inversion should also
 ; add LDS and UDS with an OR gate
-; S2 records don't deal well with odd lengths / addresses
 ; make the monitor relocatable, so it can run in RAM and ROM
+; copy the monitor to RAM to make it easier to test the write to EEPROM
+; lots of repeated code in download
 ;ram CHECK AT STARTUP??? WIOLL PREVEWNT RUNNIG CODE FROM RAM THOUGH, SO need cold/warm start
 ; check for escape during Z
 ; fix the DUART base address
@@ -25,13 +30,15 @@
 
 DEBUG               EQU 0
 
+
 ; constants
+ROM                 EQU $0
+RAM                 EQU $200000
+
 DISPLAY_BASE        EQU $E00000
 DISPLAY_            EQU $0
 DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_+1
-
-RAM                 EQU $200000
-
+   
 DUART_BASE          EQU $D30000
 DUART_MRA_          EQU $0
 DUART_CSRA_         EQU $1
@@ -215,8 +222,8 @@ CONTINUE\@
 ; A0 - address of string to print 
 
 ; start vector
-    DC.L $00000000              ; PC
-    DC.L $00000000              ; SP
+STACK    DC.L $00000000              ; STACK
+RESET    DC.L START                  ; RESET
     
 ; start of program  
 START
@@ -318,6 +325,9 @@ GET_INPUT
     
     CMP.B #'W',D2
     BEQ W
+    
+    CMP.B #'L',D2
+    BEQ L 
 
     PRINT_CRLF D3
  
@@ -338,6 +348,9 @@ GET_INPUT
 
     CMP.B #'Z',D2
     BEQ Z   
+
+    CMP.B #'X',D2
+    BEQ X
 
     LEA HUH,A0
     PRINT_STR A0,D3
@@ -631,7 +644,37 @@ EVEN
         
           MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
           ADD.L A3,A1                 ; add in the offset
+          
+          BTST #0,D7                  ; deal with odd addresses
+
+          MOVE.L D7,A1                ; put the address in an address register, and we can now re-use D7
+          BEQ EVEN2
                 
+          SUB.L #1,D5
+          SUB.L #1,A1
+        
+          MOVE.L #0,D7
+          DOWNLOAD D2,D3            ; MS 4 bits
+          PRINT_CHAR D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+          LSL.L #4,D7
+             
+          DOWNLOAD D2,D3            ; LS 4 bits    
+          PRINT_CHAR D2,D3
+          HEX2BIN D2,D2,A0
+          OR.L D2,D7
+                        
+          ADD.L D7,D6               ; add into checksum
+                      
+          MOVE.W (A1),D3            ; get the current data and replace the bottom byte
+        
+          ANDI.W #$FF00,D3
+          OR.W D7,D3
+        
+          MOVE.W D3,(A1)           ; store it!
+          ADD.L #2,A1
+EVEN2
           SUB.L #4,D5                 ; subtract four bytes for 24 bit address and 1 byte checksum
           WHILE.L D5 <GE> #2 DO       ; read the data bytes
             SUB.L #2,D5
@@ -670,7 +713,6 @@ EVEN
             MOVE.W D7,(A1)+             ; store it!
             
           ENDW
-          
             
           IF D5 <EQ> #1 THEN
             MOVE.L #0,D7              ; D7 holds the word
@@ -688,10 +730,12 @@ EVEN
                         
             ADD.L D7,D6               ; add into checksum
             
-            MOVE.W D3,(A1)            ; get the current data and replace the bottom byte
-            MOVE.B D2,D3
+            MOVE.W (A1),D3            ; get the current data and replace the top byte
+            LSL.L #8,D7
+            AND.L #$00FF,D3
+            OR.L D7,D3
 
-            MOVE.W D3,(A1)+           ; store it!
+            MOVE.W D3,(A1)+          ; store it!
           ENDI
           PRINT_CRLF D3
           LEA WAIT_FOR_SRECORD,A1     ; next place to go
@@ -766,7 +810,7 @@ EVEN
       PRINT_STR A0,D3
       PRINT_REG D4,D3,D6,D7,A0
       PRINT_CRLF D3
-      BRA MAIN_LOOP
+      JMP MAIN_LOOP
     ENDI
     
     JMP (A1)
@@ -828,6 +872,44 @@ OK
     
     JMP MAIN_LOOP
   
+L   MOVE.L #0,D5                    ; D5 will be the length  to write            
+
+    WAIT_CHAR D2,D3                 ; read most significant character -> D2
+    HEX2BIN D2,D2,A0                ; convert to binary -> D2
+    MOVE.B D2,D5                    ; put at bottom of D5
+
+    MOVE #2,D6                      ; 3 bytes left to read
+    
+READ_LENGTH
+    LSL.L #4,D5                     ; make what we have so far more significant
+    WAIT_CHAR D2,D3                 ; next character -> D2
+    HEX2BIN D2,D2,A0                ; convert to binary -> D2
+    OR.B D2,D5
+    ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
+    DBEQ D6,READ_LENGTH
+        
+    PRINT_CRLF D3
+
+    MOVE.L #ROM,A0                  ; start of ROM
+    
+    MOVE.L D7,A1                    ; address accumulator -> address register
+    MOVE.L #0,D7                    ; clear the now used address accumulator
+
+    ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
+    WHILE D5 <GT> #0 DO
+      SUB.L #4,D5
+      MOVE.L (A1)+,(A0)+            ; write the data
+  
+      MOVE.L A0,D0
+      PRINT_REG D0,D3,D7,D6,A2
+      PRINT_CRLF D3
+    ENDW    
+
+    JMP MAIN_LOOP
+    
+X   MOVE.L #0,A0
+    JMP (A0)
+
 HEX_DIGIT
     LSL.L #4,D7                    ; add the next digit in the next 4 bits
     HEX2BIN D2,D2,A0
@@ -837,8 +919,8 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.14 (05/04/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'nnnnnnnnG Go',13,10,'Z Zap memory',10,13,0
+VERSION DC.B 'MDF-mon V1.21 (06/04/2021)',13,10,0
+HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,'X exit to ROM',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
 READ    DC.B ' S records read, start address = ',0
@@ -849,6 +931,10 @@ BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
     
     END    START                    ; last line of source
+
+
+
+
 
 
 
