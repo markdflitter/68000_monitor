@@ -5,28 +5,28 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; FIX RESET VECTOR
-; backspace?
-; use the software protect and then wire up the write and oe lines permanently for the eeprom
-  ; i'd need to write the unprotect pattern and then the reprotect at the end
-  ; and, at that point we shouldn't be anywhere near ROM, so it shouldn't get corrupted: the inversion should also
-; add LDS and UDS with an OR gate
-; make the monitor relocatable, so it can run in RAM and ROM
-; copy the monitor to RAM to make it easier to test the write to EEPROM
-; lots of repeated code in download
-;ram CHECK AT STARTUP??? WIOLL PREVEWNT RUNNIG CODE FROM RAM THOUGH, SO need cold/warm start
-; check for escape during Z
 ; fix the DUART base address
 ; tidy up layout (indentation and comments)
+; tidy up NAND gate invertor and wiring for OE and WE on eeproms
+; tidy up power loom
+; add LDS and UDS with an OR gate and test
+; add simpler .W and .B variants of PRINT_REG
 ; stop using two registers in download
-; add a .W and .B variants of PRINT_REG
 ; implement DOWNLOAD_BYTE to remove repeated code
+; lots of repeated code in download between the two S record types (S1 and S2)
+
+; make the monitor relocatable, so it can run in RAM and ROM
+; keep track of highest address hit during srec download
+; fix the reset vector so that it jumps to the start
+; Replace JMP -> BRA
+; implement backspace
+; check for escape during Z and L?  Not sure if W is a good idea either
 ; fix being able to enter random chars when W'ing
-;JMP -> BRA
+; ram check at startup?  Not sure if this is a good idea!
 
 
-    ORG  $0
-    ;ORG  $200000
+    ;ORG  $0
+    ORG  $200000
 
 DEBUG               EQU 0
 
@@ -398,7 +398,7 @@ READ_DATA_TO_POKE
     PRINT_CRLF D3
     JMP MAIN_LOOP
 
-
+        
 S   MOVE.L D7,A3                    ; grab the address accumulator
     MOVE.L #0,D4                    ; count of records read -> D4
     MOVE.L 0,A2                     ; start address -> A2
@@ -894,19 +894,77 @@ READ_LENGTH
     
     MOVE.L D7,A1                    ; address accumulator -> address register
     MOVE.L #0,D7                    ; clear the now used address accumulator
+    
+    MOVE.L #$2AAA,A3
+    MOVE.W #$AAAA,(A3)
+    MOVE.L #$1554,A3
+    MOVE.W #$5555,(A3)
+    MOVE.L #$2AAA,A3
+    MOVE.W #$8080,(A3)
+    MOVE.L #$2AAA,A3
+    MOVE.W #$AAAA,(A3)
+    MOVE.L #$1554,A3
+    MOVE.W #$5555,(A3)
+    MOVE.L #$2AAA,A3
+    MOVE.W #$2020,(A3)
+    
+    LEA LOADING,A2                ; important for timing
+    PRINT_STR A2,D3
 
     ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
-    WHILE D5 <GT> #0 DO
-      SUB.L #4,D5
-      MOVE.L (A1)+,(A0)+            ; write the data
-  
-      MOVE.L A0,D0
-      PRINT_REG D0,D3,D7,D6,A2
-      PRINT_CRLF D3
-    ENDW    
-
-    JMP MAIN_LOOP
+    ;MOVE.L #0,D1
     
+    WHILE D5 <GT> #0 DO
+      SUB.L #2,D5
+      
+      MOVE.B (A1),DISPLAY
+      MOVE.W (A1),(A0)            ; write the data
+
+      ;PRINT_CHAR #'W',D3
+      ;MOVE.L #0,D3
+      ;MOVE.W (A1),D3
+      ;PRINT_REG D3,D4,D7,D6,A2
+      ;PRINT_CRLF D3      
+      
+  WAIT_FOR_COMPLETE:
+      ;PRINT_CHAR #'R',D2
+      MOVE.W (A0),D2
+
+      ;PRINT_REG D2,D3,D7,D6,A2
+      ;PRINT_CRLF D3      
+      
+      IF D2 <NE> (A1) THEN
+
+        ;PRINT_CHAR #'.',D2
+        
+        JMP WAIT_FOR_COMPLETE
+      ENDI
+
+      ;PRINT_CHAR #'c',D2
+      ;PRINT_CRLF D3      
+      
+      ADD.L #2,A0
+      ADD.L #2,A1
+
+      ;ADD.L #1,D1
+      ;IF D1 <EQ> #64 THEN
+ 
+        ;PRINT_CHAR #'A',D2
+        ;MOVE.L A0,D0
+        ;PRINT_REG D0,D3,D7,D6,A2
+        ;PRINT_CRLF D3      
+      ;ENDI
+    ENDW  
+    
+    MOVE.L #$2AAA,A3
+    MOVE.W #$AAAA,(A3)
+    MOVE.L #$1554,A3
+    MOVE.W #$5555,(A3)
+    MOVE.L #$2AAA,A3
+    MOVE.W #$A0A0,(A3)
+            
+    JMP MAIN_LOOP
+        
 X   MOVE.L #0,A0
     JMP (A0)
 
@@ -919,7 +977,7 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.21 (06/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.30 (07/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,'X exit to ROM',13,10,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
@@ -929,25 +987,9 @@ CS_FAILURE   DC.B 'WARNING: Checksum failure for record ',0
 RAM_ERROR DC.B 'WARNING: RAM error at: ',0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
+LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
