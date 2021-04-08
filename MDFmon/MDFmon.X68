@@ -5,7 +5,6 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; don't waste code on reading the srec header - just ignore it
 ; implement DOWNLOAD_BYTE to remove repeated code and shorten the gap between S1 and S2
 ; lots of repeated code in download between the two S record types (S1 and S2)
 ; tidy up NAND gate invertor and wiring for OE and WE on eeproms
@@ -424,52 +423,8 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
                 
     ADD.L D5,D6                     			; add byte count into checksum
 
-    IF.B D7 <EQ> #'0' THEN.L        			; header
-        MOVE.L #0,D7                			; read the 16 bit address, just checksum and then ignore
-        DOWNLOAD D2,D3              			; top byte
-        HEX2BIN D2,D2,A0
-        OR.L D2,D7
-        LSL.L #4,D7
-        DOWNLOAD D2,D3         
-        HEX2BIN D2,D2,A0
-        OR.L D2,D7
-        
-        ADD.L D7,D6                 			; add top byte of address into checksum
-
-        LSL.L #4,D7                 			; bottom byte
-        DOWNLOAD D2,D3
-        HEX2BIN D2,D2,A0
-        OR.L D2,D7
-        LSL.L #4,D7        
-        DOWNLOAD D2,D3
-        HEX2BIN D2,D2,A0
-        OR.L D2,D7
-        
-        MOVE.L #0,D2                 			; rextract bottom byte of address and add into checksum
-        MOVE.B D7,D2
-        ADD.L D2,D6
-        
-        SUB.L #3,D5                 			; subtract three bytes for 16 bit address and 1 byte checksum
-        WHILE.L D5 <GT> #0 DO       			; read the data bytes
-            SUB.L #1,D5
-            
-            MOVE.L #0,D7              			; D7 holds the byte
-            
-            DOWNLOAD D2,D3            			; MS 4 bits
-            HEX2BIN D2,D2,A0
-            OR.L D2,D7
-            LSL.L #4,D7
-             
-            DOWNLOAD D2,D3            			; LS 4 bits    
-            HEX2BIN D2,D2,A0
-            OR.L D2,D7
-            
-            ADD.L D7,D6               			; add into checksum
-          
-            PRINT_CHAR D7,D3          			; assume ASCII and print it
-        ENDW
-        PRINT_CRLF D3
-       LEA WAIT_FOR_SRECORD,A1            
+    IF.B D7 <EQ> #'0' THEN.L        			; header, just ignore it
+        BRA WAIT_FOR_SRECORD
     ELSE
         IF.B D7 <EQ> #'1' THEN.L       		 	; 16 bit address data record
             MOVE.L #0,D7                		; read the 16 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
@@ -950,7 +905,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.31 (08/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.32 (08/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
