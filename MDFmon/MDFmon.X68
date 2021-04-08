@@ -5,15 +5,14 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; increase baud rate x 4?
-; don't waste code on reading the srec header
+; don't waste code on reading the srec header - just ignore it
+; implement DOWNLOAD_BYTE to remove repeated code and shorten the gap between S1 and S2
+; lots of repeated code in download between the two S record types (S1 and S2)
 ; tidy up NAND gate invertor and wiring for OE and WE on eeproms
 ; tidy up power loom
 ; add LDS and UDS with an OR gate and test because then I can do byte writes and it will make the download simpler
 ; stop using two registers in download
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
-; implement DOWNLOAD_BYTE to remove repeated code
-; lots of repeated code in download between the two S record types (S1 and S2)
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
 ; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
 
@@ -26,8 +25,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ORG  $0
-    ;ORG  $200000
+    ;ORG  $0
+    ORG  $200000
 
 DEBUG               EQU 0
 
@@ -259,13 +258,13 @@ START
 ; channel A
     MOVE.B #$13,DUART_MRA           			; no flow control, no parity, 8 data bits
     MOVE.B #$07,DUART_MRA           			; 1 stop bit
-    MOVE.B #$BB,DUART_CSRA          			; 9600 baud
+    MOVE.B #$CC,DUART_CSRA          			; 9600 baud
     MOVE.B #$5,DUART_CRA            			; enable rx & tx
 
 ; channel B
     MOVE.B #$13,DUART_MRB           			; no flow control, no parity, 8 data bits
     MOVE.B #$07,DUART_MRB           			; 1 stop bit
-    MOVE.B #$BB,DUART_CSRB          			; 9600 baud
+    MOVE.B #$CC,DUART_CSRB          			; 9600 baud
     MOVE.B #$5,DUART_CRB            			; enable rx & tx
 
     PRINT_CHAR '.',D3               			; give the serial port chance to settle after reset
