@@ -5,13 +5,12 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; fix the DUART base address
 ; tidy up layout (indentation and comments)
 ; tidy up NAND gate invertor and wiring for OE and WE on eeproms
 ; tidy up power loom
-; add LDS and UDS with an OR gate and test
-; add simpler .W and .B variants of PRINT_REG
+; add LDS and UDS with an OR gate and test because then I can do byte writes and it will make the download simpler
 ; stop using two registers in download
+; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; implement DOWNLOAD_BYTE to remove repeated code
 ; lots of repeated code in download between the two S record types (S1 and S2)
 
@@ -34,12 +33,8 @@ DEBUG               EQU 0
 ; constants
 ROM                 EQU $0
 RAM                 EQU $200000
-
-DISPLAY_BASE        EQU $E00000
-DISPLAY_            EQU $0
-DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_+1
    
-DUART_BASE          EQU $D30000
+DUART_BASE          EQU $C00000
 DUART_MRA_          EQU $0
 DUART_CSRA_         EQU $1
 DUART_SRA_          EQU $1
@@ -79,6 +74,10 @@ DUART_IVR           EQU DUART_BASE+2*DUART_IVR_+1
 DUART_OPCR          EQU DUART_BASE+2*DUART_OPCR_+1
 DUART_SET_OPR       EQU DUART_BASE+2*DUART_SET_OPR_+1
 DUART_RESET_OPR     EQU DUART_BASE+2*DUART_RESET_OPR_+1
+
+DISPLAY_BASE        EQU $E00000
+DISPLAY_            EQU $0
+DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_+1
 
 ; macros
 ; convert top 4 bits of input register from binary to a single hex digit
@@ -348,9 +347,6 @@ GET_INPUT
 
     CMP.B #'Z',D2
     BEQ Z   
-
-    CMP.B #'X',D2
-    BEQ X
 
     LEA HUH,A0
     PRINT_STR A0,D3
@@ -965,9 +961,6 @@ READ_LENGTH
             
     JMP MAIN_LOOP
         
-X   MOVE.L #0,A0
-    JMP (A0)
-
 HEX_DIGIT
     LSL.L #4,D7                    ; add the next digit in the next 4 bits
     HEX2BIN D2,D2,A0
@@ -977,8 +970,8 @@ HEX_DIGIT
     SIMHALT                         ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.30 (07/04/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,'X exit to ROM',13,10,0
+VERSION DC.B 'MDF-mon V1.31 (08/04/2021)',13,10,0
+HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 UNIMP   DC.B 'Unimplemented',13,10,0
 READ    DC.B ' S records read, start address = ',0
@@ -990,6 +983,10 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
+
+
+
+
 
 
 
