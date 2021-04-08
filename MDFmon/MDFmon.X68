@@ -5,9 +5,8 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; consistency for use of labels
 ; increase baud rate x 4?
-; don't waste code on the srec header
+; don't waste code on reading the srec header
 ; tidy up NAND gate invertor and wiring for OE and WE on eeproms
 ; tidy up power loom
 ; add LDS and UDS with an OR gate and test because then I can do byte writes and it will make the download simpler
@@ -15,6 +14,8 @@
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; implement DOWNLOAD_BYTE to remove repeated code
 ; lots of repeated code in download between the two S record types (S1 and S2)
+; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
+; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
 
 ; make the monitor relocatable, so it can run in RAM and ROM
 ; keep track of highest address hit during srec download
@@ -25,8 +26,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ;ORG  $0
-    ORG  $200000
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -53,7 +54,7 @@ DUART_IVR_          EQU $C
 DUART_OPCR_         EQU $D
 DUART_SET_OPR_      EQU $E
 DUART_RESET_OPR_    EQU $F
-RRRR
+
 DUART_MRA           EQU DUART_BASE+2*DUART_MRA_+1
 DUART_SRA           EQU DUART_BASE+2*DUART_SRA_+1
 DUART_CSRA          EQU DUART_BASE+2*DUART_CSRA_+1
@@ -353,22 +354,26 @@ GET_INPUT
     JMP MAIN_LOOP
     
 ; commands
-H   LEA HELP,A0
+H   
+    LEA HELP,A0
     PRINT_STR A0,D3
     JMP MAIN_LOOP
 
-V   LEA VERSION,A0
+V   
+    LEA VERSION,A0
     PRINT_STR A0,D3       
     JMP MAIN_LOOP
     
-R   MOVE.L D7,A0                    			; address accumulator -> address register
+R   
+    MOVE.L D7,A0                    			; address accumulator -> address register
     MOVE.L (A0),D5                  			; read the memory and print it
     PRINT_REG D5,D3,D7,D6,A0
     PRINT_CRLF D3
     MOVE.L #0,D7                    			; clear the now used address accumulator
     JMP MAIN_LOOP
 
-W   MOVE.L #0,D5                    			; D5 will be the value to write            
+W
+    MOVE.L #0,D5                    			; D5 will be the value to write            
 
     WAIT_CHAR D2,D3                 			; read most significant character -> D2
     HEX2BIN D2,D2,A0                			; convert to binary -> D2
@@ -393,7 +398,8 @@ READ_DATA_TO_POKE
     JMP MAIN_LOOP
 
         
-S   MOVE.L D7,A3                    			; grab the address accumulator
+S
+    MOVE.L D7,A3                    			; grab the address accumulator
     MOVE.L #0,D4                    			; count of records read -> D4
     MOVE.L 0,A2                     			; start address -> A2
     
@@ -818,11 +824,13 @@ DOWNLOAD_DONE
         
     JMP MAIN_LOOP
     
-G   MOVE.L D7,A0                    			; address accumulator -> address register
+G
+    MOVE.L D7,A0                    			; address accumulator -> address register
     MOVE #0,D7                      			; clear the now used address accumulator
     JMP (A0)                        			; jump to it!
     
-Z   MOVE.L #RAM,A0                  			; address of RAM
+Z
+    MOVE.L #RAM,A0                  			; address of RAM
     MOVE.L #0,D0                    			; number of bytes
    
     WHILE.L D0 <LE> #$40000 DO      			; read the data bytes
@@ -866,7 +874,8 @@ OK
     
     JMP MAIN_LOOP
   
-L   MOVE.L #0,D5                    			; D5 will be the length  to write            
+L
+    MOVE.L #0,D5                    			; D5 will be the length  to write            
 
     WAIT_CHAR D2,D3                				; read most significant character -> D2
     HEX2BIN D2,D2,A0                			; convert to binary -> D2
@@ -913,7 +922,7 @@ READ_LENGTH
 		MOVE.B (A1),DISPLAY
 		MOVE.W (A1),(A0)            			; write the data
 	  
-  WAIT_FOR_COMPLETE:
+WAIT_FOR_COMPLETE
 		MOVE.W (A0),D2
 
 		IF D2 <NE> (A1) THEN
