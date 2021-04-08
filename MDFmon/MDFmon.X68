@@ -23,12 +23,10 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-
     ;ORG  $0
     ORG  $200000
 
 DEBUG               EQU 0
-
 
 ; constants
 ROM                 EQU $0
@@ -207,7 +205,6 @@ CONTINUE\@
     MOVE.B \1,DISPLAY           ; echo to the display
     
     ENDM
-
 
 ; register catalogue
 ; D0 - used for simulator I/O
@@ -908,48 +905,22 @@ READ_LENGTH
     PRINT_STR A2,D3
 
     ANDI #$FB,CCR                   ; clear the Z bit if set (from the OR above)
-    ;MOVE.L #0,D1
     
     WHILE D5 <GT> #0 DO
       SUB.L #2,D5
       
       MOVE.B (A1),DISPLAY
       MOVE.W (A1),(A0)            ; write the data
-
-      ;PRINT_CHAR #'W',D3
-      ;MOVE.L #0,D3
-      ;MOVE.W (A1),D3
-      ;PRINT_REG D3,D4,D7,D6,A2
-      ;PRINT_CRLF D3      
-      
+  
   WAIT_FOR_COMPLETE:
-      ;PRINT_CHAR #'R',D2
       MOVE.W (A0),D2
 
-      ;PRINT_REG D2,D3,D7,D6,A2
-      ;PRINT_CRLF D3      
-      
       IF D2 <NE> (A1) THEN
-
-        ;PRINT_CHAR #'.',D2
-        
         JMP WAIT_FOR_COMPLETE
       ENDI
-
-      ;PRINT_CHAR #'c',D2
-      ;PRINT_CRLF D3      
       
       ADD.L #2,A0
       ADD.L #2,A1
-
-      ;ADD.L #1,D1
-      ;IF D1 <EQ> #64 THEN
- 
-        ;PRINT_CHAR #'A',D2
-        ;MOVE.L A0,D0
-        ;PRINT_REG D0,D3,D7,D6,A2
-        ;PRINT_CRLF D3      
-      ;ENDI
     ENDW  
     
     MOVE.L #$2AAA,A3
