@@ -973,11 +973,10 @@ HEX_DIGIT
 VERSION DC.B 'MDF-mon V1.31 (08/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
-UNIMP   DC.B 'Unimplemented',13,10,0
 READ    DC.B ' S records read, start address = ',0
-UNREC   DC.B 'WARNING: Unrecognised S record type: ',0
-CS_FAILURE   DC.B 'WARNING: Checksum failure for record ',0
-RAM_ERROR DC.B 'WARNING: RAM error at: ',0
+UNREC   DC.B 'W: Unknown Srec type: ',0
+CS_FAILURE   DC.B 'W: CS failure at ',0
+RAM_ERROR DC.B 'W: RAM error at: ',0
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
