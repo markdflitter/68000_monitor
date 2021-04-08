@@ -5,11 +5,11 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; implement DOWNLOAD_BYTE to remove repeated code and shorten the gap between S1 and S2
-; lots of repeated code in download between the two S record types (S1 and S2)
 ; tidy up NAND gate invertor and wiring for OE and WE on eeproms
 ; tidy up power loom
 ; add LDS and UDS with an OR gate and test because then I can do byte writes and it will make the download simpler
+; implement DOWNLOAD_BYTE to remove repeated code and shorten the gap between S1 and S2
+; lots of repeated code in download between the two S record types (S1 and S2)
 ; stop using two registers in download
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
@@ -917,6 +917,7 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
