@@ -5,12 +5,10 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; tidy up NAND gate invertor and wiring for OE and WE on eeproms
-; tidy up power loom
-; add LDS and UDS with an OR gate and test because then I can do byte writes and it will make the download simpler
+; remove the odd byte handling in the downloads
 ; implement DOWNLOAD_BYTE to remove repeated code and shorten the gap between S1 and S2
-; lots of repeated code in download between the two S record types (S1 and S2)
 ; stop using two registers in download
+; lots of repeated code in download between the two S record types (S1 and S2)
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
 ; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
@@ -24,8 +22,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ;ORG  $0
-    ORG  $200000
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -905,7 +903,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.32 (08/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.36 (08/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
@@ -917,6 +915,7 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
