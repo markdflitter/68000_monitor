@@ -541,20 +541,13 @@ OK
 L
     MOVE.L #0,D5                    			    ; D5 will be the length  to write            
 
-    WAIT_CHAR D2,D3                				; read most significant character -> D2
-    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
-    MOVE.B D2,D5                    			    ; put at bottom of D5
-
-    MOVE #2,D6                      			    ; 3 bytes left to read
-    
-READ_LENGTH
-    LSL.L #4,D5                     			    ; make what we have so far more significant
-    WAIT_CHAR D2,D3                 			    ; next character -> D2
-    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
-    OR.B D2,D5  
-    ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
-    DBEQ D6,READ_LENGTH
-        
+    FOR D6 = #0 TO #3 DO                          ; read the length to write
+        LSL.L #4,D5                     			; make what we have so far more significant
+        WAIT_CHAR D2,D3                 			; next character -> D2
+        HEX2BIN D2,D2,A0                			; convert to binary -> D2
+        OR.B D2,D5
+    ENDF
+		  
     PRINT_CRLF D3,A0
 
     MOVE.L #ROM,A0                  			    ; start of ROM
@@ -571,8 +564,6 @@ READ_LENGTH
     
     LEA LOADING,A2                				; important for timing
     PRINT_STR A2,D3
-
-    ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
     
     WHILE D5 <GT> #0 DO
 		SUB.L #2,D5
@@ -589,7 +580,7 @@ WAIT_FOR_COMPLETE
       
 		ADD.L #2,A0
 		ADD.L #2,A1
-    ENDW  
+	 ENDW  
     
     MOVE.W #$AAAA,$2AAA
     MOVE.W #$5555,$1554
