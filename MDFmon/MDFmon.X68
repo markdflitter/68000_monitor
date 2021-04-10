@@ -5,7 +5,6 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; Replace JMP -> BRA, THEN.L
 ; revisit register usage in S record download
 ; should we just preload the LUTs at the start, rather than in each call to convert?
 ; revisit use of bytes and longs
@@ -23,8 +22,8 @@
 ; ram check at startup?  Not sure if this is a good idea!
 ; byte W?
 
-    ;ORG  $0
-    ORG  $200000
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -557,7 +556,7 @@ OK
 		ADD.L #4,D0
     ENDW
     
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
   
 L
     MOVE.L #0,D5                    			; D5 will be the length  to write            
@@ -611,7 +610,7 @@ WAIT_FOR_COMPLETE
 		MOVE.W (A0),D2
 
 		IF D2 <NE> (A1) THEN
-			JMP WAIT_FOR_COMPLETE
+			BRA WAIT_FOR_COMPLETE
 		ENDI
       
 		ADD.L #2,A0
@@ -625,7 +624,7 @@ WAIT_FOR_COMPLETE
     MOVE.L #$2AAA,A3
     MOVE.W #$A0A0,(A3)
             
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
         
 HEX_DIGIT
     LSL.L #4,D7                    				; add the next digit in the next 4 bits
@@ -636,7 +635,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.48 (10/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.49 (10/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'[v] version',13,10,'xxxxxxxx[r] read long',13,10,'xxxxxxxx[w]xxxxxxxx write long',13,10,'[s] download S records',13,10,'xxxxxxxx[g] go',13,10,'[z] zap memory',10,13,'xxxxxxxx[l]xxxx load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
