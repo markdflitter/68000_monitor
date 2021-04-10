@@ -352,10 +352,10 @@ PRINTSTR
     
 R   
     MOVE.L D7,A0                    			    ; address accumulator -> address register
+    MOVE.L #0,D7                    			    ; clear the now used address accumulator
     MOVE.L (A0),D5                  			    ; read the memory and print it
     PRINT_REG D5,D3,D7,D6,A0
     PRINT_CRLF D3,A0
-    MOVE.L #0,D7                    			    ; clear the now used address accumulator
     BRA MAIN_LOOP
 
 W
