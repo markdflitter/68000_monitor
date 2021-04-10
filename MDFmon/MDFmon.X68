@@ -17,8 +17,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ORG  $0
-    ;ORG  $230000
+    ;ORG  $0
+    ORG  $230000
 
 DEBUG               EQU 0
 
@@ -412,7 +412,7 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
 
     MOVE.L #0,D2                    			    ; clear the checksum
 
-    MOVE.L #0,D3                    			    ; read the 2 digit byte count -> D3
+    ;MOVE.L #0,D3                    			    ; read the 2 digit byte count -> D3
     DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4                                        
 
     IF.B D1 <EQ> #'0' THEN.L        			    ; header, just ignore it
@@ -434,13 +434,12 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
         	    MOVE.L D4,A2            	            ; put the address in an address register
 			ADD.L A1,A2             		        ; add in the offset
 
-            WHILE.L D3 <GT> #0 DO       		    ; read the data bytes                
-                ;MOVE.L #0,D1            		    ; D1 holds the byte
+            WHILE.B D3 <GT> #0 DO       		    ; read the data bytes                
                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it                               
                         
                 MOVE.B D1,(A2)+         		    ; store it!
 
-                SUB.L #1,D3                     ; 1 less byte to go
+                SUB.B #1,D3                     ; 1 less byte to go
             ENDW
         
             LEA WAIT_FOR_SRECORD,A3     	        ; next place to go
@@ -467,7 +466,6 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
 		ENDI
 	ENDI
     
-    ;MOVE.L #0,D4                    			    ; read the checksum from the data stream add to our checksum: should make it FF
     DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4							
     PRINT_CRLF D5,A4
 		
