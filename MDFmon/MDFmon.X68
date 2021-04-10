@@ -18,7 +18,7 @@
 ; ram check at startup?  Not sure if this is a good idea!
 
     ORG  $0
-    ;ORG  $200000
+    ;ORG  $230000
 
 DEBUG               EQU 0
 
@@ -404,10 +404,10 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
     CMP.B #'S',D1                   			    ; found S?    
     BNE WAIT_FOR_SRECORD            			    ; nope, keep waiting
     
-    PRINT_CHAR #'S',D5                          ; print the S
+    PRINT_CHAR #'S',D5                            ; print the S
     ADD.L #1,D0                     			    ; read another S record, increment count
     
-    DOWNLOAD D1                      			; read the record identifier and echo it back
+    DOWNLOAD D1                      			    ; read the record identifier and echo it back
     PRINT_CHAR D1,D5
 
     MOVE.L #0,D2                    			    ; clear the checksum
@@ -423,10 +423,10 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
             SUB.L #3,D3                 		    ; subtract three bytes for 16 bit address and 1 byte checksum
     
             MOVE.L #0,D4                		    ; read two bytes of address
-            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; first byte                           
-            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; second one
+            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4       ; first byte                           
+            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4       ; second one
             
-            IF.B D1 <EQ> #'2'  THEN.L           ; 24 bit address data record, read another byte
+            IF.B D1 <EQ> #'2'  THEN.L             ; 24 bit address data record, read another byte
                 SUB.L #1,D3                 	    ; subtract an extra bytes for 24 bit address    
                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; 3rd byte       
             ENDI
@@ -435,7 +435,7 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
 			ADD.L A1,A2             		        ; add in the offset
 
             WHILE.L D3 <GT> #0 DO       		    ; read the data bytes                
-                MOVE.L #0,D1            		    ; D1 holds the byte
+                ;MOVE.L #0,D1            		    ; D1 holds the byte
                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it                               
                         
                 MOVE.B D1,(A2)+         		    ; store it!
@@ -467,7 +467,7 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
 		ENDI
 	ENDI
     
-    MOVE.L #0,D4                    			    ; read the checksum from the data stream add to our checksum: should make it FF
+    ;MOVE.L #0,D4                    			    ; read the checksum from the data stream add to our checksum: should make it FF
     DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4							
     PRINT_CRLF D5,A4
 		
@@ -588,7 +588,7 @@ HEX_DIGIT
     SIMHALT                         			    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.52 (10/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.54 (10/04/2021)',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
         DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF

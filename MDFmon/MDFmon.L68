@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 10/04/2021 17:43:21
+Created On: 10/04/2021 17:51:28
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : MDFmon 
@@ -22,7 +22,7 @@ Created On: 10/04/2021 17:43:21
 00000000                            18  ; ram check at startup?  Not sure if this is a good idea!
 00000000                            19  
 00000000                            20      ORG  $0
-00000000                            21      ;ORG  $200000
+00000000                            21      ;ORG  $230000
 00000000                            22  
 00000000  =00000000                 23  DEBUG               EQU 0
 00000000                            24  
@@ -302,7 +302,7 @@ Created On: 10/04/2021 17:43:21
 000000EC  13FC 0001 00E00001       298      MOVE.B #1,DISPLAY
 000000F4                           299         
 000000F4                           300m     PRINT_CRLF D3,A0
-000000F4  41F9 00000E8C            301m     LEA CRLF,A0
+000000F4  41F9 00000E88            301m     LEA CRLF,A0
 000000FA                           302mm     PRINT_STR A0,D3
 000000FA                           303mm LOOP_3
 000000FA  0C10 0000                304mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -325,7 +325,7 @@ Created On: 10/04/2021 17:43:21
 00000116                           321mm     ENDM
 00000116                           322m     ENDM
 00000116                           323  
-00000116  41F9 00000D20            324      LEA VERSION,A0
+00000116  41F9 00000D1C            324      LEA VERSION,A0
 0000011C                           325m     PRINT_STR A0,D3
 0000011C                           326m LOOP_5
 0000011C  0C10 0000                327m     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -347,7 +347,7 @@ Created On: 10/04/2021 17:43:21
 00000138                           343m EXIT_5
 00000138                           344m     ENDM
 00000138                           345m     PRINT_CRLF D3,A0
-00000138  41F9 00000E8C            346m     LEA CRLF,A0
+00000138  41F9 00000E88            346m     LEA CRLF,A0
 0000013E                           347mm     PRINT_STR A0,D3
 0000013E                           348mm LOOP_8
 0000013E  0C10 0000                349mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -443,7 +443,7 @@ Created On: 10/04/2021 17:43:21
 000001BC  6D00 000E                439s     BLT _00000000
 000001C0  B43C 0039                440s     CMP.B   #'9',D2
 000001C4  6E00 0006                441s     BGT _00000000
-000001C8  6000 0B36                442          BRA HEX_DIGIT
+000001C8  6000 0B32                442          BRA HEX_DIGIT
 000001CC                           443      ENDI
 000001CC                           444s _00000000
 000001CC                           445      IF.B D2 <GE> #'A' AND.B D2 <LE> #'F' THEN
@@ -451,7 +451,7 @@ Created On: 10/04/2021 17:43:21
 000001D0  6D00 000E                447s     BLT _00000001
 000001D4  B43C 0046                448s     CMP.B   #'F',D2
 000001D8  6E00 0006                449s     BGT _00000001
-000001DC  6000 0B22                450          BRA HEX_DIGIT
+000001DC  6000 0B1E                450          BRA HEX_DIGIT
 000001E0                           451      ENDI
 000001E0                           452s _00000001
 000001E0                           453          
@@ -459,10 +459,10 @@ Created On: 10/04/2021 17:43:21
 000001E4  6700 0132                455      BEQ W
 000001E8                           456      
 000001E8  B43C 006C                457      CMP.B #'l',D2
-000001EC  6700 0A12                458      BEQ L 
+000001EC  6700 0A0E                458      BEQ L 
 000001F0                           459  
 000001F0                           460m     PRINT_CRLF D3,A0
-000001F0  41F9 00000E8C            461m     LEA CRLF,A0
+000001F0  41F9 00000E88            461m     LEA CRLF,A0
 000001F6                           462mm     PRINT_STR A0,D3
 000001F6                           463mm LOOP_16
 000001F6  0C10 0000                464mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -498,12 +498,12 @@ Created On: 10/04/2021 17:43:21
 0000022E  6700 0166                494      BEQ S
 00000232                           495  
 00000232  B43C 0067                496      CMP.B #'g',D2
-00000236  6700 08D0                497      BEQ G   
+00000236  6700 08CC                497      BEQ G   
 0000023A                           498  
 0000023A  B43C 007A                499      CMP.B #'z',D2
-0000023E  6700 08D0                500      BEQ Z   
+0000023E  6700 08CC                500      BEQ Z   
 00000242                           501  
-00000242  41F9 00000DED            502      LEA HUH,A0
+00000242  41F9 00000DE9            502      LEA HUH,A0
 00000248                           503m     PRINT_STR A0,D3
 00000248                           504m LOOP_18
 00000248  0C10 0000                505m     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -529,11 +529,11 @@ Created On: 10/04/2021 17:43:21
 00000268                           525      
 00000268                           526  ; commands
 00000268                           527  H   
-00000268  41F9 00000D3D            528      LEA HELP,A0
+00000268  41F9 00000D39            528      LEA HELP,A0
 0000026E  6000 0008                529      BRA PRINTSTR
 00000272                           530  
 00000272                           531  V   
-00000272  41F9 00000D20            532      LEA VERSION,A0
+00000272  41F9 00000D1C            532      LEA VERSION,A0
 00000278                           533  PRINTSTR
 00000278                           534m     PRINT_STR A0,D3       
 00000278                           535m LOOP_20
@@ -590,7 +590,7 @@ Created On: 10/04/2021 17:43:21
 000002C4  7C07                     586m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000002C6                           587m LOOP_22
 000002C6                           588mm     BIN2HEX D5,D7,A0
-000002C6  41F9 00000E51            589mm     LEA BIN2HEX_LUT,A0                          ; LOAD THE LOOKUP TABLE
+000002C6  41F9 00000E4D            589mm     LEA BIN2HEX_LUT,A0                          ; LOAD THE LOOKUP TABLE
 000002CC  E99D                     590mm     ROL.L #4,D5                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000002CE  1E05                     591mm     MOVE.B D5,D7
 000002D0  0287 0000000F            592mm     ANDI.L #$F,D7
@@ -612,7 +612,7 @@ Created On: 10/04/2021 17:43:21
 000002EC  57CE FFD8                608m     DBEQ D6,LOOP_22
 000002F0                           609m     ENDM
 000002F0                           610m     PRINT_CRLF D3,A0
-000002F0  41F9 00000E8C            611m     LEA CRLF,A0
+000002F0  41F9 00000E88            611m     LEA CRLF,A0
 000002F6                           612mm     PRINT_STR A0,D3
 000002F6                           613mm LOOP_28
 000002F6  0C10 0000                614mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -680,7 +680,7 @@ Created On: 10/04/2021 17:43:21
 0000034C                           676m     ENDC
 0000034C                           677m     ENDM
 0000034C                           678m     HEX2BIN D2,D2,A0                                ; convert to binary -> D2
-0000034C  41F9 00000E61            679m     LEA HEX2BIN_LUT,A0                              ; LOAD THE LOOKUP TABLE
+0000034C  41F9 00000E5D            679m     LEA HEX2BIN_LUT,A0                              ; LOAD THE LOOKUP TABLE
 00000352  0402 0030                680m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000356  C4BC 000000FF            681m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
 0000035C  1430 2000                682m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT      
@@ -695,7 +695,7 @@ Created On: 10/04/2021 17:43:21
 0000036E  2085                     691      MOVE.L D5,(A0)                                  ; write the data
 00000370                           692  
 00000370                           693m     PRINT_CRLF D3,A0
-00000370  41F9 00000E8C            694m     LEA CRLF,A0
+00000370  41F9 00000E88            694m     LEA CRLF,A0
 00000376                           695mm     PRINT_STR A0,D3
 00000376                           696mm LOOP_35
 00000376  0C10 0000                697mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
@@ -769,7 +769,7 @@ Created On: 10/04/2021 17:43:21
 000003D2  B23C 0053                765      CMP.B #'S',D1                                   ; found S?    
 000003D6  66C6                     766      BNE WAIT_FOR_SRECORD                            ; nope, keep waiting
 000003D8                           767      
-000003D8                           768m     PRINT_CHAR #'S',D5                          ; print the S
+000003D8                           768m     PRINT_CHAR #'S',D5                            ; print the S
 000003D8                           769m WAIT_FOR_READY_39                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000003D8                 TRUE      770m     IFEQ DEBUG
 000003D8  1A39 00C00003            771m         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
@@ -784,7 +784,7 @@ Created On: 10/04/2021 17:43:21
 000003EC                           780m     ENDM
 000003EC  5280                     781      ADD.L #1,D0                                     ; read another S record, increment count
 000003EE                           782      
-000003EE                           783m     DOWNLOAD D1                                 ; read the record identifier and echo it back
+000003EE                           783m     DOWNLOAD D1                                     ; read the record identifier and echo it back
 000003EE                           784m WAIT_FOR_READY_40                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000003EE                           785m 
 000003EE  1239 00C00003            786m     MOVE.B DUART_SRA,D1                         ; CHECK FOR COMMAND
@@ -874,7 +874,7 @@ Created On: 10/04/2021 17:43:21
 0000048C                           870mm 
 0000048C                           871mm     ENDM
 0000048C                           872mm         HEX2BIN D5,D5,A4
-0000048C  49F9 00000E61            873mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+0000048C  49F9 00000E5D            873mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
 00000492  0405 0030                874mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000496  CABC 000000FF            875mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 0000049C  1A34 5000                876mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
@@ -895,7 +895,7 @@ Created On: 10/04/2021 17:43:21
 000004AC  B23C 0030                891s     CMP.B   #'0',D1
 000004B0  6600 002C                892s     BNE.L   _00000002
 000004B4                           893m         PRINT_CRLF D5,A4
-000004B4  49F9 00000E8C            894m     LEA CRLF,A4
+000004B4  49F9 00000E88            894m     LEA CRLF,A4
 000004BA                           895mm     PRINT_STR A4,D5
 000004BA                           896mm LOOP_49
 000004BA  0C14 0000                897mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
@@ -919,18 +919,18 @@ Created On: 10/04/2021 17:43:21
 000004D6                           915m     ENDM
 000004D6  6000 FEC6                916          BRA WAIT_FOR_SRECORD
 000004DA                           917      ELSE
-000004DA  6000 03FC                918s     BRA _00000003
+000004DA  6000 03FA                918s     BRA _00000003
 000004DE                           919s _00000002
 000004DE                           920          IF.B D1 <EQ> #'1' OR.B D1 <EQ> #'2' THEN.L ; 16 or 24 bit address data record
 000004DE  B23C 0031                921s     CMP.B   #'1',D1
 000004E2  6708                     922s     BEQ.S   _00000004
 000004E4  B23C 0032                923s     CMP.B   #'2',D1
-000004E8  6600 0200                924s     BNE.L   _00000005
+000004E8  6600 01FE                924s     BNE.L   _00000005
 000004EC                           925s _00000004
 000004EC  5783                     926              SUB.L #3,D3                             ; subtract three bytes for 16 bit address and 1 byte checksum
 000004EE                           927      
 000004EE  7800                     928              MOVE.L #0,D4                            ; read two bytes of address
-000004F0                           929m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; first byte                           
+000004F0                           929m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4       ; first byte                           
 000004F0  1E3C 0002                930m     MOVE.B #2,D7
 000004F4                           931m     WHILE.B D7 <GT> 0 DO
 000004F4                           932ms _10000002
@@ -977,7 +977,7 @@ Created On: 10/04/2021 17:43:21
 00000544                           973mm 
 00000544                           974mm     ENDM
 00000544                           975mm         HEX2BIN D5,D5,A4
-00000544  49F9 00000E61            976mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+00000544  49F9 00000E5D            976mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
 0000054A  0405 0030                977mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 0000054E  CABC 000000FF            978mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000554  1A34 5000                979mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
@@ -993,7 +993,7 @@ Created On: 10/04/2021 17:43:21
 00000562  D484                     989m     ADD.L D4,D2
 00000564                           990m 
 00000564                           991m     ENDM
-00000564                           992m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; second one
+00000564                           992m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4       ; second one
 00000564  1E3C 0002                993m     MOVE.B #2,D7
 00000568                           994m     WHILE.B D7 <GT> 0 DO
 00000568                           995ms _10000004
@@ -1040,7 +1040,7 @@ Created On: 10/04/2021 17:43:21
 000005B8                          1036mm 
 000005B8                          1037mm     ENDM
 000005B8                          1038mm         HEX2BIN D5,D5,A4
-000005B8  49F9 00000E61           1039mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+000005B8  49F9 00000E5D           1039mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
 000005BE  0405 0030               1040mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 000005C2  CABC 000000FF           1041mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 000005C8  1A34 5000               1042mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
@@ -1057,7 +1057,7 @@ Created On: 10/04/2021 17:43:21
 000005D8                          1053m 
 000005D8                          1054m     ENDM
 000005D8                          1055              
-000005D8                          1056              IF.B D1 <EQ> #'2'  THEN.L           ; 24 bit address data record, read another byte
+000005D8                          1056              IF.B D1 <EQ> #'2'  THEN.L             ; 24 bit address data record, read another byte
 000005D8  B23C 0032               1057s     CMP.B   #'2',D1
 000005DC  6600 0078               1058s     BNE.L   _00000006
 000005E0  5383                    1059                  SUB.L #1,D3                         ; subtract an extra bytes for 24 bit address    
@@ -1108,7 +1108,7 @@ Created On: 10/04/2021 17:43:21
 00000636                          1104mm 
 00000636                          1105mm     ENDM
 00000636                          1106mm         HEX2BIN D5,D5,A4
-00000636  49F9 00000E61           1107mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+00000636  49F9 00000E5D           1107mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
 0000063C  0405 0030               1108mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000640  CABC 000000FF           1109mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000646  1A34 5000               1110mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
@@ -1133,1041 +1133,1041 @@ Created On: 10/04/2021 17:43:21
 0000065A                          1129              WHILE.L D3 <GT> #0 DO                   ; read the data bytes                
 0000065A                          1130s _10000008
 0000065A  B6BC 00000000           1131s     CMP.L   #0,D3
-00000660  6F00 0080               1132s     BLE _10000009
-00000664  7200                    1133                  MOVE.L #0,D1                        ; D1 holds the byte
-00000666                          1134m                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it                               
-00000666  1E3C 0002               1135m     MOVE.B #2,D7
-0000066A                          1136m     WHILE.B D7 <GT> 0 DO
-0000066A                          1137ms _1000000A
-0000066A  BE38 0000               1138ms     CMP.B   0,D7
-0000066E  6F00 0064               1139ms     BLE _1000000B
-00000672  E989                    1140m         LSL.L #4,D1                             ; IT's OK to do this first, because we are either starting from 0, 
-00000674                          1141mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
-00000674                          1142mm WAIT_FOR_READY_67                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000674                          1143mm 
-00000674  1A39 00C00003           1144mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
-0000067A  0805 0000               1145mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
-0000067E  6700 0010               1146mm     BEQ CONTINUE_67                             ; NOTHING, CONTINUE
-00000682                          1147mm  
-00000682                          1148mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
-00000682                 TRUE     1149mmm     IFEQ DEBUG
-00000682  1A39 00C00007           1150mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
-00000688                          1151mmm     ENDC
-00000688                 FALSE    1152mmm     IFNE DEBUG
-00000688                          1153mmm     ENDC
-00000688                          1154mmm      
-00000688  BA3C 001B               1155mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
-0000068C  6700 F97A               1156mmm     BEQ START
-00000690                          1157mmm     ENDM
-00000690                          1158mm CONTINUE_67
-00000690  1A39 00C00013           1159mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
-00000696  0805 0000               1160mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
-0000069A  67D8                    1161mm     BEQ WAIT_FOR_READY_67                           ; NOTHING, CHECK AGAIN
-0000069C                          1162mm     
-0000069C  1A39 00C00017           1163mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
-000006A2  13C5 00E00001           1164mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
-000006A8                          1165mm     
-000006A8                          1166mm     ENDM
-000006A8                          1167mm         PRINT_CHAR D5,D6
-000006A8                          1168mm WAIT_FOR_READY_69                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000006A8                 TRUE     1169mm     IFEQ DEBUG
-000006A8  1C39 00C00003           1170mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
-000006AE  0806 0002               1171mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
-000006B2  67F4                    1172mm         BEQ WAIT_FOR_READY_69                   ; NO SPACE, CHECK AGAIN
-000006B4  13C5 00C00007           1173mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
-000006BA                          1174mm     ENDC
-000006BA                          1175mm     
-000006BA                 FALSE    1176mm     IFNE DEBUG
-000006BA                          1177mm     ENDC
-000006BA                          1178mm 
-000006BA                          1179mm     ENDM
-000006BA                          1180mm         HEX2BIN D5,D5,A4
-000006BA  49F9 00000E61           1181mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
-000006C0  0405 0030               1182mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-000006C4  CABC 000000FF           1183mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
-000006CA  1A34 5000               1184mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
-000006CE                          1185mm     ENDM
-000006CE  8205                    1186m         OR.B D5,D1
-000006D0  5307                    1187m         SUB.B #1,D7
-000006D2                          1188m     ENDW
-000006D2  6096                    1189ms     BRA _1000000A
-000006D4                          1190ms _1000000B
-000006D4                          1191m     
-000006D4  7A00                    1192m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
-000006D6  1A01                    1193m     MOVE.B D1,D5
-000006D8  D481                    1194m     ADD.L D1,D2
-000006DA                          1195m 
-000006DA                          1196m     ENDM
-000006DA                          1197                          
-000006DA  14C1                    1198                  MOVE.B D1,(A2)+                     ; store it!
-000006DC                          1199  
-000006DC  5383                    1200                  SUB.L #1,D3                     ; 1 less byte to go
-000006DE                          1201              ENDW
-000006DE  6000 FF7A               1202s     BRA _10000008
-000006E2                          1203s _10000009
-000006E2                          1204          
-000006E2  47F8 039E               1205              LEA WAIT_FOR_SRECORD,A3                 ; next place to go
-000006E6                          1206          ELSE
-000006E6  6000 01F0               1207s     BRA _00000007
-000006EA                          1208s _00000005
-000006EA                          1209              IF.B D1 <EQ> #'8' THEN.L                ; termination record, exit
-000006EA  B23C 0038               1210s     CMP.B   #'8',D1
-000006EE  6600 016C               1211s     BNE.L   _00000008
-000006F2  7800                    1212                  MOVE.L #0,D4                    ; read the 24 bit start address
-000006F4                          1213m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; top byte  
-000006F4  1E3C 0002               1214m     MOVE.B #2,D7
-000006F8                          1215m     WHILE.B D7 <GT> 0 DO
-000006F8                          1216ms _1000000C
-000006F8  BE38 0000               1217ms     CMP.B   0,D7
-000006FC  6F00 0064               1218ms     BLE _1000000D
-00000700  E98C                    1219m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
-00000702                          1220mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
-00000702                          1221mm WAIT_FOR_READY_72                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000702                          1222mm 
-00000702  1A39 00C00003           1223mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
-00000708  0805 0000               1224mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
-0000070C  6700 0010               1225mm     BEQ CONTINUE_72                             ; NOTHING, CONTINUE
-00000710                          1226mm  
-00000710                          1227mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
-00000710                 TRUE     1228mmm     IFEQ DEBUG
-00000710  1A39 00C00007           1229mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
-00000716                          1230mmm     ENDC
-00000716                 FALSE    1231mmm     IFNE DEBUG
-00000716                          1232mmm     ENDC
-00000716                          1233mmm      
-00000716  BA3C 001B               1234mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
-0000071A  6700 F8EC               1235mmm     BEQ START
-0000071E                          1236mmm     ENDM
-0000071E                          1237mm CONTINUE_72
-0000071E  1A39 00C00013           1238mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
-00000724  0805 0000               1239mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
-00000728  67D8                    1240mm     BEQ WAIT_FOR_READY_72                           ; NOTHING, CHECK AGAIN
-0000072A                          1241mm     
-0000072A  1A39 00C00017           1242mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
-00000730  13C5 00E00001           1243mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
-00000736                          1244mm     
-00000736                          1245mm     ENDM
-00000736                          1246mm         PRINT_CHAR D5,D6
-00000736                          1247mm WAIT_FOR_READY_74                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000736                 TRUE     1248mm     IFEQ DEBUG
-00000736  1C39 00C00003           1249mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
-0000073C  0806 0002               1250mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
-00000740  67F4                    1251mm         BEQ WAIT_FOR_READY_74                   ; NO SPACE, CHECK AGAIN
-00000742  13C5 00C00007           1252mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
-00000748                          1253mm     ENDC
-00000748                          1254mm     
-00000748                 FALSE    1255mm     IFNE DEBUG
-00000748                          1256mm     ENDC
-00000748                          1257mm 
-00000748                          1258mm     ENDM
-00000748                          1259mm         HEX2BIN D5,D5,A4
-00000748  49F9 00000E61           1260mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
-0000074E  0405 0030               1261mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-00000752  CABC 000000FF           1262mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
-00000758  1A34 5000               1263mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
-0000075C                          1264mm     ENDM
-0000075C  8805                    1265m         OR.B D5,D4
-0000075E  5307                    1266m         SUB.B #1,D7
-00000760                          1267m     ENDW
-00000760  6096                    1268ms     BRA _1000000C
-00000762                          1269ms _1000000D
-00000762                          1270m     
-00000762  7A00                    1271m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
-00000764  1A04                    1272m     MOVE.B D4,D5
-00000766  D484                    1273m     ADD.L D4,D2
-00000768                          1274m 
-00000768                          1275m     ENDM
-00000768                          1276m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; middle byte     
-00000768  1E3C 0002               1277m     MOVE.B #2,D7
-0000076C                          1278m     WHILE.B D7 <GT> 0 DO
-0000076C                          1279ms _1000000E
-0000076C  BE38 0000               1280ms     CMP.B   0,D7
-00000770  6F00 0064               1281ms     BLE _1000000F
-00000774  E98C                    1282m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
-00000776                          1283mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
-00000776                          1284mm WAIT_FOR_READY_77                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000776                          1285mm 
-00000776  1A39 00C00003           1286mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
-0000077C  0805 0000               1287mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
-00000780  6700 0010               1288mm     BEQ CONTINUE_77                             ; NOTHING, CONTINUE
-00000784                          1289mm  
-00000784                          1290mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
-00000784                 TRUE     1291mmm     IFEQ DEBUG
-00000784  1A39 00C00007           1292mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
-0000078A                          1293mmm     ENDC
-0000078A                 FALSE    1294mmm     IFNE DEBUG
-0000078A                          1295mmm     ENDC
-0000078A                          1296mmm      
-0000078A  BA3C 001B               1297mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
-0000078E  6700 F878               1298mmm     BEQ START
-00000792                          1299mmm     ENDM
-00000792                          1300mm CONTINUE_77
-00000792  1A39 00C00013           1301mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
-00000798  0805 0000               1302mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
-0000079C  67D8                    1303mm     BEQ WAIT_FOR_READY_77                           ; NOTHING, CHECK AGAIN
-0000079E                          1304mm     
-0000079E  1A39 00C00017           1305mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
-000007A4  13C5 00E00001           1306mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
-000007AA                          1307mm     
-000007AA                          1308mm     ENDM
-000007AA                          1309mm         PRINT_CHAR D5,D6
-000007AA                          1310mm WAIT_FOR_READY_79                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000007AA                 TRUE     1311mm     IFEQ DEBUG
-000007AA  1C39 00C00003           1312mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
-000007B0  0806 0002               1313mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
-000007B4  67F4                    1314mm         BEQ WAIT_FOR_READY_79                   ; NO SPACE, CHECK AGAIN
-000007B6  13C5 00C00007           1315mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
-000007BC                          1316mm     ENDC
-000007BC                          1317mm     
-000007BC                 FALSE    1318mm     IFNE DEBUG
-000007BC                          1319mm     ENDC
-000007BC                          1320mm 
-000007BC                          1321mm     ENDM
-000007BC                          1322mm         HEX2BIN D5,D5,A4
-000007BC  49F9 00000E61           1323mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
-000007C2  0405 0030               1324mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-000007C6  CABC 000000FF           1325mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
-000007CC  1A34 5000               1326mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
-000007D0                          1327mm     ENDM
-000007D0  8805                    1328m         OR.B D5,D4
-000007D2  5307                    1329m         SUB.B #1,D7
-000007D4                          1330m     ENDW
-000007D4  6096                    1331ms     BRA _1000000E
-000007D6                          1332ms _1000000F
-000007D6                          1333m     
-000007D6  7A00                    1334m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
-000007D8  1A04                    1335m     MOVE.B D4,D5
-000007DA  D484                    1336m     ADD.L D4,D2
-000007DC                          1337m 
-000007DC                          1338m     ENDM
-000007DC                          1339m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; bottom byte
-000007DC  1E3C 0002               1340m     MOVE.B #2,D7
-000007E0                          1341m     WHILE.B D7 <GT> 0 DO
-000007E0                          1342ms _10000010
-000007E0  BE38 0000               1343ms     CMP.B   0,D7
-000007E4  6F00 0064               1344ms     BLE _10000011
-000007E8  E98C                    1345m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
-000007EA                          1346mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
-000007EA                          1347mm WAIT_FOR_READY_82                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000007EA                          1348mm 
-000007EA  1A39 00C00003           1349mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
-000007F0  0805 0000               1350mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
-000007F4  6700 0010               1351mm     BEQ CONTINUE_82                             ; NOTHING, CONTINUE
-000007F8                          1352mm  
-000007F8                          1353mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
-000007F8                 TRUE     1354mmm     IFEQ DEBUG
-000007F8  1A39 00C00007           1355mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
-000007FE                          1356mmm     ENDC
-000007FE                 FALSE    1357mmm     IFNE DEBUG
-000007FE                          1358mmm     ENDC
-000007FE                          1359mmm      
-000007FE  BA3C 001B               1360mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
-00000802  6700 F804               1361mmm     BEQ START
-00000806                          1362mmm     ENDM
-00000806                          1363mm CONTINUE_82
-00000806  1A39 00C00013           1364mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
-0000080C  0805 0000               1365mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
-00000810  67D8                    1366mm     BEQ WAIT_FOR_READY_82                           ; NOTHING, CHECK AGAIN
-00000812                          1367mm     
-00000812  1A39 00C00017           1368mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
-00000818  13C5 00E00001           1369mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
-0000081E                          1370mm     
-0000081E                          1371mm     ENDM
-0000081E                          1372mm         PRINT_CHAR D5,D6
-0000081E                          1373mm WAIT_FOR_READY_84                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-0000081E                 TRUE     1374mm     IFEQ DEBUG
-0000081E  1C39 00C00003           1375mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
-00000824  0806 0002               1376mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
-00000828  67F4                    1377mm         BEQ WAIT_FOR_READY_84                   ; NO SPACE, CHECK AGAIN
-0000082A  13C5 00C00007           1378mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
-00000830                          1379mm     ENDC
-00000830                          1380mm     
-00000830                 FALSE    1381mm     IFNE DEBUG
-00000830                          1382mm     ENDC
-00000830                          1383mm 
-00000830                          1384mm     ENDM
-00000830                          1385mm         HEX2BIN D5,D5,A4
-00000830  49F9 00000E61           1386mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
-00000836  0405 0030               1387mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-0000083A  CABC 000000FF           1388mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
-00000840  1A34 5000               1389mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
-00000844                          1390mm     ENDM
-00000844  8805                    1391m         OR.B D5,D4
-00000846  5307                    1392m         SUB.B #1,D7
-00000848                          1393m     ENDW
-00000848  6096                    1394ms     BRA _10000010
-0000084A                          1395ms _10000011
-0000084A                          1396m     
-0000084A  7A00                    1397m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
-0000084C  1A04                    1398m     MOVE.B D4,D5
-0000084E  D484                    1399m     ADD.L D4,D2
-00000850                          1400m 
-00000850                          1401m     ENDM
-00000850                          1402                    
-00000850  2044                    1403                  MOVE.L D4,A0                    ; start address -> A0
-00000852                          1404                  
-00000852  47F9 00000A16           1405                  LEA DOWNLOAD_DONE,A3            ; next place to go
-00000858                          1406              ELSE
-00000858  6000 007E               1407s     BRA _00000009
-0000085C                          1408s _00000008
-0000085C                          1409m                 PRINT_CRLF D5,A4
-0000085C  49F9 00000E8C           1410m     LEA CRLF,A4
-00000862                          1411mm     PRINT_STR A4,D5
-00000862                          1412mm LOOP_87
-00000862  0C14 0000               1413mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
-00000866  6700 0016               1414mm     BEQ EXIT_87
-0000086A                          1415mmm     PRINT_CHAR (A4)+,D5
-0000086A                          1416mmm WAIT_FOR_READY_88                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-0000086A                 TRUE     1417mmm     IFEQ DEBUG
-0000086A  1A39 00C00003           1418mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000870  0805 0002               1419mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000874  67F4                    1420mmm         BEQ WAIT_FOR_READY_88                   ; NO SPACE, CHECK AGAIN
-00000876  13DC 00C00007           1421mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-0000087C                          1422mmm     ENDC
-0000087C                          1423mmm     
-0000087C                 FALSE    1424mmm     IFNE DEBUG
-0000087C                          1425mmm     ENDC
-0000087C                          1426mmm 
-0000087C                          1427mmm     ENDM
-0000087C  60E4                    1428mm     BRA LOOP_87
-0000087E                          1429mm EXIT_87
-0000087E                          1430mm     ENDM
-0000087E                          1431m     ENDM
-0000087E                          1432              
-0000087E  49F9 00000E16           1433                  LEA UNREC,A4                    ; warn for unrecognised type
-00000884                          1434m                 PRINT_STR A4,D5
-00000884                          1435m LOOP_89
-00000884  0C14 0000               1436m     CMP.B #NULL,(A4)                            ; 0 -> DONE
-00000888  6700 0016               1437m     BEQ EXIT_89
-0000088C                          1438mm     PRINT_CHAR (A4)+,D5
-0000088C                          1439mm WAIT_FOR_READY_90                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-0000088C                 TRUE     1440mm     IFEQ DEBUG
-0000088C  1A39 00C00003           1441mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000892  0805 0002               1442mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000896  67F4                    1443mm         BEQ WAIT_FOR_READY_90                   ; NO SPACE, CHECK AGAIN
-00000898  13DC 00C00007           1444mm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-0000089E                          1445mm     ENDC
-0000089E                          1446mm     
-0000089E                 FALSE    1447mm     IFNE DEBUG
-0000089E                          1448mm     ENDC
-0000089E                          1449mm 
-0000089E                          1450mm     ENDM
-0000089E  60E4                    1451m     BRA LOOP_89
-000008A0                          1452m EXIT_89
-000008A0                          1453m     ENDM
-000008A0                          1454m                 PRINT_CHAR D1,D5
-000008A0                          1455m WAIT_FOR_READY_91                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000008A0                 TRUE     1456m     IFEQ DEBUG
-000008A0  1A39 00C00003           1457m         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-000008A6  0805 0002               1458m         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-000008AA  67F4                    1459m         BEQ WAIT_FOR_READY_91                   ; NO SPACE, CHECK AGAIN
-000008AC  13C1 00C00007           1460m         MOVE.B D1,DUART_TXA                     ; SEND THE NEXT CHARACTER
-000008B2                          1461m     ENDC
-000008B2                          1462m     
-000008B2                 FALSE    1463m     IFNE DEBUG
-000008B2                          1464m     ENDC
-000008B2                          1465m 
-000008B2                          1466m     ENDM
-000008B2                          1467m                 PRINT_CRLF D5,A4
-000008B2  49F9 00000E8C           1468m     LEA CRLF,A4
-000008B8                          1469mm     PRINT_STR A4,D5
-000008B8                          1470mm LOOP_93
-000008B8  0C14 0000               1471mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
-000008BC  6700 0016               1472mm     BEQ EXIT_93
-000008C0                          1473mmm     PRINT_CHAR (A4)+,D5
-000008C0                          1474mmm WAIT_FOR_READY_94                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000008C0                 TRUE     1475mmm     IFEQ DEBUG
-000008C0  1A39 00C00003           1476mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-000008C6  0805 0002               1477mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-000008CA  67F4                    1478mmm         BEQ WAIT_FOR_READY_94                   ; NO SPACE, CHECK AGAIN
-000008CC  13DC 00C00007           1479mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-000008D2                          1480mmm     ENDC
-000008D2                          1481mmm     
-000008D2                 FALSE    1482mmm     IFNE DEBUG
-000008D2                          1483mmm     ENDC
-000008D2                          1484mmm 
-000008D2                          1485mmm     ENDM
-000008D2  60E4                    1486mm     BRA LOOP_93
-000008D4                          1487mm EXIT_93
-000008D4                          1488mm     ENDM
-000008D4                          1489m     ENDM
-000008D4                          1490              
-000008D4  6000 FAC8               1491                  BRA WAIT_FOR_SRECORD            ; ignore any other type    
-000008D8                          1492              ENDI
-000008D8                          1493s _00000009
-000008D8                          1494          ENDI
-000008D8                          1495s _00000007
-000008D8                          1496      ENDI
-000008D8                          1497s _00000003
-000008D8                          1498      
-000008D8  7800                    1499      MOVE.L #0,D4                                    ; read the checksum from the data stream add to our checksum: should make it FF
-000008DA                          1500m     DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4                         
-000008DA  1E3C 0002               1501m     MOVE.B #2,D7
-000008DE                          1502m     WHILE.B D7 <GT> 0 DO
-000008DE                          1503ms _10000012
-000008DE  BE38 0000               1504ms     CMP.B   0,D7
-000008E2  6F00 0064               1505ms     BLE _10000013
-000008E6  E98C                    1506m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
-000008E8                          1507mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
-000008E8                          1508mm WAIT_FOR_READY_96                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000008E8                          1509mm 
-000008E8  1A39 00C00003           1510mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
-000008EE  0805 0000               1511mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
-000008F2  6700 0010               1512mm     BEQ CONTINUE_96                             ; NOTHING, CONTINUE
-000008F6                          1513mm  
-000008F6                          1514mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
-000008F6                 TRUE     1515mmm     IFEQ DEBUG
-000008F6  1A39 00C00007           1516mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
-000008FC                          1517mmm     ENDC
-000008FC                 FALSE    1518mmm     IFNE DEBUG
-000008FC                          1519mmm     ENDC
-000008FC                          1520mmm      
-000008FC  BA3C 001B               1521mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
-00000900  6700 F706               1522mmm     BEQ START
-00000904                          1523mmm     ENDM
-00000904                          1524mm CONTINUE_96
-00000904  1A39 00C00013           1525mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
-0000090A  0805 0000               1526mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
-0000090E  67D8                    1527mm     BEQ WAIT_FOR_READY_96                           ; NOTHING, CHECK AGAIN
-00000910                          1528mm     
-00000910  1A39 00C00017           1529mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
-00000916  13C5 00E00001           1530mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
-0000091C                          1531mm     
-0000091C                          1532mm     ENDM
-0000091C                          1533mm         PRINT_CHAR D5,D6
-0000091C                          1534mm WAIT_FOR_READY_98                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
-0000091C                 TRUE     1535mm     IFEQ DEBUG
-0000091C  1C39 00C00003           1536mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
-00000922  0806 0002               1537mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
-00000926  67F4                    1538mm         BEQ WAIT_FOR_READY_98                   ; NO SPACE, CHECK AGAIN
-00000928  13C5 00C00007           1539mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
-0000092E                          1540mm     ENDC
-0000092E                          1541mm     
-0000092E                 FALSE    1542mm     IFNE DEBUG
-0000092E                          1543mm     ENDC
-0000092E                          1544mm 
-0000092E                          1545mm     ENDM
-0000092E                          1546mm         HEX2BIN D5,D5,A4
-0000092E  49F9 00000E61           1547mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
-00000934  0405 0030               1548mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-00000938  CABC 000000FF           1549mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
-0000093E  1A34 5000               1550mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
-00000942                          1551mm     ENDM
-00000942  8805                    1552m         OR.B D5,D4
-00000944  5307                    1553m         SUB.B #1,D7
-00000946                          1554m     ENDW
-00000946  6096                    1555ms     BRA _10000012
-00000948                          1556ms _10000013
-00000948                          1557m     
-00000948  7A00                    1558m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
-0000094A  1A04                    1559m     MOVE.B D4,D5
-0000094C  D484                    1560m     ADD.L D4,D2
-0000094E                          1561m 
-0000094E                          1562m     ENDM
-0000094E                          1563m     PRINT_CRLF D5,A4
-0000094E  49F9 00000E8C           1564m     LEA CRLF,A4
-00000954                          1565mm     PRINT_STR A4,D5
-00000954                          1566mm LOOP_101
-00000954  0C14 0000               1567mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
-00000958  6700 0016               1568mm     BEQ EXIT_101
-0000095C                          1569mmm     PRINT_CHAR (A4)+,D5
-0000095C                          1570mmm WAIT_FOR_READY_102                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-0000095C                 TRUE     1571mmm     IFEQ DEBUG
-0000095C  1A39 00C00003           1572mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000962  0805 0002               1573mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000966  67F4                    1574mmm         BEQ WAIT_FOR_READY_102                      ; NO SPACE, CHECK AGAIN
-00000968  13DC 00C00007           1575mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-0000096E                          1576mmm     ENDC
-0000096E                          1577mmm     
-0000096E                 FALSE    1578mmm     IFNE DEBUG
-0000096E                          1579mmm     ENDC
-0000096E                          1580mmm 
-0000096E                          1581mmm     ENDM
-0000096E  60E4                    1582mm     BRA LOOP_101
-00000970                          1583mm EXIT_101
-00000970                          1584mm     ENDM
-00000970                          1585m     ENDM
-00000970                          1586          
-00000970                          1587      IF.B D2 <NE> #$FF THEN.L
-00000970  B43C 00FF               1588s     CMP.B   #$FF,D2
-00000974  6700 009E               1589s     BEQ.L   _0000000A
-00000978  49F9 00000E2D           1590          LEA CS_FAILURE,A4                       ; warn for mismatched checksum
-0000097E                          1591m         PRINT_STR A4,D5
-0000097E                          1592m LOOP_103
-0000097E  0C14 0000               1593m     CMP.B #NULL,(A4)                            ; 0 -> DONE
-00000982  6700 0016               1594m     BEQ EXIT_103
-00000986                          1595mm     PRINT_CHAR (A4)+,D5
-00000986                          1596mm WAIT_FOR_READY_104                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000986                 TRUE     1597mm     IFEQ DEBUG
-00000986  1A39 00C00003           1598mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-0000098C  0805 0002               1599mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000990  67F4                    1600mm         BEQ WAIT_FOR_READY_104                      ; NO SPACE, CHECK AGAIN
-00000992  13DC 00C00007           1601mm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000998                          1602mm     ENDC
-00000998                          1603mm     
-00000998                 FALSE    1604mm     IFNE DEBUG
-00000998                          1605mm     ENDC
-00000998                          1606mm 
-00000998                          1607mm     ENDM
-00000998  60E4                    1608m     BRA LOOP_103
-0000099A                          1609m EXIT_103
-0000099A                          1610m     ENDM
-0000099A                          1611m         PRINT_REG D0,D5,D2,D6,A4
-0000099A                          1612mm     PRINT_CHAR #'0',D5                              ;0X HEADER
-0000099A                          1613mm WAIT_FOR_READY_106                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-0000099A                 TRUE     1614mm     IFEQ DEBUG
-0000099A  1A39 00C00003           1615mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-000009A0  0805 0002               1616mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-000009A4  67F4                    1617mm         BEQ WAIT_FOR_READY_106                      ; NO SPACE, CHECK AGAIN
-000009A6  13FC 0030 00C00007      1618mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
-000009AE                          1619mm     ENDC
-000009AE                          1620mm     
-000009AE                 FALSE    1621mm     IFNE DEBUG
-000009AE                          1622mm     ENDC
-000009AE                          1623mm 
-000009AE                          1624mm     ENDM
-000009AE                          1625mm     PRINT_CHAR #'x',D5
-000009AE                          1626mm WAIT_FOR_READY_107                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000009AE                 TRUE     1627mm     IFEQ DEBUG
-000009AE  1A39 00C00003           1628mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-000009B4  0805 0002               1629mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-000009B8  67F4                    1630mm         BEQ WAIT_FOR_READY_107                      ; NO SPACE, CHECK AGAIN
-000009BA  13FC 0078 00C00007      1631mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
-000009C2                          1632mm     ENDC
-000009C2                          1633mm     
-000009C2                 FALSE    1634mm     IFNE DEBUG
-000009C2                          1635mm     ENDC
-000009C2                          1636mm 
-000009C2                          1637mm     ENDM
-000009C2  7C07                    1638m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
-000009C4                          1639m LOOP_105
-000009C4                          1640mm     BIN2HEX D0,D2,A4
-000009C4  49F9 00000E51           1641mm     LEA BIN2HEX_LUT,A4                          ; LOAD THE LOOKUP TABLE
-000009CA  E998                    1642mm     ROL.L #4,D0                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
-000009CC  1400                    1643mm     MOVE.B D0,D2
-000009CE  0282 0000000F           1644mm     ANDI.L #$F,D2
-000009D4  1434 2000               1645mm     MOVE.B 0(A4,D2),D2                          ; USE THAT AS AN INDEX INTO THE LUT
-000009D8                          1646mm     ENDM
-000009D8                          1647mm     PRINT_CHAR D2,D5
-000009D8                          1648mm WAIT_FOR_READY_109                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000009D8                 TRUE     1649mm     IFEQ DEBUG
-000009D8  1A39 00C00003           1650mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-000009DE  0805 0002               1651mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-000009E2  67F4                    1652mm         BEQ WAIT_FOR_READY_109                      ; NO SPACE, CHECK AGAIN
-000009E4  13C2 00C00007           1653mm         MOVE.B D2,DUART_TXA                     ; SEND THE NEXT CHARACTER
-000009EA                          1654mm     ENDC
-000009EA                          1655mm     
-000009EA                 FALSE    1656mm     IFNE DEBUG
-000009EA                          1657mm     ENDC
-000009EA                          1658mm 
-000009EA                          1659mm     ENDM
-000009EA  57CE FFD8               1660m     DBEQ D6,LOOP_105
-000009EE                          1661m     ENDM
-000009EE                          1662m         PRINT_CRLF D5,A4
-000009EE  49F9 00000E8C           1663m     LEA CRLF,A4
-000009F4                          1664mm     PRINT_STR A4,D5
-000009F4                          1665mm LOOP_111
-000009F4  0C14 0000               1666mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
-000009F8  6700 0016               1667mm     BEQ EXIT_111
-000009FC                          1668mmm     PRINT_CHAR (A4)+,D5
-000009FC                          1669mmm WAIT_FOR_READY_112                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-000009FC                 TRUE     1670mmm     IFEQ DEBUG
-000009FC  1A39 00C00003           1671mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000A02  0805 0002               1672mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000A06  67F4                    1673mmm         BEQ WAIT_FOR_READY_112                      ; NO SPACE, CHECK AGAIN
-00000A08  13DC 00C00007           1674mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000A0E                          1675mmm     ENDC
-00000A0E                          1676mmm     
-00000A0E                 FALSE    1677mmm     IFNE DEBUG
-00000A0E                          1678mmm     ENDC
-00000A0E                          1679mmm 
-00000A0E                          1680mmm     ENDM
-00000A0E  60E4                    1681mm     BRA LOOP_111
-00000A10                          1682mm EXIT_111
-00000A10                          1683mm     ENDM
-00000A10                          1684m     ENDM
-00000A10  6000 F752               1685          BRA MAIN_LOOP
-00000A14                          1686      ENDI
-00000A14                          1687s _0000000A
-00000A14                          1688      
-00000A14  4ED3                    1689      JMP (A3)
-00000A16                          1690  DOWNLOAD_DONE
-00000A16                          1691m     PRINT_REG D0,D5,D6,D2,A1                        ; print out number of Srecords read
-00000A16                          1692mm     PRINT_CHAR #'0',D5                              ;0X HEADER
-00000A16                          1693mm WAIT_FOR_READY_114                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000A16                 TRUE     1694mm     IFEQ DEBUG
-00000A16  1A39 00C00003           1695mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000A1C  0805 0002               1696mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000A20  67F4                    1697mm         BEQ WAIT_FOR_READY_114                      ; NO SPACE, CHECK AGAIN
-00000A22  13FC 0030 00C00007      1698mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
-00000A2A                          1699mm     ENDC
-00000A2A                          1700mm     
-00000A2A                 FALSE    1701mm     IFNE DEBUG
-00000A2A                          1702mm     ENDC
-00000A2A                          1703mm 
-00000A2A                          1704mm     ENDM
-00000A2A                          1705mm     PRINT_CHAR #'x',D5
-00000A2A                          1706mm WAIT_FOR_READY_115                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000A2A                 TRUE     1707mm     IFEQ DEBUG
-00000A2A  1A39 00C00003           1708mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000A30  0805 0002               1709mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000A34  67F4                    1710mm         BEQ WAIT_FOR_READY_115                      ; NO SPACE, CHECK AGAIN
-00000A36  13FC 0078 00C00007      1711mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
-00000A3E                          1712mm     ENDC
-00000A3E                          1713mm     
-00000A3E                 FALSE    1714mm     IFNE DEBUG
-00000A3E                          1715mm     ENDC
-00000A3E                          1716mm 
-00000A3E                          1717mm     ENDM
-00000A3E  7407                    1718m     MOVE.L #7,D2                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
-00000A40                          1719m LOOP_113
-00000A40                          1720mm     BIN2HEX D0,D6,A1
-00000A40  43F9 00000E51           1721mm     LEA BIN2HEX_LUT,A1                          ; LOAD THE LOOKUP TABLE
-00000A46  E998                    1722mm     ROL.L #4,D0                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
-00000A48  1C00                    1723mm     MOVE.B D0,D6
-00000A4A  0286 0000000F           1724mm     ANDI.L #$F,D6
-00000A50  1C31 6000               1725mm     MOVE.B 0(A1,D6),D6                          ; USE THAT AS AN INDEX INTO THE LUT
-00000A54                          1726mm     ENDM
-00000A54                          1727mm     PRINT_CHAR D6,D5
-00000A54                          1728mm WAIT_FOR_READY_117                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000A54                 TRUE     1729mm     IFEQ DEBUG
-00000A54  1A39 00C00003           1730mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000A5A  0805 0002               1731mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000A5E  67F4                    1732mm         BEQ WAIT_FOR_READY_117                      ; NO SPACE, CHECK AGAIN
-00000A60  13C6 00C00007           1733mm         MOVE.B D6,DUART_TXA                     ; SEND THE NEXT CHARACTER
-00000A66                          1734mm     ENDC
-00000A66                          1735mm     
-00000A66                 FALSE    1736mm     IFNE DEBUG
-00000A66                          1737mm     ENDC
-00000A66                          1738mm 
-00000A66                          1739mm     ENDM
-00000A66  57CA FFD8               1740m     DBEQ D2,LOOP_113
-00000A6A                          1741m     ENDM
-00000A6A  43F9 00000DF4           1742      LEA READ,A1
-00000A70                          1743m     PRINT_STR A1,D5
-00000A70                          1744m LOOP_118
-00000A70  0C11 0000               1745m     CMP.B #NULL,(A1)                            ; 0 -> DONE
-00000A74  6700 0016               1746m     BEQ EXIT_118
-00000A78                          1747mm     PRINT_CHAR (A1)+,D5
-00000A78                          1748mm WAIT_FOR_READY_119                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000A78                 TRUE     1749mm     IFEQ DEBUG
-00000A78  1A39 00C00003           1750mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000A7E  0805 0002               1751mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000A82  67F4                    1752mm         BEQ WAIT_FOR_READY_119                      ; NO SPACE, CHECK AGAIN
-00000A84  13D9 00C00007           1753mm         MOVE.B (A1)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000A8A                          1754mm     ENDC
-00000A8A                          1755mm     
-00000A8A                 FALSE    1756mm     IFNE DEBUG
-00000A8A                          1757mm     ENDC
-00000A8A                          1758mm 
-00000A8A                          1759mm     ENDM
-00000A8A  60E4                    1760m     BRA LOOP_118
-00000A8C                          1761m EXIT_118
-00000A8C                          1762m     ENDM
-00000A8C  2E08                    1763      MOVE.L A0,D7                                    ; set address accumulator to start address
-00000A8E                          1764m     PRINT_REG D7,D5,D6,D2,A1                        ; print out start address
-00000A8E                          1765mm     PRINT_CHAR #'0',D5                              ;0X HEADER
-00000A8E                          1766mm WAIT_FOR_READY_121                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000A8E                 TRUE     1767mm     IFEQ DEBUG
-00000A8E  1A39 00C00003           1768mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000A94  0805 0002               1769mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000A98  67F4                    1770mm         BEQ WAIT_FOR_READY_121                      ; NO SPACE, CHECK AGAIN
-00000A9A  13FC 0030 00C00007      1771mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
-00000AA2                          1772mm     ENDC
-00000AA2                          1773mm     
-00000AA2                 FALSE    1774mm     IFNE DEBUG
-00000AA2                          1775mm     ENDC
-00000AA2                          1776mm 
-00000AA2                          1777mm     ENDM
-00000AA2                          1778mm     PRINT_CHAR #'x',D5
-00000AA2                          1779mm WAIT_FOR_READY_122                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000AA2                 TRUE     1780mm     IFEQ DEBUG
-00000AA2  1A39 00C00003           1781mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000AA8  0805 0002               1782mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000AAC  67F4                    1783mm         BEQ WAIT_FOR_READY_122                      ; NO SPACE, CHECK AGAIN
-00000AAE  13FC 0078 00C00007      1784mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
-00000AB6                          1785mm     ENDC
-00000AB6                          1786mm     
-00000AB6                 FALSE    1787mm     IFNE DEBUG
-00000AB6                          1788mm     ENDC
-00000AB6                          1789mm 
-00000AB6                          1790mm     ENDM
-00000AB6  7407                    1791m     MOVE.L #7,D2                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
-00000AB8                          1792m LOOP_120
-00000AB8                          1793mm     BIN2HEX D7,D6,A1
-00000AB8  43F9 00000E51           1794mm     LEA BIN2HEX_LUT,A1                          ; LOAD THE LOOKUP TABLE
-00000ABE  E99F                    1795mm     ROL.L #4,D7                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
-00000AC0  1C07                    1796mm     MOVE.B D7,D6
-00000AC2  0286 0000000F           1797mm     ANDI.L #$F,D6
-00000AC8  1C31 6000               1798mm     MOVE.B 0(A1,D6),D6                          ; USE THAT AS AN INDEX INTO THE LUT
-00000ACC                          1799mm     ENDM
-00000ACC                          1800mm     PRINT_CHAR D6,D5
-00000ACC                          1801mm WAIT_FOR_READY_124                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000ACC                 TRUE     1802mm     IFEQ DEBUG
-00000ACC  1A39 00C00003           1803mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000AD2  0805 0002               1804mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000AD6  67F4                    1805mm         BEQ WAIT_FOR_READY_124                      ; NO SPACE, CHECK AGAIN
-00000AD8  13C6 00C00007           1806mm         MOVE.B D6,DUART_TXA                     ; SEND THE NEXT CHARACTER
-00000ADE                          1807mm     ENDC
-00000ADE                          1808mm     
-00000ADE                 FALSE    1809mm     IFNE DEBUG
-00000ADE                          1810mm     ENDC
-00000ADE                          1811mm 
-00000ADE                          1812mm     ENDM
-00000ADE  57CA FFD8               1813m     DBEQ D2,LOOP_120
-00000AE2                          1814m     ENDM
-00000AE2                          1815m     PRINT_CRLF D5,A4     
-00000AE2  49F9 00000E8C           1816m     LEA CRLF,A4
-00000AE8                          1817mm     PRINT_STR A4,D5
-00000AE8                          1818mm LOOP_126
-00000AE8  0C14 0000               1819mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
-00000AEC  6700 0016               1820mm     BEQ EXIT_126
-00000AF0                          1821mmm     PRINT_CHAR (A4)+,D5
-00000AF0                          1822mmm WAIT_FOR_READY_127                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000AF0                 TRUE     1823mmm     IFEQ DEBUG
-00000AF0  1A39 00C00003           1824mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
-00000AF6  0805 0002               1825mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
-00000AFA  67F4                    1826mmm         BEQ WAIT_FOR_READY_127                      ; NO SPACE, CHECK AGAIN
-00000AFC  13DC 00C00007           1827mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000B02                          1828mmm     ENDC
-00000B02                          1829mmm     
-00000B02                 FALSE    1830mmm     IFNE DEBUG
-00000B02                          1831mmm     ENDC
-00000B02                          1832mmm 
-00000B02                          1833mmm     ENDM
-00000B02  60E4                    1834mm     BRA LOOP_126
-00000B04                          1835mm EXIT_126
-00000B04                          1836mm     ENDM
-00000B04                          1837m     ENDM
-00000B04                          1838          
-00000B04  6000 F65E               1839      BRA MAIN_LOOP
-00000B08                          1840      
-00000B08                          1841  G
-00000B08  2047                    1842      MOVE.L D7,A0                                    ; address accumulator -> address register
-00000B0A  3E3C 0000               1843      MOVE #0,D7                                      ; clear the now used address accumulator
-00000B0E  4ED0                    1844      JMP (A0)                                        ; jump to it!
-00000B10                          1845      
-00000B10                          1846  Z
-00000B10  207C 00200000           1847      MOVE.L #RAM,A0                                  ; address of RAM
-00000B16                          1848      
-00000B16                          1849      FOR.L D0 = #0 TO #$40000 BY #4 DO             ; write
-00000B16  7000                    1850s     MOVE.L  #0,D0
-00000B18  6000 0012               1851s     BRA _20000001
-00000B1C                          1852s _20000000
-00000B1C  2200                    1853              MOVE.L D0,D1                              ; progress update
-00000B1E  E089                    1854          LSR.L #8,D1 
-00000B20  E089                    1855          LSR.L #8,D1
-00000B22  13C1 00E00001           1856          MOVE.B D1,DISPLAY
-00000B28                          1857  
-00000B28  20C0                    1858          MOVE.L D0,(A0)+
-00000B2A                          1859      ENDF
-00000B2A  5880                    1860s     ADD.L   #4,D0
-00000B2C                          1861s _20000001
-00000B2C  B0BC 00040000           1862s     CMP.L   #$40000,D0
-00000B32  6FE8                    1863s     BLE _20000000
-00000B34                          1864   
-00000B34  207C 00200000           1865      MOVE.L #RAM,A0                                    ; address of RAM
-00000B3A                          1866     
-00000B3A                          1867      FOR.L D0 = #0 TO #$40000 BY #4 DO               ; read back and check 
-00000B3A  7000                    1868s     MOVE.L  #0,D0
-00000B3C  6000 00B4               1869s     BRA _20000003
-00000B40                          1870s _20000002
-00000B40  2200                    1871          MOVE.L D0,D1                              ; progress update
-00000B42  E089                    1872          LSR.L #8,D1
-00000B44  E089                    1873          LSR.L #8,D1
-00000B46  13C1 00E00001           1874          MOVE.B D1,DISPLAY
-00000B4C                          1875  
-00000B4C  2218                    1876          MOVE.L (A0)+,D1
-00000B4E                          1877            
-00000B4E                          1878          IF.L D0 <NE> D1 THEN      
-00000B4E  B081                    1879s     CMP.L   D1,D0
-00000B50  6700 009E               1880s     BEQ _0000000B
-00000B54  43F9 00000E3F           1881              LEA RAM_ERROR,A1
-00000B5A                          1882m             PRINT_STR A1,D1
-00000B5A                          1883m LOOP_128
-00000B5A  0C11 0000               1884m     CMP.B #NULL,(A1)                            ; 0 -> DONE
-00000B5E  6700 0016               1885m     BEQ EXIT_128
-00000B62                          1886mm     PRINT_CHAR (A1)+,D1
-00000B62                          1887mm WAIT_FOR_READY_129                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000B62                 TRUE     1888mm     IFEQ DEBUG
-00000B62  1239 00C00003           1889mm         MOVE.B DUART_SRA,D1                     ; READ STATUS REGISTER
-00000B68  0801 0002               1890mm         BTST #2,D1                              ; CHECK FOR SPACE TO SEND
-00000B6C  67F4                    1891mm         BEQ WAIT_FOR_READY_129                      ; NO SPACE, CHECK AGAIN
-00000B6E  13D9 00C00007           1892mm         MOVE.B (A1)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000B74                          1893mm     ENDC
-00000B74                          1894mm     
-00000B74                 FALSE    1895mm     IFNE DEBUG
-00000B74                          1896mm     ENDC
-00000B74                          1897mm 
-00000B74                          1898mm     ENDM
-00000B74  60E4                    1899m     BRA LOOP_128
-00000B76                          1900m EXIT_128
-00000B76                          1901m     ENDM
-00000B76  2208                    1902              MOVE.L A0,D1
-00000B78  5981                    1903              SUB.L #4,D1
-00000B7A                          1904m             PRINT_REG D1,D3,D2,D6,A1                ; print out failure address
-00000B7A                          1905mm     PRINT_CHAR #'0',D3                              ;0X HEADER
-00000B7A                          1906mm WAIT_FOR_READY_131                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000B7A                 TRUE     1907mm     IFEQ DEBUG
-00000B7A  1639 00C00003           1908mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000B80  0803 0002               1909mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000B84  67F4                    1910mm         BEQ WAIT_FOR_READY_131                      ; NO SPACE, CHECK AGAIN
-00000B86  13FC 0030 00C00007      1911mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
-00000B8E                          1912mm     ENDC
-00000B8E                          1913mm     
-00000B8E                 FALSE    1914mm     IFNE DEBUG
-00000B8E                          1915mm     ENDC
-00000B8E                          1916mm 
-00000B8E                          1917mm     ENDM
-00000B8E                          1918mm     PRINT_CHAR #'x',D3
-00000B8E                          1919mm WAIT_FOR_READY_132                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000B8E                 TRUE     1920mm     IFEQ DEBUG
-00000B8E  1639 00C00003           1921mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000B94  0803 0002               1922mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000B98  67F4                    1923mm         BEQ WAIT_FOR_READY_132                      ; NO SPACE, CHECK AGAIN
-00000B9A  13FC 0078 00C00007      1924mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
-00000BA2                          1925mm     ENDC
-00000BA2                          1926mm     
-00000BA2                 FALSE    1927mm     IFNE DEBUG
-00000BA2                          1928mm     ENDC
-00000BA2                          1929mm 
-00000BA2                          1930mm     ENDM
-00000BA2  7C07                    1931m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
-00000BA4                          1932m LOOP_130
-00000BA4                          1933mm     BIN2HEX D1,D2,A1
-00000BA4  43F9 00000E51           1934mm     LEA BIN2HEX_LUT,A1                          ; LOAD THE LOOKUP TABLE
-00000BAA  E999                    1935mm     ROL.L #4,D1                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
-00000BAC  1401                    1936mm     MOVE.B D1,D2
-00000BAE  0282 0000000F           1937mm     ANDI.L #$F,D2
-00000BB4  1431 2000               1938mm     MOVE.B 0(A1,D2),D2                          ; USE THAT AS AN INDEX INTO THE LUT
-00000BB8                          1939mm     ENDM
-00000BB8                          1940mm     PRINT_CHAR D2,D3
-00000BB8                          1941mm WAIT_FOR_READY_134                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000BB8                 TRUE     1942mm     IFEQ DEBUG
-00000BB8  1639 00C00003           1943mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000BBE  0803 0002               1944mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000BC2  67F4                    1945mm         BEQ WAIT_FOR_READY_134                      ; NO SPACE, CHECK AGAIN
-00000BC4  13C2 00C00007           1946mm         MOVE.B D2,DUART_TXA                     ; SEND THE NEXT CHARACTER
-00000BCA                          1947mm     ENDC
-00000BCA                          1948mm     
-00000BCA                 FALSE    1949mm     IFNE DEBUG
-00000BCA                          1950mm     ENDC
-00000BCA                          1951mm 
-00000BCA                          1952mm     ENDM
-00000BCA  57CE FFD8               1953m     DBEQ D6,LOOP_130
-00000BCE                          1954m     ENDM
-00000BCE                          1955m             PRINT_CRLF D3,A1
-00000BCE  43F9 00000E8C           1956m     LEA CRLF,A1
-00000BD4                          1957mm     PRINT_STR A1,D3
-00000BD4                          1958mm LOOP_136
-00000BD4  0C11 0000               1959mm     CMP.B #NULL,(A1)                            ; 0 -> DONE
-00000BD8  6700 0016               1960mm     BEQ EXIT_136
-00000BDC                          1961mmm     PRINT_CHAR (A1)+,D3
-00000BDC                          1962mmm WAIT_FOR_READY_137                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000BDC                 TRUE     1963mmm     IFEQ DEBUG
-00000BDC  1639 00C00003           1964mmm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000BE2  0803 0002               1965mmm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000BE6  67F4                    1966mmm         BEQ WAIT_FOR_READY_137                      ; NO SPACE, CHECK AGAIN
-00000BE8  13D9 00C00007           1967mmm         MOVE.B (A1)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000BEE                          1968mmm     ENDC
-00000BEE                          1969mmm     
-00000BEE                 FALSE    1970mmm     IFNE DEBUG
-00000BEE                          1971mmm     ENDC
-00000BEE                          1972mmm 
-00000BEE                          1973mmm     ENDM
-00000BEE  60E4                    1974mm     BRA LOOP_136
-00000BF0                          1975mm EXIT_136
-00000BF0                          1976mm     ENDM
-00000BF0                          1977m     ENDM
-00000BF0                          1978          ENDI 
-00000BF0                          1979s _0000000B
-00000BF0                          1980      ENDF
-00000BF0  5880                    1981s     ADD.L   #4,D0
-00000BF2                          1982s _20000003
-00000BF2  B0BC 00040000           1983s     CMP.L   #$40000,D0
-00000BF8  6F00 FF46               1984s     BLE _20000002
-00000BFC                          1985      
-00000BFC  6000 F566               1986      BRA MAIN_LOOP
-00000C00                          1987    
-00000C00                          1988  L
-00000C00  7A00                    1989      MOVE.L #0,D5                                    ; D5 will be the length  to write            
-00000C02                          1990  
-00000C02                          1991      FOR D6 = #0 TO #3 DO                          ; read the length to write
-00000C02  3C3C 0000               1992s     MOVE.W  #0,D6
-00000C06  6000 0048               1993s     BRA _20000005
-00000C0A                          1994s _20000004
-00000C0A  E98D                    1995          LSL.L #4,D5                                 ; make what we have so far more significant
-00000C0C                          1996m         WAIT_CHAR D2,D3                             ; next character -> D2
-00000C0C                          1997m WAIT_FOR_READY_138                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000C0C                 TRUE     1998m     IFEQ DEBUG
-00000C0C  1639 00C00003           1999m         MOVE.B DUART_SRA,D3                         ; READ STATUS REGISTER
-00000C12  0803 0000               2000m         BTST #0,D3                              ; CHECK FOR CHARACTER
-00000C16  67F4                    2001m         BEQ WAIT_FOR_READY_138                      ; NOTHING, CHECK AGAIN
-00000C18                          2002m     ENDC
-00000C18                          2003m     
-00000C18                          2004mm     READ_CHAR D2
-00000C18                 TRUE     2005mm     IFEQ DEBUG
-00000C18  1439 00C00007           2006mm         MOVE.B DUART_RXA,D2                         ; GOT A CHARACTER, READ IT
-00000C1E                          2007mm     ENDC
-00000C1E                 FALSE    2008mm     IFNE DEBUG
-00000C1E                          2009mm     ENDC
-00000C1E                          2010mm      
-00000C1E  B43C 001B               2011mm     CMP.B #$1B,D2                               ; CHECK FOR ESCAPE AND GO TO START
-00000C22  6700 F3E4               2012mm     BEQ START
-00000C26                          2013mm     ENDM
-00000C26                          2014m 
-00000C26                 TRUE     2015m     IFEQ DEBUG
-00000C26                          2016mm         PRINT_CHAR D2,D3                            ; ECHO IT BACK
-00000C26                          2017mm WAIT_FOR_READY_140                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000C26                 TRUE     2018mm     IFEQ DEBUG
-00000C26  1639 00C00003           2019mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000C2C  0803 0002               2020mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000C30  67F4                    2021mm         BEQ WAIT_FOR_READY_140                      ; NO SPACE, CHECK AGAIN
-00000C32  13C2 00C00007           2022mm         MOVE.B D2,DUART_TXA                     ; SEND THE NEXT CHARACTER
-00000C38                          2023mm     ENDC
-00000C38                          2024mm     
-00000C38                 FALSE    2025mm     IFNE DEBUG
-00000C38                          2026mm     ENDC
-00000C38                          2027mm 
-00000C38                          2028mm     ENDM
-00000C38                          2029m     ENDC
-00000C38                          2030m     ENDM
-00000C38                          2031m         HEX2BIN D2,D2,A0                            ; convert to binary -> D2
-00000C38  41F9 00000E61           2032m     LEA HEX2BIN_LUT,A0                              ; LOAD THE LOOKUP TABLE
-00000C3E  0402 0030               2033m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-00000C42  C4BC 000000FF           2034m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
-00000C48  1430 2000               2035m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT      
-00000C4C                          2036m     ENDM
-00000C4C  8A02                    2037          OR.B D2,D5
-00000C4E                          2038      ENDF
-00000C4E  5246                    2039s     ADD.W   #1,D6
-00000C50                          2040s _20000005
-00000C50  BC7C 0003               2041s     CMP.W   #3,D6
-00000C54  6FB4                    2042s     BLE _20000004
-00000C56                          2043            
-00000C56                          2044m     PRINT_CRLF D3,A0
-00000C56  41F9 00000E8C           2045m     LEA CRLF,A0
-00000C5C                          2046mm     PRINT_STR A0,D3
-00000C5C                          2047mm LOOP_143
-00000C5C  0C10 0000               2048mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
-00000C60  6700 0016               2049mm     BEQ EXIT_143
-00000C64                          2050mmm     PRINT_CHAR (A0)+,D3
-00000C64                          2051mmm WAIT_FOR_READY_144                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000C64                 TRUE     2052mmm     IFEQ DEBUG
-00000C64  1639 00C00003           2053mmm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000C6A  0803 0002               2054mmm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000C6E  67F4                    2055mmm         BEQ WAIT_FOR_READY_144                      ; NO SPACE, CHECK AGAIN
-00000C70  13D8 00C00007           2056mmm         MOVE.B (A0)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000C76                          2057mmm     ENDC
-00000C76                          2058mmm     
-00000C76                 FALSE    2059mmm     IFNE DEBUG
-00000C76                          2060mmm     ENDC
-00000C76                          2061mmm 
-00000C76                          2062mmm     ENDM
-00000C76  60E4                    2063mm     BRA LOOP_143
-00000C78                          2064mm EXIT_143
-00000C78                          2065mm     ENDM
-00000C78                          2066m     ENDM
-00000C78                          2067  
-00000C78  207C 00000000           2068      MOVE.L #ROM,A0                                  ; start of ROM
-00000C7E                          2069      
-00000C7E  2247                    2070      MOVE.L D7,A1                                    ; address accumulator -> address register
-00000C80  7E00                    2071      MOVE.L #0,D7                                    ; clear the now used address accumulator
-00000C82                          2072      
-00000C82  31FC AAAA 2AAA          2073      MOVE.W #$AAAA,$2AAA
-00000C88  31FC 5555 1554          2074      MOVE.W #$5555,$1554
-00000C8E  31FC 8080 2AAA          2075      MOVE.W #$8080,$2AAA
-00000C94  31FC AAAA 2AAA          2076      MOVE.W #$AAAA,$2AAA
-00000C9A  31FC 5555 1554          2077      MOVE.W #$5555,$1554
-00000CA0  31FC 2020 2AAA          2078      MOVE.W #$2020,$2AAA
-00000CA6                          2079      
-00000CA6  45F9 00000E78           2080      LEA LOADING,A2                              ; important for timing
-00000CAC                          2081m     PRINT_STR A2,D3
-00000CAC                          2082m LOOP_145
-00000CAC  0C12 0000               2083m     CMP.B #NULL,(A2)                            ; 0 -> DONE
-00000CB0  6700 0016               2084m     BEQ EXIT_145
-00000CB4                          2085mm     PRINT_CHAR (A2)+,D3
-00000CB4                          2086mm WAIT_FOR_READY_146                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
-00000CB4                 TRUE     2087mm     IFEQ DEBUG
-00000CB4  1639 00C00003           2088mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
-00000CBA  0803 0002               2089mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
-00000CBE  67F4                    2090mm         BEQ WAIT_FOR_READY_146                      ; NO SPACE, CHECK AGAIN
-00000CC0  13DA 00C00007           2091mm         MOVE.B (A2)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
-00000CC6                          2092mm     ENDC
-00000CC6                          2093mm     
-00000CC6                 FALSE    2094mm     IFNE DEBUG
-00000CC6                          2095mm     ENDC
-00000CC6                          2096mm 
-00000CC6                          2097mm     ENDM
-00000CC6  60E4                    2098m     BRA LOOP_145
-00000CC8                          2099m EXIT_145
-00000CC8                          2100m     ENDM
-00000CC8                          2101      
-00000CC8                          2102      WHILE D5 <GT> #0 DO
-00000CC8                          2103s _10000014
-00000CC8  BA7C 0000               2104s     CMP.W   #0,D5
-00000CCC  6F00 001C               2105s     BLE _10000015
-00000CD0  5585                    2106          SUB.L #2,D5
-00000CD2                          2107            
-00000CD2  13D1 00E00001           2108          MOVE.B (A1),DISPLAY
-00000CD8  3091                    2109          MOVE.W (A1),(A0)                            ; write the data
-00000CDA                          2110        
-00000CDA                          2111  WAIT_FOR_COMPLETE
-00000CDA  3410                    2112          MOVE.W (A0),D2
-00000CDC                          2113  
-00000CDC                          2114          IF D2 <NE> (A1) THEN
-00000CDC  B451                    2115s     CMP.W   (A1),D2
-00000CDE  6700 0004               2116s     BEQ _0000000C
-00000CE2  60F6                    2117              BRA WAIT_FOR_COMPLETE
-00000CE4                          2118          ENDI
-00000CE4                          2119s _0000000C
-00000CE4                          2120        
-00000CE4  5488                    2121          ADD.L #2,A0
-00000CE6  5489                    2122          ADD.L #2,A1
-00000CE8                          2123       ENDW    
-00000CE8  60DE                    2124s     BRA _10000014
-00000CEA                          2125s _10000015
-00000CEA                          2126      
-00000CEA  31FC AAAA 2AAA          2127      MOVE.W #$AAAA,$2AAA
-00000CF0  31FC 5555 1554          2128      MOVE.W #$5555,$1554
-00000CF6  31FC A0A0 2AAA          2129      MOVE.W #$A0A0,$2AAA
-00000CFC                          2130              
-00000CFC  6000 F466               2131      BRA MAIN_LOOP
-00000D00                          2132          
-00000D00                          2133  HEX_DIGIT
-00000D00  E98F                    2134      LSL.L #4,D7                                 ; add the next digit in the next 4 bits
-00000D02                          2135m     HEX2BIN D2,D2,A0
-00000D02  41F9 00000E61           2136m     LEA HEX2BIN_LUT,A0                              ; LOAD THE LOOKUP TABLE
-00000D08  0402 0030               2137m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
-00000D0C  C4BC 000000FF           2138m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
-00000D12  1430 2000               2139m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT      
-00000D16                          2140m     ENDM
-00000D16  8E02                    2141      OR.B D2,D7  
-00000D18  6000 F472               2142      BRA GET_INPUT
-00000D1C                          2143  
-00000D1C  FFFF FFFF               2144      SIMHALT                                         ; halt simulator
-00000D20                          2145  
-00000D20                          2146  ; strings
-00000D20= 4D 44 46 2D 6D 6F ...   2147  VERSION DC.B 'MDF-mon V1.52 (10/04/2021)',CR,LF,NULL
-00000D3D= 3F 09 09 09 68 65 ...   2148  HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
-00000D47= 5B 76 5D 09 09 09 ...   2149          DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
-00000D56= 78 78 78 78 78 78 ...   2150          DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
-00000D6E= 78 78 78 78 78 78 ...   2151          DC.B 'xxxxxxxx[w]xxxxxxxx',TAB,'write long',CR,LF
-00000D8E= 5B 73 5D 09 09 09 ...   2152          DC.B '[s]',TAB,TAB,TAB,'download S records',CR,LF
-00000DA8= 78 78 78 78 78 78 ...   2153          DC.B 'xxxxxxxx[g]',TAB,TAB,'go',CR,LF
-00000DB9= 5B 7A 5D 09 09 09 ...   2154          DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
-00000DCB= 78 78 78 78 78 78 ...   2155          DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF,NULL
-00000DED= 48 75 68 3F 0D 0A 00    2156  HUH     DC.B 'Huh?',CR,LF,NULL
-00000DF4= 20 53 20 72 65 63 ...   2157  READ    DC.B ' S records read, start address = ',NULL
-00000E16= 57 3A 20 55 6E 6B ...   2158  UNREC   DC.B 'W: Unknown Srec type: ',NULL
-00000E2D= 57 3A 20 43 53 20 ...   2159  CS_FAILURE   DC.B 'W: CS failure at ',NULL
-00000E3F= 57 3A 20 52 41 4D ...   2160  RAM_ERROR DC.B 'W: RAM error at: ',NULL
-00000E51= 30 31 32 33 34 35 ...   2161  BIN2HEX_LUT DC.B '0123456789ABCDEF'
-00000E61= 00 01 02 03 04 05 ...   2162  HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-00000E78= 4C 6F 61 64 69 6E ...   2163  LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
-00000E8C= 0D 0A 00                2164  CRLF    DC.B CR,LF,NULL
-00000E8F                          2165      
-00000E8F                          2166      END    START                                ; last line of source
+00000660  6F00 007E               1132s     BLE _10000009
+00000664                          1133                  ;MOVE.L #0,D1                       ; D1 holds the byte
+00000664                          1134m                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it                               
+00000664  1E3C 0002               1135m     MOVE.B #2,D7
+00000668                          1136m     WHILE.B D7 <GT> 0 DO
+00000668                          1137ms _1000000A
+00000668  BE38 0000               1138ms     CMP.B   0,D7
+0000066C  6F00 0064               1139ms     BLE _1000000B
+00000670  E989                    1140m         LSL.L #4,D1                             ; IT's OK to do this first, because we are either starting from 0, 
+00000672                          1141mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
+00000672                          1142mm WAIT_FOR_READY_67                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000672                          1143mm 
+00000672  1A39 00C00003           1144mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
+00000678  0805 0000               1145mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
+0000067C  6700 0010               1146mm     BEQ CONTINUE_67                             ; NOTHING, CONTINUE
+00000680                          1147mm  
+00000680                          1148mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
+00000680                 TRUE     1149mmm     IFEQ DEBUG
+00000680  1A39 00C00007           1150mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
+00000686                          1151mmm     ENDC
+00000686                 FALSE    1152mmm     IFNE DEBUG
+00000686                          1153mmm     ENDC
+00000686                          1154mmm      
+00000686  BA3C 001B               1155mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
+0000068A  6700 F97C               1156mmm     BEQ START
+0000068E                          1157mmm     ENDM
+0000068E                          1158mm CONTINUE_67
+0000068E  1A39 00C00013           1159mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
+00000694  0805 0000               1160mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
+00000698  67D8                    1161mm     BEQ WAIT_FOR_READY_67                           ; NOTHING, CHECK AGAIN
+0000069A                          1162mm     
+0000069A  1A39 00C00017           1163mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
+000006A0  13C5 00E00001           1164mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
+000006A6                          1165mm     
+000006A6                          1166mm     ENDM
+000006A6                          1167mm         PRINT_CHAR D5,D6
+000006A6                          1168mm WAIT_FOR_READY_69                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000006A6                 TRUE     1169mm     IFEQ DEBUG
+000006A6  1C39 00C00003           1170mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
+000006AC  0806 0002               1171mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
+000006B0  67F4                    1172mm         BEQ WAIT_FOR_READY_69                   ; NO SPACE, CHECK AGAIN
+000006B2  13C5 00C00007           1173mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
+000006B8                          1174mm     ENDC
+000006B8                          1175mm     
+000006B8                 FALSE    1176mm     IFNE DEBUG
+000006B8                          1177mm     ENDC
+000006B8                          1178mm 
+000006B8                          1179mm     ENDM
+000006B8                          1180mm         HEX2BIN D5,D5,A4
+000006B8  49F9 00000E5D           1181mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+000006BE  0405 0030               1182mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+000006C2  CABC 000000FF           1183mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
+000006C8  1A34 5000               1184mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
+000006CC                          1185mm     ENDM
+000006CC  8205                    1186m         OR.B D5,D1
+000006CE  5307                    1187m         SUB.B #1,D7
+000006D0                          1188m     ENDW
+000006D0  6096                    1189ms     BRA _1000000A
+000006D2                          1190ms _1000000B
+000006D2                          1191m     
+000006D2  7A00                    1192m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
+000006D4  1A01                    1193m     MOVE.B D1,D5
+000006D6  D481                    1194m     ADD.L D1,D2
+000006D8                          1195m 
+000006D8                          1196m     ENDM
+000006D8                          1197                          
+000006D8  14C1                    1198                  MOVE.B D1,(A2)+                     ; store it!
+000006DA                          1199  
+000006DA  5383                    1200                  SUB.L #1,D3                     ; 1 less byte to go
+000006DC                          1201              ENDW
+000006DC  6000 FF7C               1202s     BRA _10000008
+000006E0                          1203s _10000009
+000006E0                          1204          
+000006E0  47F8 039E               1205              LEA WAIT_FOR_SRECORD,A3                 ; next place to go
+000006E4                          1206          ELSE
+000006E4  6000 01F0               1207s     BRA _00000007
+000006E8                          1208s _00000005
+000006E8                          1209              IF.B D1 <EQ> #'8' THEN.L                ; termination record, exit
+000006E8  B23C 0038               1210s     CMP.B   #'8',D1
+000006EC  6600 016C               1211s     BNE.L   _00000008
+000006F0  7800                    1212                  MOVE.L #0,D4                    ; read the 24 bit start address
+000006F2                          1213m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; top byte  
+000006F2  1E3C 0002               1214m     MOVE.B #2,D7
+000006F6                          1215m     WHILE.B D7 <GT> 0 DO
+000006F6                          1216ms _1000000C
+000006F6  BE38 0000               1217ms     CMP.B   0,D7
+000006FA  6F00 0064               1218ms     BLE _1000000D
+000006FE  E98C                    1219m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
+00000700                          1220mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
+00000700                          1221mm WAIT_FOR_READY_72                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000700                          1222mm 
+00000700  1A39 00C00003           1223mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
+00000706  0805 0000               1224mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
+0000070A  6700 0010               1225mm     BEQ CONTINUE_72                             ; NOTHING, CONTINUE
+0000070E                          1226mm  
+0000070E                          1227mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
+0000070E                 TRUE     1228mmm     IFEQ DEBUG
+0000070E  1A39 00C00007           1229mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
+00000714                          1230mmm     ENDC
+00000714                 FALSE    1231mmm     IFNE DEBUG
+00000714                          1232mmm     ENDC
+00000714                          1233mmm      
+00000714  BA3C 001B               1234mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
+00000718  6700 F8EE               1235mmm     BEQ START
+0000071C                          1236mmm     ENDM
+0000071C                          1237mm CONTINUE_72
+0000071C  1A39 00C00013           1238mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
+00000722  0805 0000               1239mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
+00000726  67D8                    1240mm     BEQ WAIT_FOR_READY_72                           ; NOTHING, CHECK AGAIN
+00000728                          1241mm     
+00000728  1A39 00C00017           1242mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
+0000072E  13C5 00E00001           1243mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
+00000734                          1244mm     
+00000734                          1245mm     ENDM
+00000734                          1246mm         PRINT_CHAR D5,D6
+00000734                          1247mm WAIT_FOR_READY_74                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000734                 TRUE     1248mm     IFEQ DEBUG
+00000734  1C39 00C00003           1249mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
+0000073A  0806 0002               1250mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
+0000073E  67F4                    1251mm         BEQ WAIT_FOR_READY_74                   ; NO SPACE, CHECK AGAIN
+00000740  13C5 00C00007           1252mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
+00000746                          1253mm     ENDC
+00000746                          1254mm     
+00000746                 FALSE    1255mm     IFNE DEBUG
+00000746                          1256mm     ENDC
+00000746                          1257mm 
+00000746                          1258mm     ENDM
+00000746                          1259mm         HEX2BIN D5,D5,A4
+00000746  49F9 00000E5D           1260mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+0000074C  0405 0030               1261mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+00000750  CABC 000000FF           1262mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
+00000756  1A34 5000               1263mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
+0000075A                          1264mm     ENDM
+0000075A  8805                    1265m         OR.B D5,D4
+0000075C  5307                    1266m         SUB.B #1,D7
+0000075E                          1267m     ENDW
+0000075E  6096                    1268ms     BRA _1000000C
+00000760                          1269ms _1000000D
+00000760                          1270m     
+00000760  7A00                    1271m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
+00000762  1A04                    1272m     MOVE.B D4,D5
+00000764  D484                    1273m     ADD.L D4,D2
+00000766                          1274m 
+00000766                          1275m     ENDM
+00000766                          1276m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; middle byte     
+00000766  1E3C 0002               1277m     MOVE.B #2,D7
+0000076A                          1278m     WHILE.B D7 <GT> 0 DO
+0000076A                          1279ms _1000000E
+0000076A  BE38 0000               1280ms     CMP.B   0,D7
+0000076E  6F00 0064               1281ms     BLE _1000000F
+00000772  E98C                    1282m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
+00000774                          1283mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
+00000774                          1284mm WAIT_FOR_READY_77                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000774                          1285mm 
+00000774  1A39 00C00003           1286mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
+0000077A  0805 0000               1287mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
+0000077E  6700 0010               1288mm     BEQ CONTINUE_77                             ; NOTHING, CONTINUE
+00000782                          1289mm  
+00000782                          1290mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
+00000782                 TRUE     1291mmm     IFEQ DEBUG
+00000782  1A39 00C00007           1292mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
+00000788                          1293mmm     ENDC
+00000788                 FALSE    1294mmm     IFNE DEBUG
+00000788                          1295mmm     ENDC
+00000788                          1296mmm      
+00000788  BA3C 001B               1297mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
+0000078C  6700 F87A               1298mmm     BEQ START
+00000790                          1299mmm     ENDM
+00000790                          1300mm CONTINUE_77
+00000790  1A39 00C00013           1301mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
+00000796  0805 0000               1302mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
+0000079A  67D8                    1303mm     BEQ WAIT_FOR_READY_77                           ; NOTHING, CHECK AGAIN
+0000079C                          1304mm     
+0000079C  1A39 00C00017           1305mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
+000007A2  13C5 00E00001           1306mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
+000007A8                          1307mm     
+000007A8                          1308mm     ENDM
+000007A8                          1309mm         PRINT_CHAR D5,D6
+000007A8                          1310mm WAIT_FOR_READY_79                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000007A8                 TRUE     1311mm     IFEQ DEBUG
+000007A8  1C39 00C00003           1312mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
+000007AE  0806 0002               1313mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
+000007B2  67F4                    1314mm         BEQ WAIT_FOR_READY_79                   ; NO SPACE, CHECK AGAIN
+000007B4  13C5 00C00007           1315mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
+000007BA                          1316mm     ENDC
+000007BA                          1317mm     
+000007BA                 FALSE    1318mm     IFNE DEBUG
+000007BA                          1319mm     ENDC
+000007BA                          1320mm 
+000007BA                          1321mm     ENDM
+000007BA                          1322mm         HEX2BIN D5,D5,A4
+000007BA  49F9 00000E5D           1323mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+000007C0  0405 0030               1324mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+000007C4  CABC 000000FF           1325mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
+000007CA  1A34 5000               1326mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
+000007CE                          1327mm     ENDM
+000007CE  8805                    1328m         OR.B D5,D4
+000007D0  5307                    1329m         SUB.B #1,D7
+000007D2                          1330m     ENDW
+000007D2  6096                    1331ms     BRA _1000000E
+000007D4                          1332ms _1000000F
+000007D4                          1333m     
+000007D4  7A00                    1334m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
+000007D6  1A04                    1335m     MOVE.B D4,D5
+000007D8  D484                    1336m     ADD.L D4,D2
+000007DA                          1337m 
+000007DA                          1338m     ENDM
+000007DA                          1339m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; bottom byte
+000007DA  1E3C 0002               1340m     MOVE.B #2,D7
+000007DE                          1341m     WHILE.B D7 <GT> 0 DO
+000007DE                          1342ms _10000010
+000007DE  BE38 0000               1343ms     CMP.B   0,D7
+000007E2  6F00 0064               1344ms     BLE _10000011
+000007E6  E98C                    1345m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
+000007E8                          1346mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
+000007E8                          1347mm WAIT_FOR_READY_82                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000007E8                          1348mm 
+000007E8  1A39 00C00003           1349mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
+000007EE  0805 0000               1350mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
+000007F2  6700 0010               1351mm     BEQ CONTINUE_82                             ; NOTHING, CONTINUE
+000007F6                          1352mm  
+000007F6                          1353mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
+000007F6                 TRUE     1354mmm     IFEQ DEBUG
+000007F6  1A39 00C00007           1355mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
+000007FC                          1356mmm     ENDC
+000007FC                 FALSE    1357mmm     IFNE DEBUG
+000007FC                          1358mmm     ENDC
+000007FC                          1359mmm      
+000007FC  BA3C 001B               1360mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
+00000800  6700 F806               1361mmm     BEQ START
+00000804                          1362mmm     ENDM
+00000804                          1363mm CONTINUE_82
+00000804  1A39 00C00013           1364mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
+0000080A  0805 0000               1365mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
+0000080E  67D8                    1366mm     BEQ WAIT_FOR_READY_82                           ; NOTHING, CHECK AGAIN
+00000810                          1367mm     
+00000810  1A39 00C00017           1368mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
+00000816  13C5 00E00001           1369mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
+0000081C                          1370mm     
+0000081C                          1371mm     ENDM
+0000081C                          1372mm         PRINT_CHAR D5,D6
+0000081C                          1373mm WAIT_FOR_READY_84                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+0000081C                 TRUE     1374mm     IFEQ DEBUG
+0000081C  1C39 00C00003           1375mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
+00000822  0806 0002               1376mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
+00000826  67F4                    1377mm         BEQ WAIT_FOR_READY_84                   ; NO SPACE, CHECK AGAIN
+00000828  13C5 00C00007           1378mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
+0000082E                          1379mm     ENDC
+0000082E                          1380mm     
+0000082E                 FALSE    1381mm     IFNE DEBUG
+0000082E                          1382mm     ENDC
+0000082E                          1383mm 
+0000082E                          1384mm     ENDM
+0000082E                          1385mm         HEX2BIN D5,D5,A4
+0000082E  49F9 00000E5D           1386mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+00000834  0405 0030               1387mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+00000838  CABC 000000FF           1388mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
+0000083E  1A34 5000               1389mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
+00000842                          1390mm     ENDM
+00000842  8805                    1391m         OR.B D5,D4
+00000844  5307                    1392m         SUB.B #1,D7
+00000846                          1393m     ENDW
+00000846  6096                    1394ms     BRA _10000010
+00000848                          1395ms _10000011
+00000848                          1396m     
+00000848  7A00                    1397m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
+0000084A  1A04                    1398m     MOVE.B D4,D5
+0000084C  D484                    1399m     ADD.L D4,D2
+0000084E                          1400m 
+0000084E                          1401m     ENDM
+0000084E                          1402                    
+0000084E  2044                    1403                  MOVE.L D4,A0                    ; start address -> A0
+00000850                          1404                  
+00000850  47F9 00000A12           1405                  LEA DOWNLOAD_DONE,A3            ; next place to go
+00000856                          1406              ELSE
+00000856  6000 007E               1407s     BRA _00000009
+0000085A                          1408s _00000008
+0000085A                          1409m                 PRINT_CRLF D5,A4
+0000085A  49F9 00000E88           1410m     LEA CRLF,A4
+00000860                          1411mm     PRINT_STR A4,D5
+00000860                          1412mm LOOP_87
+00000860  0C14 0000               1413mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
+00000864  6700 0016               1414mm     BEQ EXIT_87
+00000868                          1415mmm     PRINT_CHAR (A4)+,D5
+00000868                          1416mmm WAIT_FOR_READY_88                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000868                 TRUE     1417mmm     IFEQ DEBUG
+00000868  1A39 00C00003           1418mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+0000086E  0805 0002               1419mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000872  67F4                    1420mmm         BEQ WAIT_FOR_READY_88                   ; NO SPACE, CHECK AGAIN
+00000874  13DC 00C00007           1421mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+0000087A                          1422mmm     ENDC
+0000087A                          1423mmm     
+0000087A                 FALSE    1424mmm     IFNE DEBUG
+0000087A                          1425mmm     ENDC
+0000087A                          1426mmm 
+0000087A                          1427mmm     ENDM
+0000087A  60E4                    1428mm     BRA LOOP_87
+0000087C                          1429mm EXIT_87
+0000087C                          1430mm     ENDM
+0000087C                          1431m     ENDM
+0000087C                          1432              
+0000087C  49F9 00000E12           1433                  LEA UNREC,A4                    ; warn for unrecognised type
+00000882                          1434m                 PRINT_STR A4,D5
+00000882                          1435m LOOP_89
+00000882  0C14 0000               1436m     CMP.B #NULL,(A4)                            ; 0 -> DONE
+00000886  6700 0016               1437m     BEQ EXIT_89
+0000088A                          1438mm     PRINT_CHAR (A4)+,D5
+0000088A                          1439mm WAIT_FOR_READY_90                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+0000088A                 TRUE     1440mm     IFEQ DEBUG
+0000088A  1A39 00C00003           1441mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000890  0805 0002               1442mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000894  67F4                    1443mm         BEQ WAIT_FOR_READY_90                   ; NO SPACE, CHECK AGAIN
+00000896  13DC 00C00007           1444mm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+0000089C                          1445mm     ENDC
+0000089C                          1446mm     
+0000089C                 FALSE    1447mm     IFNE DEBUG
+0000089C                          1448mm     ENDC
+0000089C                          1449mm 
+0000089C                          1450mm     ENDM
+0000089C  60E4                    1451m     BRA LOOP_89
+0000089E                          1452m EXIT_89
+0000089E                          1453m     ENDM
+0000089E                          1454m                 PRINT_CHAR D1,D5
+0000089E                          1455m WAIT_FOR_READY_91                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+0000089E                 TRUE     1456m     IFEQ DEBUG
+0000089E  1A39 00C00003           1457m         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+000008A4  0805 0002               1458m         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+000008A8  67F4                    1459m         BEQ WAIT_FOR_READY_91                   ; NO SPACE, CHECK AGAIN
+000008AA  13C1 00C00007           1460m         MOVE.B D1,DUART_TXA                     ; SEND THE NEXT CHARACTER
+000008B0                          1461m     ENDC
+000008B0                          1462m     
+000008B0                 FALSE    1463m     IFNE DEBUG
+000008B0                          1464m     ENDC
+000008B0                          1465m 
+000008B0                          1466m     ENDM
+000008B0                          1467m                 PRINT_CRLF D5,A4
+000008B0  49F9 00000E88           1468m     LEA CRLF,A4
+000008B6                          1469mm     PRINT_STR A4,D5
+000008B6                          1470mm LOOP_93
+000008B6  0C14 0000               1471mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
+000008BA  6700 0016               1472mm     BEQ EXIT_93
+000008BE                          1473mmm     PRINT_CHAR (A4)+,D5
+000008BE                          1474mmm WAIT_FOR_READY_94                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000008BE                 TRUE     1475mmm     IFEQ DEBUG
+000008BE  1A39 00C00003           1476mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+000008C4  0805 0002               1477mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+000008C8  67F4                    1478mmm         BEQ WAIT_FOR_READY_94                   ; NO SPACE, CHECK AGAIN
+000008CA  13DC 00C00007           1479mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+000008D0                          1480mmm     ENDC
+000008D0                          1481mmm     
+000008D0                 FALSE    1482mmm     IFNE DEBUG
+000008D0                          1483mmm     ENDC
+000008D0                          1484mmm 
+000008D0                          1485mmm     ENDM
+000008D0  60E4                    1486mm     BRA LOOP_93
+000008D2                          1487mm EXIT_93
+000008D2                          1488mm     ENDM
+000008D2                          1489m     ENDM
+000008D2                          1490              
+000008D2  6000 FACA               1491                  BRA WAIT_FOR_SRECORD            ; ignore any other type    
+000008D6                          1492              ENDI
+000008D6                          1493s _00000009
+000008D6                          1494          ENDI
+000008D6                          1495s _00000007
+000008D6                          1496      ENDI
+000008D6                          1497s _00000003
+000008D6                          1498      
+000008D6                          1499      ;MOVE.L #0,D4                                   ; read the checksum from the data stream add to our checksum: should make it FF
+000008D6                          1500m     DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4                         
+000008D6  1E3C 0002               1501m     MOVE.B #2,D7
+000008DA                          1502m     WHILE.B D7 <GT> 0 DO
+000008DA                          1503ms _10000012
+000008DA  BE38 0000               1504ms     CMP.B   0,D7
+000008DE  6F00 0064               1505ms     BLE _10000013
+000008E2  E98C                    1506m         LSL.L #4,D4                             ; IT's OK to do this first, because we are either starting from 0, 
+000008E4                          1507mm         DOWNLOAD D5                             ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
+000008E4                          1508mm WAIT_FOR_READY_96                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000008E4                          1509mm 
+000008E4  1A39 00C00003           1510mm     MOVE.B DUART_SRA,D5                         ; CHECK FOR COMMAND
+000008EA  0805 0000               1511mm     BTST #0,D5                                  ; CHECK FOR CHARACTER
+000008EE  6700 0010               1512mm     BEQ CONTINUE_96                             ; NOTHING, CONTINUE
+000008F2                          1513mm  
+000008F2                          1514mmm     READ_CHAR D5                                ; WE're not going to do anything with it, just check for escape
+000008F2                 TRUE     1515mmm     IFEQ DEBUG
+000008F2  1A39 00C00007           1516mmm         MOVE.B DUART_RXA,D5                         ; GOT A CHARACTER, READ IT
+000008F8                          1517mmm     ENDC
+000008F8                 FALSE    1518mmm     IFNE DEBUG
+000008F8                          1519mmm     ENDC
+000008F8                          1520mmm      
+000008F8  BA3C 001B               1521mmm     CMP.B #$1B,D5                               ; CHECK FOR ESCAPE AND GO TO START
+000008FC  6700 F70A               1522mmm     BEQ START
+00000900                          1523mmm     ENDM
+00000900                          1524mm CONTINUE_96
+00000900  1A39 00C00013           1525mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
+00000906  0805 0000               1526mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
+0000090A  67D8                    1527mm     BEQ WAIT_FOR_READY_96                           ; NOTHING, CHECK AGAIN
+0000090C                          1528mm     
+0000090C  1A39 00C00017           1529mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
+00000912  13C5 00E00001           1530mm     MOVE.B D5,DISPLAY                               ; ECHO TO THE DISPLAY
+00000918                          1531mm     
+00000918                          1532mm     ENDM
+00000918                          1533mm         PRINT_CHAR D5,D6
+00000918                          1534mm WAIT_FOR_READY_98                               ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000918                 TRUE     1535mm     IFEQ DEBUG
+00000918  1C39 00C00003           1536mm         MOVE.B DUART_SRA,D6                     ; READ STATUS REGISTER
+0000091E  0806 0002               1537mm         BTST #2,D6                              ; CHECK FOR SPACE TO SEND
+00000922  67F4                    1538mm         BEQ WAIT_FOR_READY_98                   ; NO SPACE, CHECK AGAIN
+00000924  13C5 00C00007           1539mm         MOVE.B D5,DUART_TXA                     ; SEND THE NEXT CHARACTER
+0000092A                          1540mm     ENDC
+0000092A                          1541mm     
+0000092A                 FALSE    1542mm     IFNE DEBUG
+0000092A                          1543mm     ENDC
+0000092A                          1544mm 
+0000092A                          1545mm     ENDM
+0000092A                          1546mm         HEX2BIN D5,D5,A4
+0000092A  49F9 00000E5D           1547mm     LEA HEX2BIN_LUT,A4                              ; LOAD THE LOOKUP TABLE
+00000930  0405 0030               1548mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+00000934  CABC 000000FF           1549mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
+0000093A  1A34 5000               1550mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT      
+0000093E                          1551mm     ENDM
+0000093E  8805                    1552m         OR.B D5,D4
+00000940  5307                    1553m         SUB.B #1,D7
+00000942                          1554m     ENDW
+00000942  6096                    1555ms     BRA _10000012
+00000944                          1556ms _10000013
+00000944                          1557m     
+00000944  7A00                    1558m     MOVE.L #0,D5                                    ; REXTRACT LATEST BYTE OF ADDRESS AND ADD INTO CHECKSUM
+00000946  1A04                    1559m     MOVE.B D4,D5
+00000948  D484                    1560m     ADD.L D4,D2
+0000094A                          1561m 
+0000094A                          1562m     ENDM
+0000094A                          1563m     PRINT_CRLF D5,A4
+0000094A  49F9 00000E88           1564m     LEA CRLF,A4
+00000950                          1565mm     PRINT_STR A4,D5
+00000950                          1566mm LOOP_101
+00000950  0C14 0000               1567mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
+00000954  6700 0016               1568mm     BEQ EXIT_101
+00000958                          1569mmm     PRINT_CHAR (A4)+,D5
+00000958                          1570mmm WAIT_FOR_READY_102                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000958                 TRUE     1571mmm     IFEQ DEBUG
+00000958  1A39 00C00003           1572mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+0000095E  0805 0002               1573mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000962  67F4                    1574mmm         BEQ WAIT_FOR_READY_102                      ; NO SPACE, CHECK AGAIN
+00000964  13DC 00C00007           1575mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+0000096A                          1576mmm     ENDC
+0000096A                          1577mmm     
+0000096A                 FALSE    1578mmm     IFNE DEBUG
+0000096A                          1579mmm     ENDC
+0000096A                          1580mmm 
+0000096A                          1581mmm     ENDM
+0000096A  60E4                    1582mm     BRA LOOP_101
+0000096C                          1583mm EXIT_101
+0000096C                          1584mm     ENDM
+0000096C                          1585m     ENDM
+0000096C                          1586          
+0000096C                          1587      IF.B D2 <NE> #$FF THEN.L
+0000096C  B43C 00FF               1588s     CMP.B   #$FF,D2
+00000970  6700 009E               1589s     BEQ.L   _0000000A
+00000974  49F9 00000E29           1590          LEA CS_FAILURE,A4                       ; warn for mismatched checksum
+0000097A                          1591m         PRINT_STR A4,D5
+0000097A                          1592m LOOP_103
+0000097A  0C14 0000               1593m     CMP.B #NULL,(A4)                            ; 0 -> DONE
+0000097E  6700 0016               1594m     BEQ EXIT_103
+00000982                          1595mm     PRINT_CHAR (A4)+,D5
+00000982                          1596mm WAIT_FOR_READY_104                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000982                 TRUE     1597mm     IFEQ DEBUG
+00000982  1A39 00C00003           1598mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000988  0805 0002               1599mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+0000098C  67F4                    1600mm         BEQ WAIT_FOR_READY_104                      ; NO SPACE, CHECK AGAIN
+0000098E  13DC 00C00007           1601mm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000994                          1602mm     ENDC
+00000994                          1603mm     
+00000994                 FALSE    1604mm     IFNE DEBUG
+00000994                          1605mm     ENDC
+00000994                          1606mm 
+00000994                          1607mm     ENDM
+00000994  60E4                    1608m     BRA LOOP_103
+00000996                          1609m EXIT_103
+00000996                          1610m     ENDM
+00000996                          1611m         PRINT_REG D0,D5,D2,D6,A4
+00000996                          1612mm     PRINT_CHAR #'0',D5                              ;0X HEADER
+00000996                          1613mm WAIT_FOR_READY_106                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000996                 TRUE     1614mm     IFEQ DEBUG
+00000996  1A39 00C00003           1615mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+0000099C  0805 0002               1616mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+000009A0  67F4                    1617mm         BEQ WAIT_FOR_READY_106                      ; NO SPACE, CHECK AGAIN
+000009A2  13FC 0030 00C00007      1618mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
+000009AA                          1619mm     ENDC
+000009AA                          1620mm     
+000009AA                 FALSE    1621mm     IFNE DEBUG
+000009AA                          1622mm     ENDC
+000009AA                          1623mm 
+000009AA                          1624mm     ENDM
+000009AA                          1625mm     PRINT_CHAR #'x',D5
+000009AA                          1626mm WAIT_FOR_READY_107                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000009AA                 TRUE     1627mm     IFEQ DEBUG
+000009AA  1A39 00C00003           1628mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+000009B0  0805 0002               1629mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+000009B4  67F4                    1630mm         BEQ WAIT_FOR_READY_107                      ; NO SPACE, CHECK AGAIN
+000009B6  13FC 0078 00C00007      1631mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
+000009BE                          1632mm     ENDC
+000009BE                          1633mm     
+000009BE                 FALSE    1634mm     IFNE DEBUG
+000009BE                          1635mm     ENDC
+000009BE                          1636mm 
+000009BE                          1637mm     ENDM
+000009BE  7C07                    1638m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
+000009C0                          1639m LOOP_105
+000009C0                          1640mm     BIN2HEX D0,D2,A4
+000009C0  49F9 00000E4D           1641mm     LEA BIN2HEX_LUT,A4                          ; LOAD THE LOOKUP TABLE
+000009C6  E998                    1642mm     ROL.L #4,D0                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
+000009C8  1400                    1643mm     MOVE.B D0,D2
+000009CA  0282 0000000F           1644mm     ANDI.L #$F,D2
+000009D0  1434 2000               1645mm     MOVE.B 0(A4,D2),D2                          ; USE THAT AS AN INDEX INTO THE LUT
+000009D4                          1646mm     ENDM
+000009D4                          1647mm     PRINT_CHAR D2,D5
+000009D4                          1648mm WAIT_FOR_READY_109                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000009D4                 TRUE     1649mm     IFEQ DEBUG
+000009D4  1A39 00C00003           1650mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+000009DA  0805 0002               1651mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+000009DE  67F4                    1652mm         BEQ WAIT_FOR_READY_109                      ; NO SPACE, CHECK AGAIN
+000009E0  13C2 00C00007           1653mm         MOVE.B D2,DUART_TXA                     ; SEND THE NEXT CHARACTER
+000009E6                          1654mm     ENDC
+000009E6                          1655mm     
+000009E6                 FALSE    1656mm     IFNE DEBUG
+000009E6                          1657mm     ENDC
+000009E6                          1658mm 
+000009E6                          1659mm     ENDM
+000009E6  57CE FFD8               1660m     DBEQ D6,LOOP_105
+000009EA                          1661m     ENDM
+000009EA                          1662m         PRINT_CRLF D5,A4
+000009EA  49F9 00000E88           1663m     LEA CRLF,A4
+000009F0                          1664mm     PRINT_STR A4,D5
+000009F0                          1665mm LOOP_111
+000009F0  0C14 0000               1666mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
+000009F4  6700 0016               1667mm     BEQ EXIT_111
+000009F8                          1668mmm     PRINT_CHAR (A4)+,D5
+000009F8                          1669mmm WAIT_FOR_READY_112                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+000009F8                 TRUE     1670mmm     IFEQ DEBUG
+000009F8  1A39 00C00003           1671mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+000009FE  0805 0002               1672mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000A02  67F4                    1673mmm         BEQ WAIT_FOR_READY_112                      ; NO SPACE, CHECK AGAIN
+00000A04  13DC 00C00007           1674mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000A0A                          1675mmm     ENDC
+00000A0A                          1676mmm     
+00000A0A                 FALSE    1677mmm     IFNE DEBUG
+00000A0A                          1678mmm     ENDC
+00000A0A                          1679mmm 
+00000A0A                          1680mmm     ENDM
+00000A0A  60E4                    1681mm     BRA LOOP_111
+00000A0C                          1682mm EXIT_111
+00000A0C                          1683mm     ENDM
+00000A0C                          1684m     ENDM
+00000A0C  6000 F756               1685          BRA MAIN_LOOP
+00000A10                          1686      ENDI
+00000A10                          1687s _0000000A
+00000A10                          1688      
+00000A10  4ED3                    1689      JMP (A3)
+00000A12                          1690  DOWNLOAD_DONE
+00000A12                          1691m     PRINT_REG D0,D5,D6,D2,A1                        ; print out number of Srecords read
+00000A12                          1692mm     PRINT_CHAR #'0',D5                              ;0X HEADER
+00000A12                          1693mm WAIT_FOR_READY_114                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000A12                 TRUE     1694mm     IFEQ DEBUG
+00000A12  1A39 00C00003           1695mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000A18  0805 0002               1696mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000A1C  67F4                    1697mm         BEQ WAIT_FOR_READY_114                      ; NO SPACE, CHECK AGAIN
+00000A1E  13FC 0030 00C00007      1698mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
+00000A26                          1699mm     ENDC
+00000A26                          1700mm     
+00000A26                 FALSE    1701mm     IFNE DEBUG
+00000A26                          1702mm     ENDC
+00000A26                          1703mm 
+00000A26                          1704mm     ENDM
+00000A26                          1705mm     PRINT_CHAR #'x',D5
+00000A26                          1706mm WAIT_FOR_READY_115                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000A26                 TRUE     1707mm     IFEQ DEBUG
+00000A26  1A39 00C00003           1708mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000A2C  0805 0002               1709mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000A30  67F4                    1710mm         BEQ WAIT_FOR_READY_115                      ; NO SPACE, CHECK AGAIN
+00000A32  13FC 0078 00C00007      1711mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
+00000A3A                          1712mm     ENDC
+00000A3A                          1713mm     
+00000A3A                 FALSE    1714mm     IFNE DEBUG
+00000A3A                          1715mm     ENDC
+00000A3A                          1716mm 
+00000A3A                          1717mm     ENDM
+00000A3A  7407                    1718m     MOVE.L #7,D2                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
+00000A3C                          1719m LOOP_113
+00000A3C                          1720mm     BIN2HEX D0,D6,A1
+00000A3C  43F9 00000E4D           1721mm     LEA BIN2HEX_LUT,A1                          ; LOAD THE LOOKUP TABLE
+00000A42  E998                    1722mm     ROL.L #4,D0                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
+00000A44  1C00                    1723mm     MOVE.B D0,D6
+00000A46  0286 0000000F           1724mm     ANDI.L #$F,D6
+00000A4C  1C31 6000               1725mm     MOVE.B 0(A1,D6),D6                          ; USE THAT AS AN INDEX INTO THE LUT
+00000A50                          1726mm     ENDM
+00000A50                          1727mm     PRINT_CHAR D6,D5
+00000A50                          1728mm WAIT_FOR_READY_117                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000A50                 TRUE     1729mm     IFEQ DEBUG
+00000A50  1A39 00C00003           1730mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000A56  0805 0002               1731mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000A5A  67F4                    1732mm         BEQ WAIT_FOR_READY_117                      ; NO SPACE, CHECK AGAIN
+00000A5C  13C6 00C00007           1733mm         MOVE.B D6,DUART_TXA                     ; SEND THE NEXT CHARACTER
+00000A62                          1734mm     ENDC
+00000A62                          1735mm     
+00000A62                 FALSE    1736mm     IFNE DEBUG
+00000A62                          1737mm     ENDC
+00000A62                          1738mm 
+00000A62                          1739mm     ENDM
+00000A62  57CA FFD8               1740m     DBEQ D2,LOOP_113
+00000A66                          1741m     ENDM
+00000A66  43F9 00000DF0           1742      LEA READ,A1
+00000A6C                          1743m     PRINT_STR A1,D5
+00000A6C                          1744m LOOP_118
+00000A6C  0C11 0000               1745m     CMP.B #NULL,(A1)                            ; 0 -> DONE
+00000A70  6700 0016               1746m     BEQ EXIT_118
+00000A74                          1747mm     PRINT_CHAR (A1)+,D5
+00000A74                          1748mm WAIT_FOR_READY_119                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000A74                 TRUE     1749mm     IFEQ DEBUG
+00000A74  1A39 00C00003           1750mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000A7A  0805 0002               1751mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000A7E  67F4                    1752mm         BEQ WAIT_FOR_READY_119                      ; NO SPACE, CHECK AGAIN
+00000A80  13D9 00C00007           1753mm         MOVE.B (A1)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000A86                          1754mm     ENDC
+00000A86                          1755mm     
+00000A86                 FALSE    1756mm     IFNE DEBUG
+00000A86                          1757mm     ENDC
+00000A86                          1758mm 
+00000A86                          1759mm     ENDM
+00000A86  60E4                    1760m     BRA LOOP_118
+00000A88                          1761m EXIT_118
+00000A88                          1762m     ENDM
+00000A88  2E08                    1763      MOVE.L A0,D7                                    ; set address accumulator to start address
+00000A8A                          1764m     PRINT_REG D7,D5,D6,D2,A1                        ; print out start address
+00000A8A                          1765mm     PRINT_CHAR #'0',D5                              ;0X HEADER
+00000A8A                          1766mm WAIT_FOR_READY_121                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000A8A                 TRUE     1767mm     IFEQ DEBUG
+00000A8A  1A39 00C00003           1768mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000A90  0805 0002               1769mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000A94  67F4                    1770mm         BEQ WAIT_FOR_READY_121                      ; NO SPACE, CHECK AGAIN
+00000A96  13FC 0030 00C00007      1771mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
+00000A9E                          1772mm     ENDC
+00000A9E                          1773mm     
+00000A9E                 FALSE    1774mm     IFNE DEBUG
+00000A9E                          1775mm     ENDC
+00000A9E                          1776mm 
+00000A9E                          1777mm     ENDM
+00000A9E                          1778mm     PRINT_CHAR #'x',D5
+00000A9E                          1779mm WAIT_FOR_READY_122                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000A9E                 TRUE     1780mm     IFEQ DEBUG
+00000A9E  1A39 00C00003           1781mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000AA4  0805 0002               1782mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000AA8  67F4                    1783mm         BEQ WAIT_FOR_READY_122                      ; NO SPACE, CHECK AGAIN
+00000AAA  13FC 0078 00C00007      1784mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
+00000AB2                          1785mm     ENDC
+00000AB2                          1786mm     
+00000AB2                 FALSE    1787mm     IFNE DEBUG
+00000AB2                          1788mm     ENDC
+00000AB2                          1789mm 
+00000AB2                          1790mm     ENDM
+00000AB2  7407                    1791m     MOVE.L #7,D2                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
+00000AB4                          1792m LOOP_120
+00000AB4                          1793mm     BIN2HEX D7,D6,A1
+00000AB4  43F9 00000E4D           1794mm     LEA BIN2HEX_LUT,A1                          ; LOAD THE LOOKUP TABLE
+00000ABA  E99F                    1795mm     ROL.L #4,D7                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
+00000ABC  1C07                    1796mm     MOVE.B D7,D6
+00000ABE  0286 0000000F           1797mm     ANDI.L #$F,D6
+00000AC4  1C31 6000               1798mm     MOVE.B 0(A1,D6),D6                          ; USE THAT AS AN INDEX INTO THE LUT
+00000AC8                          1799mm     ENDM
+00000AC8                          1800mm     PRINT_CHAR D6,D5
+00000AC8                          1801mm WAIT_FOR_READY_124                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000AC8                 TRUE     1802mm     IFEQ DEBUG
+00000AC8  1A39 00C00003           1803mm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000ACE  0805 0002               1804mm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000AD2  67F4                    1805mm         BEQ WAIT_FOR_READY_124                      ; NO SPACE, CHECK AGAIN
+00000AD4  13C6 00C00007           1806mm         MOVE.B D6,DUART_TXA                     ; SEND THE NEXT CHARACTER
+00000ADA                          1807mm     ENDC
+00000ADA                          1808mm     
+00000ADA                 FALSE    1809mm     IFNE DEBUG
+00000ADA                          1810mm     ENDC
+00000ADA                          1811mm 
+00000ADA                          1812mm     ENDM
+00000ADA  57CA FFD8               1813m     DBEQ D2,LOOP_120
+00000ADE                          1814m     ENDM
+00000ADE                          1815m     PRINT_CRLF D5,A4     
+00000ADE  49F9 00000E88           1816m     LEA CRLF,A4
+00000AE4                          1817mm     PRINT_STR A4,D5
+00000AE4                          1818mm LOOP_126
+00000AE4  0C14 0000               1819mm     CMP.B #NULL,(A4)                            ; 0 -> DONE
+00000AE8  6700 0016               1820mm     BEQ EXIT_126
+00000AEC                          1821mmm     PRINT_CHAR (A4)+,D5
+00000AEC                          1822mmm WAIT_FOR_READY_127                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000AEC                 TRUE     1823mmm     IFEQ DEBUG
+00000AEC  1A39 00C00003           1824mmm         MOVE.B DUART_SRA,D5                     ; READ STATUS REGISTER
+00000AF2  0805 0002               1825mmm         BTST #2,D5                              ; CHECK FOR SPACE TO SEND
+00000AF6  67F4                    1826mmm         BEQ WAIT_FOR_READY_127                      ; NO SPACE, CHECK AGAIN
+00000AF8  13DC 00C00007           1827mmm         MOVE.B (A4)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000AFE                          1828mmm     ENDC
+00000AFE                          1829mmm     
+00000AFE                 FALSE    1830mmm     IFNE DEBUG
+00000AFE                          1831mmm     ENDC
+00000AFE                          1832mmm 
+00000AFE                          1833mmm     ENDM
+00000AFE  60E4                    1834mm     BRA LOOP_126
+00000B00                          1835mm EXIT_126
+00000B00                          1836mm     ENDM
+00000B00                          1837m     ENDM
+00000B00                          1838          
+00000B00  6000 F662               1839      BRA MAIN_LOOP
+00000B04                          1840      
+00000B04                          1841  G
+00000B04  2047                    1842      MOVE.L D7,A0                                    ; address accumulator -> address register
+00000B06  3E3C 0000               1843      MOVE #0,D7                                      ; clear the now used address accumulator
+00000B0A  4ED0                    1844      JMP (A0)                                        ; jump to it!
+00000B0C                          1845      
+00000B0C                          1846  Z
+00000B0C  207C 00200000           1847      MOVE.L #RAM,A0                                  ; address of RAM
+00000B12                          1848      
+00000B12                          1849      FOR.L D0 = #0 TO #$40000 BY #4 DO             ; write
+00000B12  7000                    1850s     MOVE.L  #0,D0
+00000B14  6000 0012               1851s     BRA _20000001
+00000B18                          1852s _20000000
+00000B18  2200                    1853              MOVE.L D0,D1                              ; progress update
+00000B1A  E089                    1854          LSR.L #8,D1 
+00000B1C  E089                    1855          LSR.L #8,D1
+00000B1E  13C1 00E00001           1856          MOVE.B D1,DISPLAY
+00000B24                          1857  
+00000B24  20C0                    1858          MOVE.L D0,(A0)+
+00000B26                          1859      ENDF
+00000B26  5880                    1860s     ADD.L   #4,D0
+00000B28                          1861s _20000001
+00000B28  B0BC 00040000           1862s     CMP.L   #$40000,D0
+00000B2E  6FE8                    1863s     BLE _20000000
+00000B30                          1864   
+00000B30  207C 00200000           1865      MOVE.L #RAM,A0                                    ; address of RAM
+00000B36                          1866     
+00000B36                          1867      FOR.L D0 = #0 TO #$40000 BY #4 DO               ; read back and check 
+00000B36  7000                    1868s     MOVE.L  #0,D0
+00000B38  6000 00B4               1869s     BRA _20000003
+00000B3C                          1870s _20000002
+00000B3C  2200                    1871          MOVE.L D0,D1                              ; progress update
+00000B3E  E089                    1872          LSR.L #8,D1
+00000B40  E089                    1873          LSR.L #8,D1
+00000B42  13C1 00E00001           1874          MOVE.B D1,DISPLAY
+00000B48                          1875  
+00000B48  2218                    1876          MOVE.L (A0)+,D1
+00000B4A                          1877            
+00000B4A                          1878          IF.L D0 <NE> D1 THEN      
+00000B4A  B081                    1879s     CMP.L   D1,D0
+00000B4C  6700 009E               1880s     BEQ _0000000B
+00000B50  43F9 00000E3B           1881              LEA RAM_ERROR,A1
+00000B56                          1882m             PRINT_STR A1,D1
+00000B56                          1883m LOOP_128
+00000B56  0C11 0000               1884m     CMP.B #NULL,(A1)                            ; 0 -> DONE
+00000B5A  6700 0016               1885m     BEQ EXIT_128
+00000B5E                          1886mm     PRINT_CHAR (A1)+,D1
+00000B5E                          1887mm WAIT_FOR_READY_129                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000B5E                 TRUE     1888mm     IFEQ DEBUG
+00000B5E  1239 00C00003           1889mm         MOVE.B DUART_SRA,D1                     ; READ STATUS REGISTER
+00000B64  0801 0002               1890mm         BTST #2,D1                              ; CHECK FOR SPACE TO SEND
+00000B68  67F4                    1891mm         BEQ WAIT_FOR_READY_129                      ; NO SPACE, CHECK AGAIN
+00000B6A  13D9 00C00007           1892mm         MOVE.B (A1)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000B70                          1893mm     ENDC
+00000B70                          1894mm     
+00000B70                 FALSE    1895mm     IFNE DEBUG
+00000B70                          1896mm     ENDC
+00000B70                          1897mm 
+00000B70                          1898mm     ENDM
+00000B70  60E4                    1899m     BRA LOOP_128
+00000B72                          1900m EXIT_128
+00000B72                          1901m     ENDM
+00000B72  2208                    1902              MOVE.L A0,D1
+00000B74  5981                    1903              SUB.L #4,D1
+00000B76                          1904m             PRINT_REG D1,D3,D2,D6,A1                ; print out failure address
+00000B76                          1905mm     PRINT_CHAR #'0',D3                              ;0X HEADER
+00000B76                          1906mm WAIT_FOR_READY_131                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000B76                 TRUE     1907mm     IFEQ DEBUG
+00000B76  1639 00C00003           1908mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000B7C  0803 0002               1909mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000B80  67F4                    1910mm         BEQ WAIT_FOR_READY_131                      ; NO SPACE, CHECK AGAIN
+00000B82  13FC 0030 00C00007      1911mm         MOVE.B #'0',DUART_TXA                       ; SEND THE NEXT CHARACTER
+00000B8A                          1912mm     ENDC
+00000B8A                          1913mm     
+00000B8A                 FALSE    1914mm     IFNE DEBUG
+00000B8A                          1915mm     ENDC
+00000B8A                          1916mm 
+00000B8A                          1917mm     ENDM
+00000B8A                          1918mm     PRINT_CHAR #'x',D3
+00000B8A                          1919mm WAIT_FOR_READY_132                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000B8A                 TRUE     1920mm     IFEQ DEBUG
+00000B8A  1639 00C00003           1921mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000B90  0803 0002               1922mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000B94  67F4                    1923mm         BEQ WAIT_FOR_READY_132                      ; NO SPACE, CHECK AGAIN
+00000B96  13FC 0078 00C00007      1924mm         MOVE.B #'x',DUART_TXA                       ; SEND THE NEXT CHARACTER
+00000B9E                          1925mm     ENDC
+00000B9E                          1926mm     
+00000B9E                 FALSE    1927mm     IFNE DEBUG
+00000B9E                          1928mm     ENDC
+00000B9E                          1929mm 
+00000B9E                          1930mm     ENDM
+00000B9E  7C07                    1931m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
+00000BA0                          1932m LOOP_130
+00000BA0                          1933mm     BIN2HEX D1,D2,A1
+00000BA0  43F9 00000E4D           1934mm     LEA BIN2HEX_LUT,A1                          ; LOAD THE LOOKUP TABLE
+00000BA6  E999                    1935mm     ROL.L #4,D1                                 ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
+00000BA8  1401                    1936mm     MOVE.B D1,D2
+00000BAA  0282 0000000F           1937mm     ANDI.L #$F,D2
+00000BB0  1431 2000               1938mm     MOVE.B 0(A1,D2),D2                          ; USE THAT AS AN INDEX INTO THE LUT
+00000BB4                          1939mm     ENDM
+00000BB4                          1940mm     PRINT_CHAR D2,D3
+00000BB4                          1941mm WAIT_FOR_READY_134                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000BB4                 TRUE     1942mm     IFEQ DEBUG
+00000BB4  1639 00C00003           1943mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000BBA  0803 0002               1944mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000BBE  67F4                    1945mm         BEQ WAIT_FOR_READY_134                      ; NO SPACE, CHECK AGAIN
+00000BC0  13C2 00C00007           1946mm         MOVE.B D2,DUART_TXA                     ; SEND THE NEXT CHARACTER
+00000BC6                          1947mm     ENDC
+00000BC6                          1948mm     
+00000BC6                 FALSE    1949mm     IFNE DEBUG
+00000BC6                          1950mm     ENDC
+00000BC6                          1951mm 
+00000BC6                          1952mm     ENDM
+00000BC6  57CE FFD8               1953m     DBEQ D6,LOOP_130
+00000BCA                          1954m     ENDM
+00000BCA                          1955m             PRINT_CRLF D3,A1
+00000BCA  43F9 00000E88           1956m     LEA CRLF,A1
+00000BD0                          1957mm     PRINT_STR A1,D3
+00000BD0                          1958mm LOOP_136
+00000BD0  0C11 0000               1959mm     CMP.B #NULL,(A1)                            ; 0 -> DONE
+00000BD4  6700 0016               1960mm     BEQ EXIT_136
+00000BD8                          1961mmm     PRINT_CHAR (A1)+,D3
+00000BD8                          1962mmm WAIT_FOR_READY_137                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000BD8                 TRUE     1963mmm     IFEQ DEBUG
+00000BD8  1639 00C00003           1964mmm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000BDE  0803 0002               1965mmm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000BE2  67F4                    1966mmm         BEQ WAIT_FOR_READY_137                      ; NO SPACE, CHECK AGAIN
+00000BE4  13D9 00C00007           1967mmm         MOVE.B (A1)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000BEA                          1968mmm     ENDC
+00000BEA                          1969mmm     
+00000BEA                 FALSE    1970mmm     IFNE DEBUG
+00000BEA                          1971mmm     ENDC
+00000BEA                          1972mmm 
+00000BEA                          1973mmm     ENDM
+00000BEA  60E4                    1974mm     BRA LOOP_136
+00000BEC                          1975mm EXIT_136
+00000BEC                          1976mm     ENDM
+00000BEC                          1977m     ENDM
+00000BEC                          1978          ENDI 
+00000BEC                          1979s _0000000B
+00000BEC                          1980      ENDF
+00000BEC  5880                    1981s     ADD.L   #4,D0
+00000BEE                          1982s _20000003
+00000BEE  B0BC 00040000           1983s     CMP.L   #$40000,D0
+00000BF4  6F00 FF46               1984s     BLE _20000002
+00000BF8                          1985      
+00000BF8  6000 F56A               1986      BRA MAIN_LOOP
+00000BFC                          1987    
+00000BFC                          1988  L
+00000BFC  7A00                    1989      MOVE.L #0,D5                                    ; D5 will be the length  to write            
+00000BFE                          1990  
+00000BFE                          1991      FOR D6 = #0 TO #3 DO                          ; read the length to write
+00000BFE  3C3C 0000               1992s     MOVE.W  #0,D6
+00000C02  6000 0048               1993s     BRA _20000005
+00000C06                          1994s _20000004
+00000C06  E98D                    1995          LSL.L #4,D5                                 ; make what we have so far more significant
+00000C08                          1996m         WAIT_CHAR D2,D3                             ; next character -> D2
+00000C08                          1997m WAIT_FOR_READY_138                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000C08                 TRUE     1998m     IFEQ DEBUG
+00000C08  1639 00C00003           1999m         MOVE.B DUART_SRA,D3                         ; READ STATUS REGISTER
+00000C0E  0803 0000               2000m         BTST #0,D3                              ; CHECK FOR CHARACTER
+00000C12  67F4                    2001m         BEQ WAIT_FOR_READY_138                      ; NOTHING, CHECK AGAIN
+00000C14                          2002m     ENDC
+00000C14                          2003m     
+00000C14                          2004mm     READ_CHAR D2
+00000C14                 TRUE     2005mm     IFEQ DEBUG
+00000C14  1439 00C00007           2006mm         MOVE.B DUART_RXA,D2                         ; GOT A CHARACTER, READ IT
+00000C1A                          2007mm     ENDC
+00000C1A                 FALSE    2008mm     IFNE DEBUG
+00000C1A                          2009mm     ENDC
+00000C1A                          2010mm      
+00000C1A  B43C 001B               2011mm     CMP.B #$1B,D2                               ; CHECK FOR ESCAPE AND GO TO START
+00000C1E  6700 F3E8               2012mm     BEQ START
+00000C22                          2013mm     ENDM
+00000C22                          2014m 
+00000C22                 TRUE     2015m     IFEQ DEBUG
+00000C22                          2016mm         PRINT_CHAR D2,D3                            ; ECHO IT BACK
+00000C22                          2017mm WAIT_FOR_READY_140                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000C22                 TRUE     2018mm     IFEQ DEBUG
+00000C22  1639 00C00003           2019mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000C28  0803 0002               2020mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000C2C  67F4                    2021mm         BEQ WAIT_FOR_READY_140                      ; NO SPACE, CHECK AGAIN
+00000C2E  13C2 00C00007           2022mm         MOVE.B D2,DUART_TXA                     ; SEND THE NEXT CHARACTER
+00000C34                          2023mm     ENDC
+00000C34                          2024mm     
+00000C34                 FALSE    2025mm     IFNE DEBUG
+00000C34                          2026mm     ENDC
+00000C34                          2027mm 
+00000C34                          2028mm     ENDM
+00000C34                          2029m     ENDC
+00000C34                          2030m     ENDM
+00000C34                          2031m         HEX2BIN D2,D2,A0                            ; convert to binary -> D2
+00000C34  41F9 00000E5D           2032m     LEA HEX2BIN_LUT,A0                              ; LOAD THE LOOKUP TABLE
+00000C3A  0402 0030               2033m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+00000C3E  C4BC 000000FF           2034m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
+00000C44  1430 2000               2035m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT      
+00000C48                          2036m     ENDM
+00000C48  8A02                    2037          OR.B D2,D5
+00000C4A                          2038      ENDF
+00000C4A  5246                    2039s     ADD.W   #1,D6
+00000C4C                          2040s _20000005
+00000C4C  BC7C 0003               2041s     CMP.W   #3,D6
+00000C50  6FB4                    2042s     BLE _20000004
+00000C52                          2043            
+00000C52                          2044m     PRINT_CRLF D3,A0
+00000C52  41F9 00000E88           2045m     LEA CRLF,A0
+00000C58                          2046mm     PRINT_STR A0,D3
+00000C58                          2047mm LOOP_143
+00000C58  0C10 0000               2048mm     CMP.B #NULL,(A0)                            ; 0 -> DONE
+00000C5C  6700 0016               2049mm     BEQ EXIT_143
+00000C60                          2050mmm     PRINT_CHAR (A0)+,D3
+00000C60                          2051mmm WAIT_FOR_READY_144                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000C60                 TRUE     2052mmm     IFEQ DEBUG
+00000C60  1639 00C00003           2053mmm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000C66  0803 0002               2054mmm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000C6A  67F4                    2055mmm         BEQ WAIT_FOR_READY_144                      ; NO SPACE, CHECK AGAIN
+00000C6C  13D8 00C00007           2056mmm         MOVE.B (A0)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000C72                          2057mmm     ENDC
+00000C72                          2058mmm     
+00000C72                 FALSE    2059mmm     IFNE DEBUG
+00000C72                          2060mmm     ENDC
+00000C72                          2061mmm 
+00000C72                          2062mmm     ENDM
+00000C72  60E4                    2063mm     BRA LOOP_143
+00000C74                          2064mm EXIT_143
+00000C74                          2065mm     ENDM
+00000C74                          2066m     ENDM
+00000C74                          2067  
+00000C74  207C 00000000           2068      MOVE.L #ROM,A0                                  ; start of ROM
+00000C7A                          2069      
+00000C7A  2247                    2070      MOVE.L D7,A1                                    ; address accumulator -> address register
+00000C7C  7E00                    2071      MOVE.L #0,D7                                    ; clear the now used address accumulator
+00000C7E                          2072      
+00000C7E  31FC AAAA 2AAA          2073      MOVE.W #$AAAA,$2AAA
+00000C84  31FC 5555 1554          2074      MOVE.W #$5555,$1554
+00000C8A  31FC 8080 2AAA          2075      MOVE.W #$8080,$2AAA
+00000C90  31FC AAAA 2AAA          2076      MOVE.W #$AAAA,$2AAA
+00000C96  31FC 5555 1554          2077      MOVE.W #$5555,$1554
+00000C9C  31FC 2020 2AAA          2078      MOVE.W #$2020,$2AAA
+00000CA2                          2079      
+00000CA2  45F9 00000E74           2080      LEA LOADING,A2                              ; important for timing
+00000CA8                          2081m     PRINT_STR A2,D3
+00000CA8                          2082m LOOP_145
+00000CA8  0C12 0000               2083m     CMP.B #NULL,(A2)                            ; 0 -> DONE
+00000CAC  6700 0016               2084m     BEQ EXIT_145
+00000CB0                          2085mm     PRINT_CHAR (A2)+,D3
+00000CB0                          2086mm WAIT_FOR_READY_146                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
+00000CB0                 TRUE     2087mm     IFEQ DEBUG
+00000CB0  1639 00C00003           2088mm         MOVE.B DUART_SRA,D3                     ; READ STATUS REGISTER
+00000CB6  0803 0002               2089mm         BTST #2,D3                              ; CHECK FOR SPACE TO SEND
+00000CBA  67F4                    2090mm         BEQ WAIT_FOR_READY_146                      ; NO SPACE, CHECK AGAIN
+00000CBC  13DA 00C00007           2091mm         MOVE.B (A2)+,DUART_TXA                      ; SEND THE NEXT CHARACTER
+00000CC2                          2092mm     ENDC
+00000CC2                          2093mm     
+00000CC2                 FALSE    2094mm     IFNE DEBUG
+00000CC2                          2095mm     ENDC
+00000CC2                          2096mm 
+00000CC2                          2097mm     ENDM
+00000CC2  60E4                    2098m     BRA LOOP_145
+00000CC4                          2099m EXIT_145
+00000CC4                          2100m     ENDM
+00000CC4                          2101      
+00000CC4                          2102      WHILE D5 <GT> #0 DO
+00000CC4                          2103s _10000014
+00000CC4  BA7C 0000               2104s     CMP.W   #0,D5
+00000CC8  6F00 001C               2105s     BLE _10000015
+00000CCC  5585                    2106          SUB.L #2,D5
+00000CCE                          2107            
+00000CCE  13D1 00E00001           2108          MOVE.B (A1),DISPLAY
+00000CD4  3091                    2109          MOVE.W (A1),(A0)                            ; write the data
+00000CD6                          2110        
+00000CD6                          2111  WAIT_FOR_COMPLETE
+00000CD6  3410                    2112          MOVE.W (A0),D2
+00000CD8                          2113  
+00000CD8                          2114          IF D2 <NE> (A1) THEN
+00000CD8  B451                    2115s     CMP.W   (A1),D2
+00000CDA  6700 0004               2116s     BEQ _0000000C
+00000CDE  60F6                    2117              BRA WAIT_FOR_COMPLETE
+00000CE0                          2118          ENDI
+00000CE0                          2119s _0000000C
+00000CE0                          2120        
+00000CE0  5488                    2121          ADD.L #2,A0
+00000CE2  5489                    2122          ADD.L #2,A1
+00000CE4                          2123       ENDW    
+00000CE4  60DE                    2124s     BRA _10000014
+00000CE6                          2125s _10000015
+00000CE6                          2126      
+00000CE6  31FC AAAA 2AAA          2127      MOVE.W #$AAAA,$2AAA
+00000CEC  31FC 5555 1554          2128      MOVE.W #$5555,$1554
+00000CF2  31FC A0A0 2AAA          2129      MOVE.W #$A0A0,$2AAA
+00000CF8                          2130              
+00000CF8  6000 F46A               2131      BRA MAIN_LOOP
+00000CFC                          2132          
+00000CFC                          2133  HEX_DIGIT
+00000CFC  E98F                    2134      LSL.L #4,D7                                 ; add the next digit in the next 4 bits
+00000CFE                          2135m     HEX2BIN D2,D2,A0
+00000CFE  41F9 00000E5D           2136m     LEA HEX2BIN_LUT,A0                              ; LOAD THE LOOKUP TABLE
+00000D04  0402 0030               2137m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
+00000D08  C4BC 000000FF           2138m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
+00000D0E  1430 2000               2139m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT      
+00000D12                          2140m     ENDM
+00000D12  8E02                    2141      OR.B D2,D7  
+00000D14  6000 F476               2142      BRA GET_INPUT
+00000D18                          2143  
+00000D18  FFFF FFFF               2144      SIMHALT                                         ; halt simulator
+00000D1C                          2145  
+00000D1C                          2146  ; strings
+00000D1C= 4D 44 46 2D 6D 6F ...   2147  VERSION DC.B 'MDF-mon V1.54 (10/04/2021)',CR,LF,NULL
+00000D39= 3F 09 09 09 68 65 ...   2148  HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
+00000D43= 5B 76 5D 09 09 09 ...   2149          DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
+00000D52= 78 78 78 78 78 78 ...   2150          DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
+00000D6A= 78 78 78 78 78 78 ...   2151          DC.B 'xxxxxxxx[w]xxxxxxxx',TAB,'write long',CR,LF
+00000D8A= 5B 73 5D 09 09 09 ...   2152          DC.B '[s]',TAB,TAB,TAB,'download S records',CR,LF
+00000DA4= 78 78 78 78 78 78 ...   2153          DC.B 'xxxxxxxx[g]',TAB,TAB,'go',CR,LF
+00000DB5= 5B 7A 5D 09 09 09 ...   2154          DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
+00000DC7= 78 78 78 78 78 78 ...   2155          DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF,NULL
+00000DE9= 48 75 68 3F 0D 0A 00    2156  HUH     DC.B 'Huh?',CR,LF,NULL
+00000DF0= 20 53 20 72 65 63 ...   2157  READ    DC.B ' S records read, start address = ',NULL
+00000E12= 57 3A 20 55 6E 6B ...   2158  UNREC   DC.B 'W: Unknown Srec type: ',NULL
+00000E29= 57 3A 20 43 53 20 ...   2159  CS_FAILURE   DC.B 'W: CS failure at ',NULL
+00000E3B= 57 3A 20 52 41 4D ...   2160  RAM_ERROR DC.B 'W: RAM error at: ',NULL
+00000E4D= 30 31 32 33 34 35 ...   2161  BIN2HEX_LUT DC.B '0123456789ABCDEF'
+00000E5D= 00 01 02 03 04 05 ...   2162  HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
+00000E74= 4C 6F 61 64 69 6E ...   2163  LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
+00000E88= 0D 0A 00                2164  CRLF    DC.B CR,LF,NULL
+00000E8B                          2165      
+00000E8B                          2166      END    START                                ; last line of source
 
 No errors detected
 No warnings generated
@@ -2177,28 +2177,28 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 BIN2HEX             0
-BIN2HEX_LUT         E51
+BIN2HEX_LUT         E4D
 CONTINUE_37         3BA
 CONTINUE_40         40A
 CONTINUE_44         462
 CONTINUE_52         51A
 CONTINUE_57         58E
 CONTINUE_62         60C
-CONTINUE_67         690
-CONTINUE_72         71E
-CONTINUE_77         792
-CONTINUE_82         806
-CONTINUE_96         904
+CONTINUE_67         68E
+CONTINUE_72         71C
+CONTINUE_77         790
+CONTINUE_82         804
+CONTINUE_96         900
 CR                  D
-CRLF                E8C
-CS_FAILURE          E2D
+CRLF                E88
+CS_FAILURE          E29
 DEBUG               0
 DISPLAY             E00001
 DISPLAY_            0
 DISPLAY_BASE        E00000
 DOWNLOAD            962
 DOWNLOAD_BYTE       C47
-DOWNLOAD_DONE       A16
+DOWNLOAD_DONE       A12
 DUART_ACR           C00009
 DUART_ACR_          4
 DUART_BASE          C00000
@@ -2236,15 +2236,15 @@ DUART_TXA           C00007
 DUART_TXA_          3
 DUART_TXB           C00017
 DUART_TXB_          B
-EXIT_101            970
-EXIT_103            99A
-EXIT_111            A10
-EXIT_118            A8C
-EXIT_126            B04
-EXIT_128            B76
-EXIT_136            BF0
-EXIT_143            C78
-EXIT_145            CC8
+EXIT_101            96C
+EXIT_103            996
+EXIT_111            A0C
+EXIT_118            A88
+EXIT_126            B00
+EXIT_128            B72
+EXIT_136            BEC
+EXIT_143            C74
+EXIT_145            CC4
 EXIT_16             212
 EXIT_18             264
 EXIT_20             294
@@ -2254,33 +2254,33 @@ EXIT_35             392
 EXIT_49             4D6
 EXIT_5              138
 EXIT_8              15A
-EXIT_87             87E
-EXIT_89             8A0
-EXIT_93             8D4
-G                   B08
+EXIT_87             87C
+EXIT_89             89E
+EXIT_93             8D2
+G                   B04
 GET_INPUT           18C
 H                   268
-HELP                D3D
+HELP                D39
 HEX2BIN             134
-HEX2BIN_LUT         E61
-HEX_DIGIT           D00
-HUH                 DED
-L                   C00
+HEX2BIN_LUT         E5D
+HEX_DIGIT           CFC
+HUH                 DE9
+L                   BFC
 LF                  A
-LOADING             E78
-LOOP_101            954
-LOOP_103            97E
-LOOP_105            9C4
-LOOP_111            9F4
-LOOP_113            A40
-LOOP_118            A70
-LOOP_120            AB8
-LOOP_126            AE8
-LOOP_128            B5A
-LOOP_130            BA4
-LOOP_136            BD4
-LOOP_143            C5C
-LOOP_145            CAC
+LOADING             E74
+LOOP_101            950
+LOOP_103            97A
+LOOP_105            9C0
+LOOP_111            9F0
+LOOP_113            A3C
+LOOP_118            A6C
+LOOP_120            AB4
+LOOP_126            AE4
+LOOP_128            B56
+LOOP_130            BA0
+LOOP_136            BD0
+LOOP_143            C58
+LOOP_145            CA8
 LOOP_16             1F6
 LOOP_18             248
 LOOP_20             278
@@ -2291,9 +2291,9 @@ LOOP_35             376
 LOOP_49             4BA
 LOOP_5              11C
 LOOP_8              13E
-LOOP_87             862
-LOOP_89             884
-LOOP_93             8B8
+LOOP_87             860
+LOOP_89             882
+LOOP_93             8B6
 MAIN_LOOP           164
 NULL                0
 PRINTSTR            278
@@ -2303,8 +2303,8 @@ PRINT_REG           555
 PRINT_STR           4CD
 R                   298
 RAM                 200000
-RAM_ERROR           E3F
-READ                DF4
+RAM_ERROR           E3B
+READ                DF0
 READ_CHAR           7FC
 READ_DATA_TO_POKE   31E
 RESET               4
@@ -2313,40 +2313,40 @@ S                   396
 STACK               0
 START               8
 TAB                 9
-UNREC               E16
+UNREC               E12
 V                   272
-VERSION             D20
+VERSION             D1C
 W                   318
 WAIT_CHAR           64D
-WAIT_FOR_COMPLETE   CDA
+WAIT_FOR_COMPLETE   CD6
 WAIT_FOR_READY_1    D8
 WAIT_FOR_READY_10   164
-WAIT_FOR_READY_102  95C
-WAIT_FOR_READY_104  986
-WAIT_FOR_READY_106  99A
-WAIT_FOR_READY_107  9AE
-WAIT_FOR_READY_109  9D8
+WAIT_FOR_READY_102  958
+WAIT_FOR_READY_104  982
+WAIT_FOR_READY_106  996
+WAIT_FOR_READY_107  9AA
+WAIT_FOR_READY_109  9D4
 WAIT_FOR_READY_11   178
-WAIT_FOR_READY_112  9FC
-WAIT_FOR_READY_114  A16
-WAIT_FOR_READY_115  A2A
-WAIT_FOR_READY_117  A54
-WAIT_FOR_READY_119  A78
+WAIT_FOR_READY_112  9F8
+WAIT_FOR_READY_114  A12
+WAIT_FOR_READY_115  A26
+WAIT_FOR_READY_117  A50
+WAIT_FOR_READY_119  A74
 WAIT_FOR_READY_12   18C
-WAIT_FOR_READY_121  A8E
-WAIT_FOR_READY_122  AA2
-WAIT_FOR_READY_124  ACC
-WAIT_FOR_READY_127  AF0
-WAIT_FOR_READY_129  B62
-WAIT_FOR_READY_131  B7A
-WAIT_FOR_READY_132  B8E
-WAIT_FOR_READY_134  BB8
-WAIT_FOR_READY_137  BDC
-WAIT_FOR_READY_138  C0C
+WAIT_FOR_READY_121  A8A
+WAIT_FOR_READY_122  A9E
+WAIT_FOR_READY_124  AC8
+WAIT_FOR_READY_127  AEC
+WAIT_FOR_READY_129  B5E
+WAIT_FOR_READY_131  B76
+WAIT_FOR_READY_132  B8A
+WAIT_FOR_READY_134  BB4
+WAIT_FOR_READY_137  BD8
+WAIT_FOR_READY_138  C08
 WAIT_FOR_READY_14   1A6
-WAIT_FOR_READY_140  C26
-WAIT_FOR_READY_144  C64
-WAIT_FOR_READY_146  CB4
+WAIT_FOR_READY_140  C22
+WAIT_FOR_READY_144  C60
+WAIT_FOR_READY_146  CB0
 WAIT_FOR_READY_17   1FE
 WAIT_FOR_READY_19   250
 WAIT_FOR_READY_21   280
@@ -2372,36 +2372,36 @@ WAIT_FOR_READY_59   5A6
 WAIT_FOR_READY_6    124
 WAIT_FOR_READY_62   5F0
 WAIT_FOR_READY_64   624
-WAIT_FOR_READY_67   674
-WAIT_FOR_READY_69   6A8
-WAIT_FOR_READY_72   702
-WAIT_FOR_READY_74   736
-WAIT_FOR_READY_77   776
-WAIT_FOR_READY_79   7AA
-WAIT_FOR_READY_82   7EA
-WAIT_FOR_READY_84   81E
-WAIT_FOR_READY_88   86A
+WAIT_FOR_READY_67   672
+WAIT_FOR_READY_69   6A6
+WAIT_FOR_READY_72   700
+WAIT_FOR_READY_74   734
+WAIT_FOR_READY_77   774
+WAIT_FOR_READY_79   7A8
+WAIT_FOR_READY_82   7E8
+WAIT_FOR_READY_84   81C
+WAIT_FOR_READY_88   868
 WAIT_FOR_READY_9    146
-WAIT_FOR_READY_90   88C
-WAIT_FOR_READY_91   8A0
-WAIT_FOR_READY_94   8C0
-WAIT_FOR_READY_96   8E8
-WAIT_FOR_READY_98   91C
+WAIT_FOR_READY_90   88A
+WAIT_FOR_READY_91   89E
+WAIT_FOR_READY_94   8BE
+WAIT_FOR_READY_96   8E4
+WAIT_FOR_READY_98   918
 WAIT_FOR_SRECORD    39E
-Z                   B10
+Z                   B0C
 _00000000           1CC
 _00000001           1E0
 _00000002           4DE
-_00000003           8D8
+_00000003           8D6
 _00000004           4EC
-_00000005           6EA
+_00000005           6E8
 _00000006           656
-_00000007           8D8
-_00000008           85C
-_00000009           8D8
-_0000000A           A14
-_0000000B           BF0
-_0000000C           CE4
+_00000007           8D6
+_00000008           85A
+_00000009           8D6
+_0000000A           A10
+_0000000B           BEC
+_0000000C           CE0
 _10000000           43C
 _10000001           4A6
 _10000002           4F4
@@ -2411,22 +2411,22 @@ _10000005           5D2
 _10000006           5E6
 _10000007           650
 _10000008           65A
-_10000009           6E2
-_1000000A           66A
-_1000000B           6D4
-_1000000C           6F8
-_1000000D           762
-_1000000E           76C
-_1000000F           7D6
-_10000010           7E0
-_10000011           84A
-_10000012           8DE
-_10000013           948
-_10000014           CC8
-_10000015           CEA
-_20000000           B1C
-_20000001           B2C
-_20000002           B40
-_20000003           BF2
-_20000004           C0A
-_20000005           C50
+_10000009           6E0
+_1000000A           668
+_1000000B           6D2
+_1000000C           6F6
+_1000000D           760
+_1000000E           76A
+_1000000F           7D4
+_10000010           7DE
+_10000011           848
+_10000012           8DA
+_10000013           944
+_10000014           CC4
+_10000015           CE6
+_20000000           B18
+_20000001           B28
+_20000002           B3C
+_20000003           BEE
+_20000004           C06
+_20000005           C4C
