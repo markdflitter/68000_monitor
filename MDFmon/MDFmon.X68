@@ -133,7 +133,7 @@ LOOP\@
     CMP.B #0,(\1)                 				; 0 -> done
     BEQ EXIT\@
     PRINT_CHAR (\1)+,\2
-    JMP LOOP\@
+    BRA LOOP\@
 EXIT\@
     ENDM
   
@@ -326,23 +326,23 @@ GET_INPUT
     BEQ HEX_DIGIT
     CMP.B #'9',D2
     BEQ HEX_DIGIT
-    CMP.B #'A',D2
+    CMP.B #'a',D2
     BEQ HEX_DIGIT
-    CMP.B #'B',D2
+    CMP.B #'b',D2
     BEQ HEX_DIGIT
-    CMP.B #'C',D2
+    CMP.B #'c',D2
     BEQ HEX_DIGIT
-    CMP.B #'D',D2
+    CMP.B #'d',D2
     BEQ HEX_DIGIT
-    CMP.B #'E',D2
+    CMP.B #'e',D2
     BEQ HEX_DIGIT
-    CMP.B #'F',D2
+    CMP.B #'f',D2
     BEQ HEX_DIGIT
     
-    CMP.B #'W',D2
+    CMP.B #'w',D2
     BEQ W
     
-    CMP.B #'L',D2
+    CMP.B #'l',D2
     BEQ L 
 
     PRINT_CRLF D3
@@ -350,19 +350,19 @@ GET_INPUT
     CMP.B #'?',D2
     BEQ H
 
-    CMP.B #'V',D2
+    CMP.B #'v',D2
     BEQ V
     
-    CMP.B #'R',D2
+    CMP.B #'r',D2
     BEQ R
 
-    CMP.B #'S',D2
+    CMP.B #'s',D2
     BEQ S
 
-    CMP.B #'G',D2
+    CMP.B #'g',D2
     BEQ G   
 
-    CMP.B #'Z',D2
+    CMP.B #'z',D2
     BEQ Z   
 
     LEA HUH,A0
@@ -637,7 +637,7 @@ HEX_DIGIT
 
 ; strings
 VERSION DC.B 'MDF-mon V1.48 (10/04/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
+HELP    DC.B '? Help',13,10,'[v] version',13,10,'xxxxxxxx[r] read long',13,10,'xxxxxxxx[w]xxxxxxxx write long',13,10,'[s] download S records',13,10,'xxxxxxxx[g] go',13,10,'[z] zap memory',10,13,'xxxxxxxx[l]xxxx load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
 UNREC   DC.B 'W: Unknown Srec type: ',0
@@ -648,6 +648,7 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
+
 
 
 
