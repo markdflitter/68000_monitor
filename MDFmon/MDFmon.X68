@@ -5,17 +5,16 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
-; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
-; make the monitor relocatable, so it can run in RAM and ROM
+; make the monitor relocatable, so it can run in RAM and ROM, seems to be almost there
 
-
+; ideas, but no room to do them
+;------------------------------
 ; keep track of highest address hit during srec download
 ; implement backspace
-; check for escape during Z and L?  Not sure if W is a good idea either
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
+; check for escape during Z and L?  Not sure if W is a good idea either
 
     ORG  $0
     ;ORG  $200000
@@ -484,7 +483,7 @@ Z
     MOVE.L #RAM,A0                  			    ; address of RAM
     
     FOR.L D0 = #0 TO #$40000 BY #4 DO             ; write
-        	MOVE.L D0,D1                              ; progress update
+        MOVE.L D0,D1                              ; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
 		MOVE.B D1,DISPLAY
@@ -573,7 +572,7 @@ HEX_DIGIT
     SIMHALT                         			    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.54 (10/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.57 (10/04/2021)',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
         DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
