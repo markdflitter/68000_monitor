@@ -562,18 +562,12 @@ READ_LENGTH
     MOVE.L D7,A1                    			    ; address accumulator -> address register
     MOVE.L #0,D7                    			    ; clear the now used address accumulator
     
-    MOVE.L #$2AAA,A3
-    MOVE.W #$AAAA,(A3)
-    MOVE.L #$1554,A3
-    MOVE.W #$5555,(A3)
-    MOVE.L #$2AAA,A3
-    MOVE.W #$8080,(A3)
-    MOVE.L #$2AAA,A3
-    MOVE.W #$AAAA,(A3)
-    MOVE.L #$1554,A3
-    MOVE.W #$5555,(A3)
-    MOVE.L #$2AAA,A3
-    MOVE.W #$2020,(A3)
+    MOVE.W #$AAAA,$2AAA
+    MOVE.W #$5555,$1554
+    MOVE.W #$8080,$2AAA
+    MOVE.W #$AAAA,$2AAA
+    MOVE.W #$5555,$1554
+    MOVE.W #$2020,$2AAA
     
     LEA LOADING,A2                				; important for timing
     PRINT_STR A2,D3
@@ -597,12 +591,9 @@ WAIT_FOR_COMPLETE
 		ADD.L #2,A1
     ENDW  
     
-    MOVE.L #$2AAA,A3
-    MOVE.W #$AAAA,(A3)
-    MOVE.L #$1554,A3
-    MOVE.W #$5555,(A3)
-    MOVE.L #$2AAA,A3
-    MOVE.W #$A0A0,(A3)
+    MOVE.W #$AAAA,$2AAA
+    MOVE.W #$5555,$1554
+    MOVE.W #$A0A0,$2AAA
             
     BRA MAIN_LOOP
         
@@ -615,7 +606,7 @@ HEX_DIGIT
     SIMHALT                         			    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.50 (10/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.51 (10/04/2021)',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
         DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
