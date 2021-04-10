@@ -5,6 +5,7 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; fix read
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
 ; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
@@ -139,8 +140,8 @@ EXIT\@
 ; send the contents of a data register to the serial port as a 8 digit hex number
 ; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register
 PRINT_REG MACRO
-    PRINT_CHAR #'0',\2          				    ;0x header
-    PRINT_CHAR #'x',\2
+    LEA ox,\5
+    PRINT_STR \5,\2
     MOVE.L #7,\4                				    ; loop round all 8 hex characters of 4 bits each
 LOOP\@
     BIN2HEX \1,\3,\5
@@ -243,27 +244,18 @@ START
 
 ; reset the UART in case of warm start
     MOVE.B #$A,DUART_CRA            			    ; disable rx & tx
-    MOVE.B #$50,DUART_CRA           			    ; reset everyting
-    NOP
-    MOVE.B #$40,DUART_CRA           
-    NOP
-    MOVE.B #$30,DUART_CRA
-    NOP
-    MOVE.B #$20,DUART_CRA
-    NOP
-    MOVE.B #$10,DUART_CRA   
-
     MOVE.B #$A,DUART_CRB            			    ; disable rx & tx
-    MOVE.B #$50,DUART_CRB           			    ; reset everyting
-    NOP
-    MOVE.B #$40,DUART_CRB           
-    NOP
-    MOVE.B #$30,DUART_CRB
-    NOP
-    MOVE.B #$20,DUART_CRB
-    NOP
-    MOVE.B #$10,DUART_CRB   
+    
+    FOR D1 = #$50 DOWNTO #$10 BY #$10 DO
+        MOVE.B D1,DUART_CRA           			; reset everyting
+        NOP
+    ENDF
 
+    FOR D1 = #$50 DOWNTO #$10 BY #$10 DO
+        MOVE.B D1,DUART_CRB           			; reset everyting
+        NOP
+    ENDF
+  
 ;initialise UART
     MOVE.B #$0,DUART_ACR            
     MOVE.B #$0,DUART_IMR            			    ; no interrupts, please            
@@ -601,15 +593,9 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
 CRLF    DC.B CR,LF,NULL
 PROMPT  DC.B '> ',NULL
+ox      DC.B '0x',NULL
     
     END    START                                ; last line of source
-
-
-
-
-
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
