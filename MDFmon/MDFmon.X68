@@ -16,8 +16,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ORG  $0
-    ;ORG  $200000
+    ;ORG  $0
+    ORG  $200000
 
 DEBUG               EQU 0
 
@@ -336,11 +336,11 @@ GET_INPUT
 ; commands
 H   
     LEA HELP,A0
-    PRINT_STR A0,D3
-    BRA MAIN_LOOP
+    BRA PRINTSTR
 
 V   
     LEA VERSION,A0
+PRINTSTR
     PRINT_STR A0,D3       
     BRA MAIN_LOOP
     
