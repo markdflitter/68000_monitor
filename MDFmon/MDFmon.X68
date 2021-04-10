@@ -5,10 +5,10 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; Replace JMP -> BRA, THEN.L
 ; revisit register usage in S record download
 ; should we just preload the LUTs at the start, rather than in each call to convert?
 ; revisit use of bytes and longs
-; can I operate READ_CHAR with just one register?
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
@@ -17,7 +17,6 @@
 ; make the monitor relocatable, so it can run in RAM and ROM
 ; keep track of highest address hit during srec download
 ; fix the reset vector so that it jumps to the start
-; Replace JMP -> BRA
 ; implement backspace
 ; check for escape during Z and L?  Not sure if W is a good idea either
 ; fix being able to enter random chars when W'ing
@@ -489,9 +488,6 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 		ENDI
 	ENDI
     
-    AND.L #$FF,D6
-    NOT.L D6                        			; ones complement the checksum
-        
     MOVE.L #0,D7                    			; read the checksum from the data stream, and add into the inverted checksum: should make it FF
     DOWNLOAD_BYTE D2,D7,D3,D1,D6,A0							
     PRINT_CRLF D3
@@ -640,7 +636,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.47 (10/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.48 (10/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
@@ -652,6 +648,7 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
+
 
 
 
