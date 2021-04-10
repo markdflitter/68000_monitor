@@ -8,7 +8,6 @@
 ; lots of repeated code in download between the two S record types (S1 and S2)
 ; give DOWNLOAD_BYTE a loop to remove loop unrolling and doubling of code
 ; include the checksum in download_byte
-; stop using two registers in download
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
@@ -188,18 +187,18 @@ READ_CHAR MACRO
     
     
 ; read data from the download serial port
-; \ 1= data register for read char, \2 = register to use for status poll
+; \ 1= data register for read char
 DOWNLOAD MACRO
 WAIT_FOR_READY\@                  				; wait until the there is space to send
 
-    MOVE.B DUART_SRA,\2           				; check for command
-    BTST #0,\2                    				; check for character
+    MOVE.B DUART_SRA,\1           				; check for command
+    BTST #0,\1                    				; check for character
     BEQ CONTINUE\@                				; nothing, continue
  
-    READ_CHAR \1
+    READ_CHAR \1                                ; we're not going to do anything with it, just check for escape
 CONTINUE\@
-    MOVE.B DUART_SRB,\2         				; read status register
-    BTST #0,\2                  				; check for character
+    MOVE.B DUART_SRB,\1         				; read download status register
+    BTST #0,\1                  				; check for character
     BEQ WAIT_FOR_READY\@        				; nothing, check again
     
     MOVE.B DUART_RXB,\1         				; got a character, read it
@@ -208,15 +207,15 @@ CONTINUE\@
     ENDM
     
 ; read two hex digits from the download serial port and convert to a byte
-; \ 1= data register for read char, \2 result register, \3 = register to use for status poll, \4 = working address register
+; \ 1= data register for read char, \2 result register, \3 = register to use for status poll, \4 = working address register, 
 DOWNLOAD_BYTE MACRO
-    DOWNLOAD \1,\3                              ; read first (most significant) char, convert to 4 bits and shift to top
+    DOWNLOAD \1                                ; read first (most significant) char, convert to 4 bits and shift to top
     PRINT_CHAR \1,\3
     HEX2BIN \1,\1,\4
     OR.B \1,\2
     LSL.L #4,\2
         
-    DOWNLOAD \1,\3                              ; now the second (least significant) char, convert to binary
+    DOWNLOAD \1                                ; now the second (least significant) char, convert to binary
     PRINT_CHAR \1,\3
     HEX2BIN \1,\1,\4
     OR.B \1,\2    
@@ -418,14 +417,14 @@ S
     MOVE.L 0,A2                     			; start address -> A2
     
 WAIT_FOR_SRECORD                    			; wait for the start of a record, indicated by 'S'
-    DOWNLOAD D2,D3                  
+    DOWNLOAD D2                 
     CMP.B #'S',D2                   			; found S?    
     BNE WAIT_FOR_SRECORD            			; nope, keep waiting
     
     PRINT_CHAR #'S',D3                            ; print it
     ADD.L #1,D4                     			; read another S record, increment count
     
-    DOWNLOAD D7,D3                  			; read the record identifier
+    DOWNLOAD D7                      			; read the record identifier
     PRINT_CHAR D7,D3                            ; print it
 
     MOVE.L #0,D6                    			; clear the checksum
@@ -682,7 +681,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.44 (09/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.45 (10/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
