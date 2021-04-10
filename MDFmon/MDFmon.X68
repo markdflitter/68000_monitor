@@ -5,9 +5,8 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; lots of repeated code in download between the two S record types (S1 and S2)
-; give DOWNLOAD_BYTE a loop to remove loop unrolling and doubling of code
 ; include the checksum in download_byte
+; revisit register usage in S record download - should we just preload the LUTs at the start, rather than in each call to convert?
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
@@ -207,18 +206,17 @@ CONTINUE\@
     ENDM
     
 ; read two hex digits from the download serial port and convert to a byte
-; \ 1= data register for read char, \2 result register, \3 = register to use for status poll, \4 = working address register, 
+; \ 1= data register for read char, \2 result register, \3 = register to use for status poll, \4 = working data register, \5 = working address register, 
 DOWNLOAD_BYTE MACRO
-    DOWNLOAD \1                                ; read first (most significant) char, convert to 4 bits and shift to top
-    PRINT_CHAR \1,\3
-    HEX2BIN \1,\1,\4
-    OR.B \1,\2
-    LSL.L #4,\2
-        
-    DOWNLOAD \1                                ; now the second (least significant) char, convert to binary
-    PRINT_CHAR \1,\3
-    HEX2BIN \1,\1,\4
-    OR.B \1,\2    
+    MOVE.B #2,\4
+    WHILE.B \4 <GT> 0 DO
+        DOWNLOAD \1                                ; read first (most significant) char, convert to 4 bits and shift to top
+        PRINT_CHAR \1,\3
+        HEX2BIN \1,\1,\5
+        OR.B \1,\2
+        LSL.L #4,\2
+        SUB.B #1,\4
+    ENDW
     ENDM
     
 
@@ -421,40 +419,51 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
     CMP.B #'S',D2                   			; found S?    
     BNE WAIT_FOR_SRECORD            			; nope, keep waiting
     
-    PRINT_CHAR #'S',D3                            ; print it
+    PRINT_CHAR #'S',D3                          ; print it
     ADD.L #1,D4                     			; read another S record, increment count
     
-    DOWNLOAD D7                      			; read the record identifier
-    PRINT_CHAR D7,D3                            ; print it
+    DOWNLOAD D0                      			; read the record identifier
+    PRINT_CHAR D0,D3                            ; print it
 
     MOVE.L #0,D6                    			; clear the checksum
 
     MOVE.L #0,D5                    			; read the 2 digit byte count -> D5
-    DOWNLOAD_BYTE D2,D5,D3,A0                               
+    DOWNLOAD_BYTE D2,D5,D3,D1,A0                               
     ADD.L D5,D6                     			; add to checksum
 
-    IF.B D7 <EQ> #'0' THEN.L        			; header, just ignore it
+    IF.B D0 <EQ> #'0' THEN.L        			; header, just ignore it
+        PRINT_CRLF D3
         BRA WAIT_FOR_SRECORD
     ELSE
-        IF.B D7 <EQ> #'1' THEN.L       		 	; 16 bit address data record
-            MOVE.L #0,D7                		; read the 16 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
-            DOWNLOAD_BYTE D2,D7,D3,A0           ; top byte                           
+        IF.B D0 <EQ> #'1' OR.B D0 <EQ> #'2' THEN.L ; 16 or 24 bit address data record
+            SUB.L #3,D5                 		; subtract three bytes for 16 bit address and 1 byte checksum
+    
+            MOVE.L #0,D7                		; read two bytes of address, we'll stomp on D7 for this since it's sort of like the address accumulator
+            DOWNLOAD_BYTE D2,D7,D3,D1,A0        ; first byte                           
             ADD.L D7,D6                 		; add into checksum
 
-            LSL.L #4,D7                 		; bottom byte
-            DOWNLOAD_BYTE D2,D7,D3,A0           ; top byte       
-            MOVE.L #0,D2                		; rextract bottom byte of address and add into checksum
+            LSL.L #4,D7                 		; second byte
+            DOWNLOAD_BYTE D2,D7,D3,D1,A0       
+            MOVE.L #0,D2                		; rextract latest byte of address and add into checksum
             MOVE.B D7,D2
             ADD.L D2,D6
-        
+            
+            IF.B D0 <EQ> #'2'  THEN.L           ; 24 bit address data record, read another byte
+                SUB.L #1,D5                 	; subtract an extra bytes for 24 bit address
+    
+                LSL.L #4,D7                 	; third byte
+                DOWNLOAD_BYTE D2,D7,D3,D1,A0       
+                MOVE.L #0,D2                	; rextract latest byte of address and add into checksum
+                MOVE.B D7,D2
+                ADD.L D2,D6
+            ENDI
+            
         	MOVE.L D7,A1            		    ; put the address in an address register, and we can now re-use D7
 			ADD.L A3,A1             		    ; add in the offset
-		
-            SUB.L #3,D5                 		; subtract three bytes for 16 bit address and 1 byte checksum
         
             WHILE.L D5 <GT> #0 DO       		; read the data bytes
                 MOVE.L #0,D7            		; D7 holds the byte
-                DOWNLOAD_BYTE D2,D7,D3,A0       ; read it                               
+                DOWNLOAD_BYTE D2,D7,D3,D1,A0    ; read it                               
                 ADD.L D7,D6             		; add into checksum
                         
                 MOVE.B D7,(A1)+         		; store it!
@@ -462,79 +471,46 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
                 SUB.L #1,D5                     ; 1 less byte to go
             ENDW
         
-            PRINT_CRLF D3
             LEA WAIT_FOR_SRECORD,A1     	    ; next place to go
-      ELSE
-			IF.B D7 <EQ> #'2' THEN.L    		; 24 bit address data record
-				MOVE.L #0,D7            		; read the 24 bit address, we'll stomp on D7 for this since it's sort of like the address accumulator
-				DOWNLOAD_BYTE D2,D7,D3,A0				
-				ADD.L D7,D6             		; add into checksum
+		ELSE
+	        IF.B D0 <EQ> #'8' THEN.L    	    ; termination record, exit
+				MOVE.L #0,D7              	    ; read the 24 bit start address, we'll stomp on D7 for this since it's sort of like the address accumulator
+	            DOWNLOAD_BYTE D2,D7,D3,D1,A0    ; read byte				
+			    ADD.L D7,D6               	    ; add top byte of address into checksum
 
-				LSL.L #4,D7             		; middle byte
-				DOWNLOAD_BYTE D2,D7,D3,A0				
-				MOVE.L #0,D2            		; rextract middle byte of address and add into checksum
+				LSL.L #4,D7               	    ; middle byte
+	            DOWNLOAD_BYTE D2,D7,D3,D1,A0    ; read byte				
+				MOVE.L #0,D2              	    ; rextract middle byte of address and add into checksum
 				MOVE.B D7,D2
 				ADD.L D2,D6
-          
-				LSL.L #4,D7             		; bottom byte
-				DOWNLOAD_BYTE D2,D7,D3,A0				        
-				MOVE.L #0,D2            		; rextract bottom byte of address and add into checksum
+				  
+				LSL.L #4,D7               	    ; bottom byte
+	            DOWNLOAD_BYTE D2,D7,D3,D1,A0    ; read byte								
+				MOVE.L #0,D2              	    ; rextract bottom byte of address and add into checksum
 				MOVE.B D7,D2
 				ADD.L D2,D6
+				  
+				MOVE.L D7,A2              	    ; start address -> A2
 				
-				MOVE.L D7,A1            		; put the address in an address register, and we can now re-use D7
-				ADD.L A3,A1             		; add in the offset
-		
-				SUB.L #4,D5             		; subtract four bytes for 24 bit address and 1 byte checksum
-				WHILE.L D5 <GT> #0 DO   		; read the data bytes					
-					MOVE.L #0,D7        		; D7 holds the byte
-	                DOWNLOAD_BYTE D2,D7,D3,A0   ; read byte                        
-					ADD.L D7,D6        		 	; add into checksum
-					
-					MOVE.B D7,(A1)+         	; store it!
-
-					SUB.L #1,D5                 ; 1 less byte to go
-				ENDW
-            
-				LEA WAIT_FOR_SRECORD,A1 		; next place to go
+				LEA DOWNLOAD_DONE,A1      	    ; next place to go
 			ELSE
-				IF.B D7 <EQ> #'8' THEN.L    	; termination record, exit
-					MOVE.L #0,D7              	; read the 24 bit start address, we'll stomp on D7 for this since it's sort of like the address accumulator
-	                DOWNLOAD_BYTE D2,D7,D3,A0   ; read byte				
-					ADD.L D7,D6               	; add top byte of address into checksum
-
-					LSL.L #4,D7               	; middle byte
-	                DOWNLOAD_BYTE D2,D7,D3,A0   ; read byte				
-					MOVE.L #0,D2              	; rextract middle byte of address and add into checksum
-					MOVE.B D7,D2
-					ADD.L D2,D6
-				  
-					LSL.L #4,D7               	; bottom byte
-	                DOWNLOAD_BYTE D2,D7,D3,A0   ; read byte								
-					MOVE.L #0,D2              	; rextract bottom byte of address and add into checksum
-					MOVE.B D7,D2
-					ADD.L D2,D6
-				  
-					MOVE.L D7,A2              	; start address -> A2
-					
-					LEA DOWNLOAD_DONE,A1      	; next place to go
-				ELSE
-					LEA UNREC,A0              	; warn for unrecognised type
-					PRINT_STR A0,D3
-					PRINT_CHAR D7,D3
-					PRINT_CRLF D3
+				PRINT_CRLF D3
 			
-					JMP WAIT_FOR_SRECORD      	; ignore any other type    
-				ENDI
+				LEA UNREC,A0              	    ; warn for unrecognised type
+				PRINT_STR A0,D3
+				PRINT_CHAR D7,D3
+				PRINT_CRLF D3
+			
+				JMP WAIT_FOR_SRECORD      	    ; ignore any other type    
 			ENDI
 		ENDI
-    ENDI
+	ENDI
     
     NOT.L D6                        			; ones complement the checksum
     ANDI.L #$FF,D6                  			; and take the LSByte
         
     MOVE.L #0,D7                    			; read the checksum from the data stream
-    DOWNLOAD_BYTE D2,D7,D3,A0							
+    DOWNLOAD_BYTE D2,D7,D3,D1,A0							
     PRINT_CRLF D3
 
     IF.B D7 <NE> D6 THEN.L
@@ -681,7 +657,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.45 (10/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.47 (10/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
