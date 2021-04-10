@@ -5,8 +5,6 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; swap first and second args in download_byte
-; should we just preload the LUTs at the start, rather than in each call to convert?
 ; revisit use of bytes and longs, eg for checksum
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
@@ -22,8 +20,8 @@
 ; ram check at startup?  Not sure if this is a good idea!
 ; byte W?
 
-    ;ORG  $0
-    ORG  $200000
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -153,7 +151,6 @@ LOOP\@
 ; will stamp on D0 and D1 in debug mode
 WAIT_CHAR MACRO
 WAIT_FOR_READY\@                  				; wait until the there is space to send
-
     IFEQ DEBUG
         MOVE.B DUART_SRA,\2         			; read status register
         BTST #0,\2                    			; check for character
@@ -210,7 +207,7 @@ CONTINUE\@
 DOWNLOAD_BYTE MACRO
     MOVE.B #2,\4
     WHILE.B \4 <GT> 0 DO
-        LSL.L #4,\1                    ; it's OK to do this first, because we are either starting from 0, or we are reading the next byte along, so need to shift up the previous one
+        LSL.L #4,\1                         ; it's OK to do this first, because we are either starting from 0, or we are reading the next byte along, so need to shift up the previous one
         DOWNLOAD \2
         PRINT_CHAR \2,\3
         HEX2BIN \2,\2,\6
@@ -218,7 +215,7 @@ DOWNLOAD_BYTE MACRO
         SUB.B #1,\4
     ENDW
     
-    MOVE.L #0,\2                		; rextract latest byte of address and add into checksum
+    MOVE.L #0,\2                		    ; rextract latest byte of address and add into checksum
     MOVE.B \1,\2
     ADD.L \1,\5
 
@@ -303,39 +300,13 @@ MAIN_LOOP
 GET_INPUT
     WAIT_CHAR D2,D3                  			; fetch character from serial port -> D2
     
-    CMP.B #'0',D2
-    BEQ HEX_DIGIT
-    CMP.B #'1',D2
-    BEQ HEX_DIGIT
-    CMP.B #'2',D2
-    BEQ HEX_DIGIT
-    CMP.B #'3',D2
-    BEQ HEX_DIGIT
-    CMP.B #'4',D2
-    BEQ HEX_DIGIT
-    CMP.B #'5',D2
-    BEQ HEX_DIGIT
-    CMP.B #'6',D2
-    BEQ HEX_DIGIT
-    CMP.B #'7',D2
-    BEQ HEX_DIGIT
-    CMP.B #'8',D2
-    BEQ HEX_DIGIT
-    CMP.B #'9',D2
-    BEQ HEX_DIGIT
-    CMP.B #'a',D2
-    BEQ HEX_DIGIT
-    CMP.B #'b',D2
-    BEQ HEX_DIGIT
-    CMP.B #'c',D2
-    BEQ HEX_DIGIT
-    CMP.B #'d',D2
-    BEQ HEX_DIGIT
-    CMP.B #'e',D2
-    BEQ HEX_DIGIT
-    CMP.B #'f',D2
-    BEQ HEX_DIGIT
-    
+    IF.B D2 <GE> #'0' AND.B D2 <LE> #'9' THEN
+        BRA HEX_DIGIT
+    ENDI
+    IF.B D2 <GE> #'A' AND.B D2 <LE> #'F' THEN
+        BRA HEX_DIGIT
+    ENDI
+        
     CMP.B #'w',D2
     BEQ W
     
