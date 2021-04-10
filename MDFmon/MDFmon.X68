@@ -9,7 +9,6 @@
 ; give DOWNLOAD_BYTE a loop to remove loop unrolling and doubling of code
 ; include the checksum in download_byte
 ; stop using two registers in download
-; use DOWNLOAD_BYTE to read checksum
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
@@ -25,8 +24,8 @@
 ; ram check at startup?  Not sure if this is a good idea!
 ; byte W?
 
-    ORG  $0
-    ;ORG  $200000
+    ;ORG  $0
+    ORG  $200000
 
 DEBUG               EQU 0
 
@@ -423,9 +422,11 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
     CMP.B #'S',D2                   			; found S?    
     BNE WAIT_FOR_SRECORD            			; nope, keep waiting
     
+    PRINT_CHAR #'S',D3                            ; print it
     ADD.L #1,D4                     			; read another S record, increment count
     
     DOWNLOAD D7,D3                  			; read the record identifier
+    PRINT_CHAR D7,D3                            ; print it
 
     MOVE.L #0,D6                    			; clear the checksum
 
@@ -496,7 +497,6 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 					SUB.L #1,D5                 ; 1 less byte to go
 				ENDW
             
-				PRINT_CRLF D3
 				LEA WAIT_FOR_SRECORD,A1 		; next place to go
 			ELSE
 				IF.B D7 <EQ> #'8' THEN.L    	; termination record, exit
@@ -517,7 +517,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 					ADD.L D2,D6
 				  
 					MOVE.L D7,A2              	; start address -> A2
-				
+					
 					LEA DOWNLOAD_DONE,A1      	; next place to go
 				ELSE
 					LEA UNREC,A0              	; warn for unrecognised type
@@ -535,14 +535,9 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
     ANDI.L #$FF,D6                  			; and take the LSByte
         
     MOVE.L #0,D7                    			; read the checksum from the data stream
-    DOWNLOAD D2,D3                  			; top byte
-    HEX2BIN D2,D2,A0
-    OR.L D2,D7
-    LSL.L #4,D7
-    DOWNLOAD D2,D3                  			; bottom byte
-    HEX2BIN D2,D2,A0
-    OR.L D2,D7
-                
+    DOWNLOAD_BYTE D2,D7,D3,A0							
+    PRINT_CRLF D3
+
     IF.B D7 <NE> D6 THEN.L
 		LEA CS_FAILURE,A0             			; warn for mismatched checksum
 		PRINT_STR A0,D3
@@ -687,7 +682,7 @@ HEX_DIGIT
     SIMHALT                         			; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.41 (09/04/2021)',13,10,0
+VERSION DC.B 'MDF-mon V1.44 (09/04/2021)',13,10,0
 HELP    DC.B '? Help',13,10,'V Version',13,10,'xxxxxxxxR Read long',13,10,'xxxxxxxxWxxxxxxxx Write long',13,10,'S download S records',13,10,'xxxxxxxxG Go',13,10,'Z Zap memory',10,13,'xxxxxxxxLxxxx Load to EEPROM',10,13,0
 HUH     DC.B 'Huh?',13,10,0
 READ    DC.B ' S records read, start address = ',0
@@ -699,6 +694,7 @@ HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING  DC.B 'Loading EEPROM...',13,11,0
     
     END    START                    ; last line of source
+
 
 
 
