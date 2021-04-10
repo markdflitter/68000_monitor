@@ -23,8 +23,8 @@
 ; ram check at startup?  Not sure if this is a good idea!
 ; byte W?
 
-    ORG  $0
-    ;ORG  $200000
+    ;ORG  $0
+    ORG  $200000
 
 DEBUG               EQU 0
 
@@ -368,18 +368,18 @@ GET_INPUT
     LEA HUH,A0
     PRINT_STR A0,D3
                        
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
     
 ; commands
 H   
     LEA HELP,A0
     PRINT_STR A0,D3
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
 
 V   
     LEA VERSION,A0
     PRINT_STR A0,D3       
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
     
 R   
     MOVE.L D7,A0                    			; address accumulator -> address register
@@ -387,7 +387,7 @@ R
     PRINT_REG D5,D3,D7,D6,A0
     PRINT_CRLF D3
     MOVE.L #0,D7                    			; clear the now used address accumulator
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
 
 W
     MOVE.L #0,D5                    			; D5 will be the value to write            
@@ -412,7 +412,7 @@ READ_DATA_TO_POKE
     MOVE.L D5,(A0)                  			; write the data
 
     PRINT_CRLF D3
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
 
         
 S
@@ -483,7 +483,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 				PRINT_CHAR D7,D3
 				PRINT_CRLF D3
 			
-				JMP WAIT_FOR_SRECORD      	    ; ignore any other type    
+				BRA WAIT_FOR_SRECORD      	    ; ignore any other type    
 			ENDI
 		ENDI
 	ENDI
@@ -497,7 +497,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 		PRINT_STR A0,D3
 		PRINT_REG D4,D3,D6,D7,A0
 		PRINT_CRLF D3
-		JMP MAIN_LOOP
+		BRA MAIN_LOOP
 	ENDI
     
     JMP (A1)
@@ -509,7 +509,7 @@ DOWNLOAD_DONE
     PRINT_REG D7,D3,D2,D6,A0        			; print out start address
     PRINT_CRLF D3     
         
-    JMP MAIN_LOOP
+    BRA MAIN_LOOP
     
 G
     MOVE.L D7,A0                    			; address accumulator -> address register
@@ -631,7 +631,7 @@ HEX_DIGIT
     LSL.L #4,D7                    				; add the next digit in the next 4 bits
     HEX2BIN D2,D2,A0
     OR.B D2,D7  
-    JMP GET_INPUT
+    BRA GET_INPUT
 
     SIMHALT                         			; halt simulator
 
