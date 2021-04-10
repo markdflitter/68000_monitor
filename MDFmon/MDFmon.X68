@@ -17,8 +17,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ;ORG  $0
-    ORG  $230000
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -359,8 +359,6 @@ R
     BRA MAIN_LOOP
 
 W
-    MOVE.L #0,D5                    			    ; D5 will be the value to write            
-
     MOVE #7,D6                      			    ; 7 bytes left to read
     
 READ_DATA_TO_POKE
@@ -368,7 +366,6 @@ READ_DATA_TO_POKE
     WAIT_CHAR D2,D3                 			    ; next character -> D2
     HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
     OR.B D2,D5
-    ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
     DBEQ D6,READ_DATA_TO_POKE
     
     MOVE.L D7,A0                    			    ; address accumulator -> address register
@@ -412,7 +409,6 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
 
     MOVE.L #0,D2                    			    ; clear the checksum
 
-    ;MOVE.L #0,D3                    			    ; read the 2 digit byte count -> D3
     DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4                                        
 
     IF.B D1 <EQ> #'0' THEN.L        			    ; header, just ignore it
