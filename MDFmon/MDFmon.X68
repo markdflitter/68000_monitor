@@ -22,6 +22,11 @@
 DEBUG               EQU 0
 
 ; constants
+NULL                EQU 0
+TAB                 EQU 9
+CR                  EQU 13
+LF                  EQU 10
+
 ROM                 EQU $0
 RAM                 EQU $200000
    
@@ -115,15 +120,15 @@ WAIT_FOR_READY\@                  				; wait until the there is space to send
 ; send CR,LF to the serial port
 ; \1 = data register to use for status poll
 PRINT_CRLF MACRO
-    PRINT_CHAR #13,\1             				; CR
-    PRINT_CHAR #10,\1             				; LF
+    PRINT_CHAR #CR,\1             				; CR
+    PRINT_CHAR #LF,\1             				; LF
     ENDM
 
 ; send C-style, zero terminated string to the serial port
 ; \1 = address register containing address of zero terminated string, \2 = data register to use for status poll, 
 PRINT_STR MACRO
 LOOP\@
-    CMP.B #0,(\1)                 				; 0 -> done
+    CMP.B #NULL,(\1)                 			; 0 -> done
     BEQ EXIT\@
     PRINT_CHAR (\1)+,\2
     BRA LOOP\@
@@ -429,7 +434,7 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; 3rd byte       
             ENDI
             
-        	MOVE.L D4,A2            		            ; put the address in an address register
+        	    MOVE.L D4,A2            	            ; put the address in an address register
 			ADD.L A1,A2             		        ; add in the offset
 
             WHILE.L D3 <GT> #0 DO       		    ; read the data bytes                
@@ -613,16 +618,23 @@ HEX_DIGIT
     SIMHALT                         			    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.50 (10/04/2021)',13,10,0
-HELP    DC.B '? Help',13,10,'[v] version',13,10,'xxxxxxxx[r] read long',13,10,'xxxxxxxx[w]xxxxxxxx write long',13,10,'[s] download S records',13,10,'xxxxxxxx[g] go',13,10,'[z] zap memory',10,13,'xxxxxxxx[l]xxxx load to EEPROM',10,13,0
-HUH     DC.B 'Huh?',13,10,0
-READ    DC.B ' S records read, start address = ',0
-UNREC   DC.B 'W: Unknown Srec type: ',0
-CS_FAILURE   DC.B 'W: CS failure at ',0
-RAM_ERROR DC.B 'W: RAM error at: ',0
+VERSION DC.B 'MDF-mon V1.50 (10/04/2021)',CR,LF,NULL
+HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
+        DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
+        DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
+        DC.B 'xxxxxxxx[w]xxxxxxxx',TAB,'write long',CR,LF
+        DC.B '[s]',TAB,TAB,TAB,'download S records',CR,LF
+        DC.B 'xxxxxxxx[g]',TAB,TAB,'go',CR,LF
+        DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
+        DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF,NULL
+HUH     DC.B 'Huh?',CR,LF,NULL
+READ    DC.B ' S records read, start address = ',NULL
+UNREC   DC.B 'W: Unknown Srec type: ',NULL
+CS_FAILURE   DC.B 'W: CS failure at ',NULL
+RAM_ERROR DC.B 'W: RAM error at: ',NULL
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-LOADING  DC.B 'Loading EEPROM...',13,11,0
+LOADING  DC.B 'Loading EEPROM...',CR,LF,NULL
     
     END    START                                ; last line of source
 
