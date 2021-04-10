@@ -497,44 +497,35 @@ G
     
 Z
     MOVE.L #RAM,A0                  			    ; address of RAM
-    MOVE.L #0,D0                    			    ; number of bytes
-   
-    WHILE.L D0 <LE> #$40000 DO      			    ; read the data bytes
-		MOVE.L D0,D1                            	; progress update
+    
+    FOR.L D0 = #0 TO #$40000 BY #4 DO             ; write
+        	MOVE.L D0,D1                              ; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
-		ANDI.L #$F,D1
 		MOVE.B D1,DISPLAY
 
-		MOVE.L D0,(A0)+ 
-		ADD.L #4,D0
-    ENDW
+		MOVE.L D0,(A0)+
+    ENDF
  
-    MOVE.L #RAM,A0              				    ; address of RAM
-    MOVE.L #0,D0                				    ; number of bytes
+    MOVE.L #RAM,A0              				      ; address of RAM
    
-    WHILE.L D0 <LE> #$40000 DO 					; read the data bytes
-		MOVE.L D0,D1              				; progress update
+    FOR.L D0 = #0 TO #$40000 BY #4 DO               ; read back and check 
+		MOVE.L D0,D1              				  ; progress update
 		LSR.L #8,D1
 		LSR.L #8,D1
-		ANDI.L #$F,D1
 		MOVE.B D1,DISPLAY
 
 		MOVE.L (A0)+,D1
 		  
-		IF.L D0 <EQ> D1 THEN
-			BRA OK
+		IF.L D0 <NE> D1 THEN	  
+		    LEA RAM_ERROR,A1
+		    PRINT_STR A1,D1
+		    MOVE.L A0,D1
+		    SUB.L #4,D1
+		    PRINT_REG D1,D3,D2,D6,A1       			; print out failure address
+		    PRINT_CRLF D3,A1
 		ENDI 
-		  
-		LEA RAM_ERROR,A1
-		PRINT_STR A1,D1
-		MOVE.L A0,D1
-		SUB.L #4,D1
-		PRINT_REG D1,D3,D2,D6,A1       			; print out failure address
-		PRINT_CRLF D3,A1
-OK    
-		ADD.L #4,D0
-    ENDW
+    ENDF
     
     BRA MAIN_LOOP
   
@@ -580,7 +571,7 @@ WAIT_FOR_COMPLETE
       
 		ADD.L #2,A0
 		ADD.L #2,A1
-	 ENDW  
+	 ENDW    
     
     MOVE.W #$AAAA,$2AAA
     MOVE.W #$5555,$1554
@@ -597,7 +588,7 @@ HEX_DIGIT
     SIMHALT                         			    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.51 (10/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.52 (10/04/2021)',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
         DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
