@@ -5,8 +5,8 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; should we just preload the LUTs at the start, rather than in each call to convert?
 ; swap first and second args in download_byte
+; should we just preload the LUTs at the start, rather than in each call to convert?
 ; revisit use of bytes and longs, eg for checksum
 ; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
@@ -22,8 +22,8 @@
 ; ram check at startup?  Not sure if this is a good idea!
 ; byte W?
 
-    ORG  $0
-    ;ORG  $230000
+    ;ORG  $0
+    ORG  $200000
 
 DEBUG               EQU 0
 
@@ -206,21 +206,21 @@ CONTINUE\@
     ENDM
     
 ; read two hex digits from the download serial port and convert to a byte
-; \ 1= data register for read char, \2 result register, \3 = register to use for status poll, \4 = working data register, \5 = checksum register, \6 = working address register
+; \1 result register, \2 = data register for read char, \3 = register to use for status poll, \4 = working data register, \5 = checksum register, \6 = working address register
 DOWNLOAD_BYTE MACRO
     MOVE.B #2,\4
     WHILE.B \4 <GT> 0 DO
-        LSL.L #4,\2                    ; it's OK to do this first, because we are either starting from 0, or we are reading the next byte along, so need to shift up the previous one
-        DOWNLOAD \1
-        PRINT_CHAR \1,\3
-        HEX2BIN \1,\1,\6
-        OR.B \1,\2
+        LSL.L #4,\1                    ; it's OK to do this first, because we are either starting from 0, or we are reading the next byte along, so need to shift up the previous one
+        DOWNLOAD \2
+        PRINT_CHAR \2,\3
+        HEX2BIN \2,\2,\6
+        OR.B \2,\1
         SUB.B #1,\4
     ENDW
     
-    MOVE.L #0,\1                		; rextract latest byte of address and add into checksum
-    MOVE.B \2,\1
-    ADD.L \2,\5
+    MOVE.L #0,\2                		; rextract latest byte of address and add into checksum
+    MOVE.B \1,\2
+    ADD.L \1,\5
 
     ENDM
     
@@ -445,7 +445,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
     MOVE.L #0,D2                    			; clear the checksum
 
     MOVE.L #0,D3                    			; read the 2 digit byte count -> D3
-    DOWNLOAD_BYTE D5,D3,D6,D7,D2,A4                                        
+    DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4                                        
 
     IF.B D1 <EQ> #'0' THEN.L        			; header, just ignore it
         PRINT_CRLF D5
@@ -455,12 +455,12 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
             SUB.L #3,D3                 		; subtract three bytes for 16 bit address and 1 byte checksum
     
             MOVE.L #0,D4                		; read two bytes of address
-			DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4     ; first byte                           
-            DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4     ; second one
+			DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; first byte                           
+            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; second one
             
             IF.B D1 <EQ> #'2'  THEN.L           ; 24 bit address data record, read another byte
                 SUB.L #1,D3                 	; subtract an extra bytes for 24 bit address    
-                DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4 ; 3rd byte       
+                DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; 3rd byte       
             ENDI
             
         	MOVE.L D4,A2            		    ; put the address in an address register
@@ -468,7 +468,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 
             WHILE.L D3 <GT> #0 DO       		; read the data bytes                
                 MOVE.L #0,D1            		; D1 holds the byte
-                DOWNLOAD_BYTE D5,D1,D6,D7,D2,A4 ; read it                               
+                DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it                               
                         
                 MOVE.B D1,(A2)+         		; store it!
 
@@ -479,9 +479,9 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 		ELSE
 	        IF.B D1 <EQ> #'8' THEN.L    	    ; termination record, exit
 				MOVE.L #0,D4              	    ; read the 24 bit start address
-	            DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4 ; top byte	
-			    DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4 ; middle byte	  
-			    DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4 ; bottom byte
+	            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; top byte	
+			    DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; middle byte	  
+			    DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; bottom byte
 				  
 				MOVE.L D4,A0              	    ; start address -> A0
 				
@@ -500,7 +500,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 	ENDI
     
     MOVE.L #0,D4                    			; read the checksum from the data stream add to our checksum: should make it FF
-    DOWNLOAD_BYTE D5,D4,D6,D7,D2,A4							
+    DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4							
     PRINT_CRLF D5
 		
     IF.B D2 <NE> #$FF THEN.L
