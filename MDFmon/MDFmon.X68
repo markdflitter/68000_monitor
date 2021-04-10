@@ -17,8 +17,8 @@
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
 
-    ;ORG  $0
-    ORG  $200000
+    ORG  $0
+    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -119,10 +119,10 @@ WAIT_FOR_READY\@                  				; wait until the there is space to send
     ENDM
 
 ; send CR,LF to the serial port
-; \1 = data register to use for status poll
+; \1 = data register to use for status poll, /2 = working address register
 PRINT_CRLF MACRO
-    PRINT_CHAR #CR,\1             				; CR
-    PRINT_CHAR #LF,\1             				; LF
+    LEA CRLF,\2
+    PRINT_STR \2,\1
     ENDM
 
 ; send C-style, zero terminated string to the serial port
@@ -285,11 +285,11 @@ START
 
     MOVE.B #1,DISPLAY
        
-    PRINT_CRLF D3
+    PRINT_CRLF D3,A0
 
     LEA VERSION,A0
     PRINT_STR A0,D3
-    PRINT_CRLF D3
+    PRINT_CRLF D3,A0
 
     MOVE.L #0,D7                    			    ; address accumulator
 
@@ -314,7 +314,7 @@ GET_INPUT
     CMP.B #'l',D2
     BEQ L 
 
-    PRINT_CRLF D3
+    PRINT_CRLF D3,A0
  
     CMP.B #'?',D2
     BEQ H
@@ -354,7 +354,7 @@ R
     MOVE.L D7,A0                    			    ; address accumulator -> address register
     MOVE.L (A0),D5                  			    ; read the memory and print it
     PRINT_REG D5,D3,D7,D6,A0
-    PRINT_CRLF D3
+    PRINT_CRLF D3,A0
     MOVE.L #0,D7                    			    ; clear the now used address accumulator
     BRA MAIN_LOOP
 
@@ -376,7 +376,7 @@ READ_DATA_TO_POKE
     
     MOVE.L D5,(A0)                  			    ; write the data
 
-    PRINT_CRLF D3
+    PRINT_CRLF D3,A0
     BRA MAIN_LOOP
 
 ; register map for S
@@ -416,7 +416,7 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
     DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4                                        
 
     IF.B D1 <EQ> #'0' THEN.L        			    ; header, just ignore it
-        PRINT_CRLF D5
+        PRINT_CRLF D5,A4
         BRA WAIT_FOR_SRECORD
     ELSE
         IF.B D1 <EQ> #'1' OR.B D1 <EQ> #'2' THEN.L ; 16 or 24 bit address data record
@@ -455,12 +455,12 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
 				
 				LEA DOWNLOAD_DONE,A3      	    ; next place to go
 			ELSE
-				PRINT_CRLF D5
+				PRINT_CRLF D5,A4
 			
 				LEA UNREC,A4              	    ; warn for unrecognised type
 				PRINT_STR A4,D5
 				PRINT_CHAR D1,D5
-				PRINT_CRLF D5
+				PRINT_CRLF D5,A4
 			
 				BRA WAIT_FOR_SRECORD      	    ; ignore any other type    
 			ENDI
@@ -469,13 +469,13 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
     
     MOVE.L #0,D4                    			    ; read the checksum from the data stream add to our checksum: should make it FF
     DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4							
-    PRINT_CRLF D5
+    PRINT_CRLF D5,A4
 		
     IF.B D2 <NE> #$FF THEN.L
 		LEA CS_FAILURE,A4             			; warn for mismatched checksum
 		PRINT_STR A4,D5
 		PRINT_REG D0,D5,D2,D6,A4
-		PRINT_CRLF D5
+		PRINT_CRLF D5,A4
 		BRA MAIN_LOOP
 	ENDI
     
@@ -486,7 +486,7 @@ DOWNLOAD_DONE
     PRINT_STR A1,D5
     MOVE.L A0,D7                    			    ; set address accumulator to start address
     PRINT_REG D7,D5,D6,D2,A1        			    ; print out start address
-    PRINT_CRLF D5     
+    PRINT_CRLF D5,A4     
         
     BRA MAIN_LOOP
     
@@ -531,7 +531,7 @@ Z
 		MOVE.L A0,D1
 		SUB.L #4,D1
 		PRINT_REG D1,D3,D2,D6,A1       			; print out failure address
-		PRINT_CRLF D3
+		PRINT_CRLF D3,A1
 OK    
 		ADD.L #4,D0
     ENDW
@@ -555,7 +555,7 @@ READ_LENGTH
     ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
     DBEQ D6,READ_LENGTH
         
-    PRINT_CRLF D3
+    PRINT_CRLF D3,A0
 
     MOVE.L #ROM,A0                  			    ; start of ROM
     
@@ -631,7 +631,8 @@ CS_FAILURE   DC.B 'W: CS failure at ',NULL
 RAM_ERROR DC.B 'W: RAM error at: ',NULL
 BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-LOADING  DC.B 'Loading EEPROM...',CR,LF,NULL
+LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
+CRLF    DC.B CR,LF,NULL
     
     END    START                                ; last line of source
 
