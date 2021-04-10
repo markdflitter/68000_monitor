@@ -5,20 +5,16 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; revisit use of bytes and longs, eg for checksum
-; add simpler .W and .B variants of PRINT_REG, will reduce code a bit
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
 ; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
 
 ; make the monitor relocatable, so it can run in RAM and ROM
 ; keep track of highest address hit during srec download
-; fix the reset vector so that it jumps to the start
 ; implement backspace
 ; check for escape during Z and L?  Not sure if W is a good idea either
 ; fix being able to enter random chars when W'ing
 ; ram check at startup?  Not sure if this is a good idea!
-; byte W?
 
     ORG  $0
     ;ORG  $200000
@@ -90,10 +86,10 @@ BIN2HEX MACRO
 ; the input register is changed during the process
 ; \1 data register containing hex character, \2 data register for return value, \3 working address register
 HEX2BIN MACRO
-    LEA HEX2BIN_LUT,\3                  		; load the lookup table
-    SUB.B #'0',\1                       		; work out offset and mask off anything rogue
-    AND.L #$FF,\1                       		; ignore the top 3 bytes
-    MOVE.B 0(\3,\1),\2                  		; use that as an index into the LUT      
+    LEA HEX2BIN_LUT,\3                  		    ; load the lookup table
+    SUB.B #'0',\1                       		    ; work out offset and mask off anything rogue
+    AND.L #$FF,\1                       		    ; ignore the top 3 bytes
+    MOVE.B 0(\3,\1),\2                  		    ; use that as an index into the LUT      
     ENDM
 
 ; send a single char to the serial port
@@ -135,32 +131,32 @@ EXIT\@
     ENDM
   
 ; send the contents of a data register to the serial port as a 8 digit hex number
-; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register, 
+; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register
 PRINT_REG MACRO
-    PRINT_CHAR #'0',\2          				;0x header
+    PRINT_CHAR #'0',\2          				    ;0x header
     PRINT_CHAR #'x',\2
-    MOVE.L #7,\4                				; loop round all 8 hex characters of 4 bits each
+    MOVE.L #7,\4                				    ; loop round all 8 hex characters of 4 bits each
 LOOP\@
     BIN2HEX \1,\3,\5
     PRINT_CHAR \3,\2
     DBEQ \4,LOOP\@
     ENDM
-  
+    
 ; wait for a char from the serial port
 ; \ 1= data register for read char, \2 = register to use for status poll
 ; will stamp on D0 and D1 in debug mode
 WAIT_CHAR MACRO
-WAIT_FOR_READY\@                  				; wait until the there is space to send
+WAIT_FOR_READY\@                  			    ; wait until the there is space to send
     IFEQ DEBUG
-        MOVE.B DUART_SRA,\2         			; read status register
-        BTST #0,\2                    			; check for character
-        BEQ WAIT_FOR_READY\@          			; nothing, check again
+        MOVE.B DUART_SRA,\2         			    ; read status register
+        BTST #0,\2                    		    ; check for character
+        BEQ WAIT_FOR_READY\@          		    ; nothing, check again
     ENDC
     
     READ_CHAR \1
 
     IFEQ DEBUG
-        PRINT_CHAR \1,\2            			; echo it back
+        PRINT_CHAR \1,\2            			    ; echo it back
     ENDC
     ENDM
     
@@ -169,15 +165,15 @@ WAIT_FOR_READY\@                  				; wait until the there is space to send
 ; will stamp on D0 and D1 in debug mode
 READ_CHAR MACRO
     IFEQ DEBUG
-        MOVE.B DUART_RXA,\1         			; got a character, read it
+        MOVE.B DUART_RXA,\1         			    ; got a character, read it
     ENDC
     IFNE DEBUG
         MOVE.L #5,D0    
-        TRAP #15                    			; read from keyboard in simulator
+        TRAP #15                    			    ; read from keyboard in simulator
         MOVE.L D1,\1
     ENDC
      
-    CMP.B #$1B,\1                 				; check for escape and go to start
+    CMP.B #$1B,\1                 			    ; check for escape and go to start
     BEQ START
     ENDM
     
@@ -193,12 +189,12 @@ WAIT_FOR_READY\@                  				; wait until the there is space to send
  
     READ_CHAR \1                                ; we're not going to do anything with it, just check for escape
 CONTINUE\@
-    MOVE.B DUART_SRB,\1         				; read download status register
-    BTST #0,\1                  				; check for character
-    BEQ WAIT_FOR_READY\@        				; nothing, check again
+    MOVE.B DUART_SRB,\1         				    ; read download status register
+    BTST #0,\1                  				    ; check for character
+    BEQ WAIT_FOR_READY\@        				    ; nothing, check again
     
-    MOVE.B DUART_RXB,\1         				; got a character, read it
-    MOVE.B \1,DISPLAY           				; echo to the display
+    MOVE.B DUART_RXB,\1         				    ; got a character, read it
+    MOVE.B \1,DISPLAY           				    ; echo to the display
     
     ENDM
     
@@ -207,15 +203,15 @@ CONTINUE\@
 DOWNLOAD_BYTE MACRO
     MOVE.B #2,\4
     WHILE.B \4 <GT> 0 DO
-        LSL.L #4,\1                         ; it's OK to do this first, because we are either starting from 0, or we are reading the next byte along, so need to shift up the previous one
-        DOWNLOAD \2
+        LSL.L #4,\1                             ; it's OK to do this first, because we are either starting from 0, 
+        DOWNLOAD \2                             ; or we are reading the next byte along, so need to shift up the previous one
         PRINT_CHAR \2,\3
         HEX2BIN \2,\2,\6
         OR.B \2,\1
         SUB.B #1,\4
     ENDW
     
-    MOVE.L #0,\2                		    ; rextract latest byte of address and add into checksum
+    MOVE.L #0,\2                		            ; rextract latest byte of address and add into checksum
     MOVE.B \1,\2
     ADD.L \1,\5
 
@@ -240,8 +236,8 @@ START
     MOVE.B #0,DISPLAY
 
 ; reset the UART in case of warm start
-    MOVE.B #$A,DUART_CRA            			; disable rx & tx
-    MOVE.B #$50,DUART_CRA           			; reset everyting
+    MOVE.B #$A,DUART_CRA            			    ; disable rx & tx
+    MOVE.B #$50,DUART_CRA           			    ; reset everyting
     NOP
     MOVE.B #$40,DUART_CRA           
     NOP
@@ -251,8 +247,8 @@ START
     NOP
     MOVE.B #$10,DUART_CRA   
 
-    MOVE.B #$A,DUART_CRB            			; disable rx & tx
-    MOVE.B #$50,DUART_CRB           			; reset everyting
+    MOVE.B #$A,DUART_CRB            			    ; disable rx & tx
+    MOVE.B #$50,DUART_CRB           			    ; reset everyting
     NOP
     MOVE.B #$40,DUART_CRB           
     NOP
@@ -264,22 +260,22 @@ START
 
 ;initialise UART
     MOVE.B #$0,DUART_ACR            
-    MOVE.B #$0,DUART_IMR            			; no interrupts, please            
-    MOVE.B #$0,DUART_OPCR           			; enable all outputs
+    MOVE.B #$0,DUART_IMR            			    ; no interrupts, please            
+    MOVE.B #$0,DUART_OPCR           			    ; enable all outputs
 
 ; channel A
-    MOVE.B #$13,DUART_MRA           			; no flow control, no parity, 8 data bits
-    MOVE.B #$07,DUART_MRA           			; 1 stop bit
-    MOVE.B #$CC,DUART_CSRA          			; 9600 baud
-    MOVE.B #$5,DUART_CRA            			; enable rx & tx
+    MOVE.B #$13,DUART_MRA           			    ; no flow control, no parity, 8 data bits
+    MOVE.B #$07,DUART_MRA           			    ; 1 stop bit
+    MOVE.B #$CC,DUART_CSRA          			    ; 9600 baud
+    MOVE.B #$5,DUART_CRA            			    ; enable rx & tx
 
 ; channel B
-    MOVE.B #$13,DUART_MRB           			; no flow control, no parity, 8 data bits
-    MOVE.B #$07,DUART_MRB           			; 1 stop bit
-    MOVE.B #$CC,DUART_CSRB          			; 9600 baud
-    MOVE.B #$5,DUART_CRB            			; enable rx & tx
+    MOVE.B #$13,DUART_MRB           			    ; no flow control, no parity, 8 data bits
+    MOVE.B #$07,DUART_MRB           			    ; 1 stop bit
+    MOVE.B #$CC,DUART_CSRB          			    ; 9600 baud
+    MOVE.B #$5,DUART_CRB            			    ; enable rx & tx
 
-    PRINT_CHAR '.',D3               			; give the serial port chance to settle after reset
+    PRINT_CHAR '.',D3               			    ; give the serial port chance to settle after reset
 
     MOVE.B #1,DISPLAY
        
@@ -288,17 +284,16 @@ START
     LEA VERSION,A0
     PRINT_STR A0,D3
     PRINT_CRLF D3
-    PRINT_CHAR #7,D3
 
-    MOVE.L #0,D7                    			; address accumulator
+    MOVE.L #0,D7                    			    ; address accumulator
 
     MOVE.B #2,DISPLAY
 MAIN_LOOP
-    PRINT_CHAR #'>',D3               			; prompt
-    PRINT_CHAR #32,D3                			; space
+    PRINT_CHAR #'>',D3               		    ; prompt
+    PRINT_CHAR #32,D3                		    ; space
     
 GET_INPUT
-    WAIT_CHAR D2,D3                  			; fetch character from serial port -> D2
+    WAIT_CHAR D2,D3                  		    ; fetch character from serial port -> D2
     
     IF.B D2 <GE> #'0' AND.B D2 <LE> #'9' THEN
         BRA HEX_DIGIT
@@ -350,34 +345,34 @@ V
     BRA MAIN_LOOP
     
 R   
-    MOVE.L D7,A0                    			; address accumulator -> address register
-    MOVE.L (A0),D5                  			; read the memory and print it
+    MOVE.L D7,A0                    			    ; address accumulator -> address register
+    MOVE.L (A0),D5                  			    ; read the memory and print it
     PRINT_REG D5,D3,D7,D6,A0
     PRINT_CRLF D3
-    MOVE.L #0,D7                    			; clear the now used address accumulator
+    MOVE.L #0,D7                    			    ; clear the now used address accumulator
     BRA MAIN_LOOP
 
 W
-    MOVE.L #0,D5                    			; D5 will be the value to write            
+    MOVE.L #0,D5                    			    ; D5 will be the value to write            
 
-    WAIT_CHAR D2,D3                 			; read most significant character -> D2
-    HEX2BIN D2,D2,A0                			; convert to binary -> D2
-    MOVE.B D2,D5                    			; put at bottom of D5
+    WAIT_CHAR D2,D3                 			    ; read most significant character -> D2
+    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
+    MOVE.B D2,D5                    			    ; put at bottom of D5
 
-    MOVE #6,D6                      			; 7 bytes left to read
+    MOVE #6,D6                      			    ; 7 bytes left to read
     
 READ_DATA_TO_POKE
-    LSL.L #4,D5                     			; make what we have so far more significant
-    WAIT_CHAR D2,D3                 			; next character -> D2
-    HEX2BIN D2,D2,A0                			; convert to binary -> D2
+    LSL.L #4,D5                     			    ; make what we have so far more significant
+    WAIT_CHAR D2,D3                 			    ; next character -> D2
+    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
     OR.B D2,D5
-    ANDI #$FB,CCR                   			; clear the Z bit if set (from the OR above)
+    ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
     DBEQ D6,READ_DATA_TO_POKE
     
-    MOVE.L D7,A0                    			; address accumulator -> address register
-    MOVE.L #0,D7                    			; clear the now used address accumulator
+    MOVE.L D7,A0                    			    ; address accumulator -> address register
+    MOVE.L #0,D7                    			    ; clear the now used address accumulator
     
-    MOVE.L D5,(A0)                  			; write the data
+    MOVE.L D5,(A0)                  			    ; write the data
 
     PRINT_CRLF D3
     BRA MAIN_LOOP
@@ -397,58 +392,58 @@ READ_DATA_TO_POKE
 ; D6 - temp
 ; D7 - temp
 S
-    MOVE.L 0,A0                     			; start address -> A0
-    MOVE.L D7,A1                    			; grab the address accumulator (offset) into A1
+    MOVE.L 0,A0                     			    ; start address -> A0
+    MOVE.L D7,A1                    			    ; grab the address accumulator (offset) into A1
     
-    MOVE.L #0,D0                    			; count of records read -> D0
+    MOVE.L #0,D0                    			    ; count of records read -> D0
         
-WAIT_FOR_SRECORD                    			; wait for the start of a record, indicated by 'S'
+WAIT_FOR_SRECORD                    			    ; wait for the start of a record, indicated by 'S'
     DOWNLOAD D1                 
-    CMP.B #'S',D1                   			; found S?    
-    BNE WAIT_FOR_SRECORD            			; nope, keep waiting
+    CMP.B #'S',D1                   			    ; found S?    
+    BNE WAIT_FOR_SRECORD            			    ; nope, keep waiting
     
     PRINT_CHAR #'S',D5                          ; print the S
-    ADD.L #1,D0                     			; read another S record, increment count
+    ADD.L #1,D0                     			    ; read another S record, increment count
     
     DOWNLOAD D1                      			; read the record identifier and echo it back
     PRINT_CHAR D1,D5
 
-    MOVE.L #0,D2                    			; clear the checksum
+    MOVE.L #0,D2                    			    ; clear the checksum
 
-    MOVE.L #0,D3                    			; read the 2 digit byte count -> D3
+    MOVE.L #0,D3                    			    ; read the 2 digit byte count -> D3
     DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4                                        
 
-    IF.B D1 <EQ> #'0' THEN.L        			; header, just ignore it
+    IF.B D1 <EQ> #'0' THEN.L        			    ; header, just ignore it
         PRINT_CRLF D5
         BRA WAIT_FOR_SRECORD
     ELSE
         IF.B D1 <EQ> #'1' OR.B D1 <EQ> #'2' THEN.L ; 16 or 24 bit address data record
-            SUB.L #3,D3                 		; subtract three bytes for 16 bit address and 1 byte checksum
+            SUB.L #3,D3                 		    ; subtract three bytes for 16 bit address and 1 byte checksum
     
-            MOVE.L #0,D4                		; read two bytes of address
-			DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; first byte                           
+            MOVE.L #0,D4                		    ; read two bytes of address
+            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; first byte                           
             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; second one
             
             IF.B D1 <EQ> #'2'  THEN.L           ; 24 bit address data record, read another byte
-                SUB.L #1,D3                 	; subtract an extra bytes for 24 bit address    
+                SUB.L #1,D3                 	    ; subtract an extra bytes for 24 bit address    
                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; 3rd byte       
             ENDI
             
-        	MOVE.L D4,A2            		    ; put the address in an address register
-			ADD.L A1,A2             		    ; add in the offset
+        	MOVE.L D4,A2            		            ; put the address in an address register
+			ADD.L A1,A2             		        ; add in the offset
 
-            WHILE.L D3 <GT> #0 DO       		; read the data bytes                
-                MOVE.L #0,D1            		; D1 holds the byte
+            WHILE.L D3 <GT> #0 DO       		    ; read the data bytes                
+                MOVE.L #0,D1            		    ; D1 holds the byte
                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it                               
                         
-                MOVE.B D1,(A2)+         		; store it!
+                MOVE.B D1,(A2)+         		    ; store it!
 
                 SUB.L #1,D3                     ; 1 less byte to go
             ENDW
         
-            LEA WAIT_FOR_SRECORD,A3     	    ; next place to go
+            LEA WAIT_FOR_SRECORD,A3     	        ; next place to go
 		ELSE
-	        IF.B D1 <EQ> #'8' THEN.L    	    ; termination record, exit
+	        IF.B D1 <EQ> #'8' THEN.L    	        ; termination record, exit
 				MOVE.L #0,D4              	    ; read the 24 bit start address
 	            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; top byte	
 			    DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; middle byte	  
@@ -470,7 +465,7 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
 		ENDI
 	ENDI
     
-    MOVE.L #0,D4                    			; read the checksum from the data stream add to our checksum: should make it FF
+    MOVE.L #0,D4                    			    ; read the checksum from the data stream add to our checksum: should make it FF
     DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4							
     PRINT_CRLF D5
 		
@@ -484,26 +479,26 @@ WAIT_FOR_SRECORD                    			; wait for the start of a record, indicat
     
     JMP (A3)
 DOWNLOAD_DONE
-    PRINT_REG D0,D5,D6,D2,A1        			; print out number of Srecords read
+    PRINT_REG D0,D5,D6,D2,A1        			    ; print out number of Srecords read
     LEA READ,A1
     PRINT_STR A1,D5
-    MOVE.L A0,D7                    			; set address accumulator to start address
-    PRINT_REG D7,D5,D6,D2,A1        			; print out start address
+    MOVE.L A0,D7                    			    ; set address accumulator to start address
+    PRINT_REG D7,D5,D6,D2,A1        			    ; print out start address
     PRINT_CRLF D5     
         
     BRA MAIN_LOOP
     
 G
-    MOVE.L D7,A0                    			; address accumulator -> address register
-    MOVE #0,D7                      			; clear the now used address accumulator
-    JMP (A0)                        			; jump to it!
+    MOVE.L D7,A0                    			    ; address accumulator -> address register
+    MOVE #0,D7                      			    ; clear the now used address accumulator
+    JMP (A0)                        			    ; jump to it!
     
 Z
-    MOVE.L #RAM,A0                  			; address of RAM
-    MOVE.L #0,D0                    			; number of bytes
+    MOVE.L #RAM,A0                  			    ; address of RAM
+    MOVE.L #0,D0                    			    ; number of bytes
    
-    WHILE.L D0 <LE> #$40000 DO      			; read the data bytes
-		MOVE.L D0,D1                  			; progress update
+    WHILE.L D0 <LE> #$40000 DO      			    ; read the data bytes
+		MOVE.L D0,D1                            	; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
 		ANDI.L #$F,D1
@@ -513,8 +508,8 @@ Z
 		ADD.L #4,D0
     ENDW
  
-    MOVE.L #RAM,A0              				; address of RAM
-    MOVE.L #0,D0                				; number of bytes
+    MOVE.L #RAM,A0              				    ; address of RAM
+    MOVE.L #0,D0                				    ; number of bytes
    
     WHILE.L D0 <LE> #$40000 DO 					; read the data bytes
 		MOVE.L D0,D1              				; progress update
@@ -542,28 +537,28 @@ OK
     BRA MAIN_LOOP
   
 L
-    MOVE.L #0,D5                    			; D5 will be the length  to write            
+    MOVE.L #0,D5                    			    ; D5 will be the length  to write            
 
     WAIT_CHAR D2,D3                				; read most significant character -> D2
-    HEX2BIN D2,D2,A0                			; convert to binary -> D2
-    MOVE.B D2,D5                    			; put at bottom of D5
+    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
+    MOVE.B D2,D5                    			    ; put at bottom of D5
 
-    MOVE #2,D6                      			; 3 bytes left to read
+    MOVE #2,D6                      			    ; 3 bytes left to read
     
 READ_LENGTH
-    LSL.L #4,D5                     			; make what we have so far more significant
-    WAIT_CHAR D2,D3                 			; next character -> D2
-    HEX2BIN D2,D2,A0                			; convert to binary -> D2
-    OR.B D2,D5
-    ANDI #$FB,CCR                   			; clear the Z bit if set (from the OR above)
+    LSL.L #4,D5                     			    ; make what we have so far more significant
+    WAIT_CHAR D2,D3                 			    ; next character -> D2
+    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
+    OR.B D2,D5  
+    ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
     DBEQ D6,READ_LENGTH
         
     PRINT_CRLF D3
 
-    MOVE.L #ROM,A0                  			; start of ROM
+    MOVE.L #ROM,A0                  			    ; start of ROM
     
-    MOVE.L D7,A1                    			; address accumulator -> address register
-    MOVE.L #0,D7                    			; clear the now used address accumulator
+    MOVE.L D7,A1                    			    ; address accumulator -> address register
+    MOVE.L #0,D7                    			    ; clear the now used address accumulator
     
     MOVE.L #$2AAA,A3
     MOVE.W #$AAAA,(A3)
@@ -581,13 +576,13 @@ READ_LENGTH
     LEA LOADING,A2                				; important for timing
     PRINT_STR A2,D3
 
-    ANDI #$FB,CCR                   			; clear the Z bit if set (from the OR above)
+    ANDI #$FB,CCR                   			    ; clear the Z bit if set (from the OR above)
     
     WHILE D5 <GT> #0 DO
 		SUB.L #2,D5
 		  
 		MOVE.B (A1),DISPLAY
-		MOVE.W (A1),(A0)            			; write the data
+		MOVE.W (A1),(A0)            			    ; write the data
 	  
 WAIT_FOR_COMPLETE
 		MOVE.W (A0),D2
@@ -615,7 +610,7 @@ HEX_DIGIT
     OR.B D2,D7  
     BRA GET_INPUT
 
-    SIMHALT                         			; halt simulator
+    SIMHALT                         			    ; halt simulator
 
 ; strings
 VERSION DC.B 'MDF-mon V1.50 (10/04/2021)',13,10,0
