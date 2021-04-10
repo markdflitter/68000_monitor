@@ -8,8 +8,9 @@
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
 ; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
-
 ; make the monitor relocatable, so it can run in RAM and ROM
+
+
 ; keep track of highest address hit during srec download
 ; implement backspace
 ; check for escape during Z and L?  Not sure if W is a good idea either
@@ -360,11 +361,7 @@ R
 W
     MOVE.L #0,D5                    			    ; D5 will be the value to write            
 
-    WAIT_CHAR D2,D3                 			    ; read most significant character -> D2
-    HEX2BIN D2,D2,A0                			    ; convert to binary -> D2
-    MOVE.B D2,D5                    			    ; put at bottom of D5
-
-    MOVE #6,D6                      			    ; 7 bytes left to read
+    MOVE #7,D6                      			    ; 7 bytes left to read
     
 READ_DATA_TO_POKE
     LSL.L #4,D5                     			    ; make what we have so far more significant
