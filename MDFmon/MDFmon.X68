@@ -295,8 +295,8 @@ START
 
     MOVE.B #2,DISPLAY
 MAIN_LOOP
-    PRINT_CHAR #'>',D3               		    ; prompt
-    PRINT_CHAR #32,D3                		    ; space
+    LEA PROMPT,A0
+    PRINT_STR A0,D3
     
 GET_INPUT
     WAIT_CHAR D2,D3                  		    ; fetch character from serial port -> D2
@@ -318,7 +318,7 @@ GET_INPUT
  
     CMP.B #'?',D2
     BEQ H
-
+ 
     CMP.B #'v',D2
     BEQ V
     
@@ -600,6 +600,7 @@ BIN2HEX_LUT DC.B '0123456789ABCDEF'
 HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
 CRLF    DC.B CR,LF,NULL
+PROMPT  DC.B '> ',NULL
     
     END    START                                ; last line of source
 
