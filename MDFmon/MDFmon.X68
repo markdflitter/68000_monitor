@@ -5,7 +5,6 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; fix read
 ; Review for any other savings
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
 ; if the EEPROM programming getas stuck, print out value read back and retry write eventually? 
@@ -345,8 +344,8 @@ PRINTSTR
 R   
     MOVE.L D7,A0                    			    ; address accumulator -> address register
     MOVE.L #0,D7                    			    ; clear the now used address accumulator
-    MOVE.L (A0),D5                  			    ; read the memory and print it
-    PRINT_REG D5,D3,D7,D6,A0
+    MOVE.L (A0),D2                  			    ; read the memory and print it
+    PRINT_REG D2,D3,D4,D5,A0
     PRINT_CRLF D3,A0
     BRA MAIN_LOOP
 
