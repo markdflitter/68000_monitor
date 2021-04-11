@@ -5,10 +5,9 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
-; load SP with some version indication
 ; add command to write to eeprom to back patch start address
-; something prints 'N' on starting...
+; shared code between load and patch
+; tidy up comments again, sigh
 ; also garbage on serial port when starting
 ; use DBLoop?
 
@@ -324,6 +323,9 @@ GET_INPUT
     CMP.B #'l',D2
     BEQ L 
 
+    CMP.B #'p',D2
+    BEQ P
+
     PRINT_CRLF D3,A0
  
     CMP.B #'?',D2
@@ -561,7 +563,7 @@ L
     ADD.L #8,A1                                   ; skip the initial stack pointer and reset vector for now
     SUB.L #8,D0
     
-    MOVE.W #$AAAA,$2AAA
+    MOVE.W #$AAAA,$2AAA                         ; remove write protect
     NOP
     MOVE.W #$5555,$1554
     NOP
@@ -610,7 +612,56 @@ L
     MOVE.W #$A0A0,$2AAA
             
     BRA MAIN_LOOP
-        
+    
+P
+    MOVE.L #0,D0                    			    ; D0 will be the data to write            
+
+    FOR D1 = #0 TO #3 DO                           ; read 2 bytes
+        LSL.L #4,D0                     			; make what we have so far more significant
+        WAIT_CHAR D2,D3                 			; next character -> D2
+        HEX2BIN D2,D2,A0                			; convert to binary -> D2
+        OR.B D2,D0
+    ENDF
+       
+    PRINT_CRLF D2,A1
+    
+    MOVE.L D7,A0                    			    ; address accumulator -> target address register
+    MOVE.L #0,D7                    			    ; clear the now used address accumulator
+    
+    MOVE.W #$AAAA,$2AAA                             ; remove write protect
+    NOP
+    MOVE.W #$5555,$1554
+    NOP
+    MOVE.W #$8080,$2AAA
+    NOP
+    MOVE.W #$AAAA,$2AAA
+    NOP
+    MOVE.W #$5555,$1554
+    NOP
+    MOVE.W #$2020,$2AAA
+          
+    LEA LOADING(PC),A2                		    ; the prints seem to be important for timing to unprotect the EEPROM
+    PRINT_STR A2,D2
+    
+    PRINT_CHAR '#',D3
+    PRINT_REG D0,D3,D4,D5,A2
+
+    LEA TO(PC),A2
+    PRINT_STR A2,D3
+    
+    MOVE.L A0,D2          		
+    PRINT_REG D2,D3,D4,D5,A2
+
+	PRINT_CRLF D3,A2
+     
+    PROGRAM D0,(A0),D2
+	
+    MOVE.W #$AAAA,$2AAA                             ; and write protect
+    MOVE.W #$5555,$1554
+    MOVE.W #$A0A0,$2AAA
+            
+    BRA MAIN_LOOP
+
 HEX_DIGIT
     LSL.L #4,D7                    			    ; add the next digit in the next 4 bits
     HEX2BIN D2,D2,A0
@@ -620,7 +671,7 @@ HEX_DIGIT
     SIMHALT                         		    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.64 (11/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.65 (11/04/2021)',CR,LF,NULL
 HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
@@ -630,6 +681,7 @@ HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B 'xxxxxxxx[g]',TAB,TAB,'go',CR,LF
         DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
         DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF,NULL
+        DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF,NULL
 HUH     DC.B 'Huh?',CR,LF,NULL
 READ    DC.B ' S records read, start address = ',NULL
 UNREC   DC.B 'W: Unknown Srec type: ',NULL
