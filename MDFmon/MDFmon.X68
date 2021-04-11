@@ -223,7 +223,19 @@ DOWNLOAD_BYTE MACRO
 
     ENDM
     
+; write word to EEPROM
+; \1 word to write, \2 = target address, \3 = working data register
+PROGRAM MACRO
+  MOVE.W \1,\2            			    ; write the data
+	  
+WAIT_FOR_COMPLETE\@
+		MOVE.W \2,\3
 
+		IF.W \3 <NE> \1 THEN
+			BRA WAIT_FOR_COMPLETE\@
+		ENDI
+    	ENDM
+    	
 ; register catalogue
 ; D0 - used for simulator I/O
 ; D1 - used for simulator I/O
@@ -280,6 +292,10 @@ START
 
     LEA VERSION(PC),A0
     PRINT_STR A0,D3
+    
+    LEA HELPPROMPT(PC),A0
+    PRINT_STR A0,D3
+    
     PRINT_CRLF D3,A0
 
     MOVE.L #0,D7                    			    ; address accumulator
@@ -518,21 +534,29 @@ Z
     BRA MAIN_LOOP
   
 L
-    MOVE.L #0,D5                    			    ; D5 will be the length  to write            
+    MOVE.L #0,D0                    			    ; D0 will be the length  to write            
+    MOVE.L #0,D1                    			    ; D1 will be the address to write 
 
-    FOR D6 = #0 TO #3 DO                          ; read the length to write
-        LSL.L #4,D5                     			; make what we have so far more significant
-        WAIT_CHAR D2,D3                 			; next character -> D2
-        HEX2BIN D2,D2,A0                			; convert to binary -> D2
-        OR.B D2,D5
+    FOR D2 = #0 TO #7 DO                          ; read 4 bytes, we'll split into 2 byte address (MS) and 2 byte length (LS)
+        LSL.L #4,D1                     			; make what we have so far more significant
+        WAIT_CHAR D3,D4                 			; next character -> D2
+        HEX2BIN D3,D3,A0                			; convert to binary -> D2
+        OR.B D3,D1
     ENDF
-		  
-    PRINT_CRLF D3,A0
+    
+    MOVE.W D1,D0                                  ; extract the LSword for the length
+    LSR.L #8,D1                                   ; extract the MSword for the address
+    LSR.L #8,D1                                   
+		  	          
+    PRINT_CRLF D2,A1
 
-    MOVE.L #ROM,A0                  			    ; start of ROM
+    MOVE.L D1,A0                  			    ; target address
     
     MOVE.L D7,A1                    			    ; address accumulator -> address register
     MOVE.L #0,D7                    			    ; clear the now used address accumulator
+
+    ADD.L #8,A1                                   ; skip the initial stack pointer and reset vector for now
+    SUB.L #8,D0
     
     MOVE.W #$AAAA,$2AAA
     MOVE.W #$5555,$1554
@@ -541,27 +565,40 @@ L
     MOVE.W #$5555,$1554
     MOVE.W #$2020,$2AAA
     
-    LEA LOADING(PC),A2                		    ; important for timing
+    LEA LOADING(PC),A2                		    ; the prints are important for timing to unprotect the EEPROM
+    PRINT_STR A2,D2
+    
+    MOVE.L A1,D2          		
+	PRINT_REG D2,D3,D4,D5,A2
+
+    LEA TO(PC),A2
     PRINT_STR A2,D3
     
-    WHILE D5 <GT> #0 DO
-		SUB.L #2,D5
-		  
-		MOVE.B (A1),DISPLAY
-		MOVE.W (A1),(A0)            			    ; write the data
-	  
-WAIT_FOR_COMPLETE
-		MOVE.W (A0),D2
+    	MOVE.L A0,D2          		
+    PRINT_REG D2,D3,D4,D5,A2
 
-		IF D2 <NE> (A1) THEN
-			BRA WAIT_FOR_COMPLETE
-		ENDI
-      
+	PRINT_CRLF D3,A2
+
+    WHILE D0 <GT> #0 DO
+		SUB.L #2,D0
+	  
+		MOVE.B (A1),DISPLAY
+		
+		PROGRAM (A1),(A0),D2
+		      
 		ADD.L #2,A0
 		ADD.L #2,A1
-	 ENDW    
-    
-    MOVE.W #$AAAA,$2AAA
+	ENDW
+	
+    PROGRAM #$1234, $0, D2                         ; we're done, can now update the SP and start vector
+    PROGRAM #$5678, $2, D2                         
+
+    PROGRAM D1, $4, D2                             ; we're done, can now update the SP and start vector
+    LSR.L #8,D1
+    LSR.L #8,D1
+    PROGRAM D1, $6, D2                         
+
+    MOVE.W #$AAAA,$2AAA                            ; and write protect
     MOVE.W #$5555,$1554
     MOVE.W #$A0A0,$2AAA
             
@@ -577,6 +614,7 @@ HEX_DIGIT
 
 ; strings
 VERSION DC.B 'MDF-mon V1.59 (11/04/2021)',CR,LF,NULL
+HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
         DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
@@ -596,8 +634,10 @@ LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
 CRLF    DC.B CR,LF,NULL
 PROMPT  DC.B '> ',NULL
 ox      DC.B '0x',NULL
+to      DC.B ' -> ',NULL
     
     END    START                                ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
