@@ -6,7 +6,9 @@
 *-----------------------------------------------------------
 ; to do
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
-; make the monitor relocatable, so it can run in RAM and ROM, seems to be almost there
+; something prints 'N' on starting...
+; press ? for help
+; use DBLoop?
 
 ; ideas, but no room to do them
 ;------------------------------
@@ -17,7 +19,6 @@
 ; check for escape during Z and L?  Not sure if W is a good idea either
 
     ORG  $0
-    ;ORG  $200000
 
 DEBUG               EQU 0
 
@@ -80,7 +81,7 @@ DISPLAY             EQU DISPLAY_BASE+2*DISPLAY_+1
 ; the input register is changed during the process
 ; \1 input data register containing binary number,  \2 data register for return value, \3 working address register
 BIN2HEX MACRO
-    LEA BIN2HEX_LUT,\3							; load the lookup table
+    LEA BIN2HEX_LUT(PC),\3						; load the lookup table
     ROL.L #4,\1                       			; shift the top 4 bits down to bottom of the register the and mask off everything else
     MOVE.B \1,\2
     ANDI.L #$F,\2
@@ -91,7 +92,7 @@ BIN2HEX MACRO
 ; the input register is changed during the process
 ; \1 data register containing hex character, \2 data register for return value, \3 working address register
 HEX2BIN MACRO
-    LEA HEX2BIN_LUT,\3                  		    ; load the lookup table
+    LEA HEX2BIN_LUT(PC),\3                  	    ; load the lookup table
     SUB.B #'0',\1                       		    ; work out offset and mask off anything rogue
     AND.L #$FF,\1                       		    ; ignore the top 3 bytes
     MOVE.B 0(\3,\1),\2                  		    ; use that as an index into the LUT      
@@ -120,7 +121,7 @@ WAIT_FOR_READY\@                  				; wait until the there is space to send
 ; send CR,LF to the serial port
 ; \1 = data register to use for status poll, /2 = working address register
 PRINT_CRLF MACRO
-    LEA CRLF,\2
+    LEA CRLF(PC),\2
     PRINT_STR \2,\1
     ENDM
 
@@ -138,7 +139,7 @@ EXIT\@
 ; send the contents of a data register to the serial port as a 8 digit hex number
 ; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register
 PRINT_REG MACRO
-    LEA ox,\5
+    LEA ox(PC),\5
     PRINT_STR \5,\2
     MOVE.L #7,\4                				    ; loop round all 8 hex characters of 4 bits each
 LOOP\@
@@ -277,7 +278,7 @@ START
        
     PRINT_CRLF D3,A0
 
-    LEA VERSION,A0
+    LEA VERSION(PC),A0
     PRINT_STR A0,D3
     PRINT_CRLF D3,A0
 
@@ -285,7 +286,7 @@ START
 
     MOVE.B #2,DISPLAY
 MAIN_LOOP
-    LEA PROMPT,A0
+    LEA PROMPT(PC),A0
     PRINT_STR A0,D3
     
 GET_INPUT
@@ -324,18 +325,18 @@ GET_INPUT
     CMP.B #'z',D2
     BEQ Z   
 
-    LEA HUH,A0
+    LEA HUH(PC),A0
     PRINT_STR A0,D3
                        
     BRA MAIN_LOOP
     
 ; commands
 H   
-    LEA HELP,A0
+    LEA HELP(PC),A0
     BRA PRINTSTR
 
 V   
-    LEA VERSION,A0
+    LEA VERSION(PC),A0
 PRINTSTR
     PRINT_STR A0,D3       
     BRA MAIN_LOOP
@@ -373,7 +374,7 @@ READ_DATA_TO_POKE
 ; A3 - next location (jmp)
 ; A4 - Working Address Register
 ; D0 - record count
-; D1 - 'S', record type, data byte
+; D1 - 'S', record type, data byte, done flag (0x00000000 = continue, 0xFFFFFFFF = done)
 ; D2 - checksum
 ; D3 - data byte count
 ; D4 - read address, moved into A2
@@ -425,24 +426,25 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
                         
                 MOVE.B D1,(A2)+         		    ; store it!
 
-                SUB.B #1,D3                     ; 1 less byte to go
+                SUB.B #1,D3                      ; 1 less byte to go
             ENDW
         
-            LEA WAIT_FOR_SRECORD,A3     	        ; next place to go
+            MOVE.L #0,D1                         ; not done yet
 		ELSE
 	        IF.B D1 <EQ> #'8' THEN.L    	        ; termination record, exit
 				MOVE.L #0,D4              	    ; read the 24 bit start address
 	            DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; top byte	
 			    DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; middle byte	  
 			    DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; bottom byte
-				  
+				  		  
 				MOVE.L D4,A0              	    ; start address -> A0
-				
-				LEA DOWNLOAD_DONE,A3      	    ; next place to go
+				ADD.L A1,A0             		    ; add in the offset
+
+				MOVE.L #$FFFFFFFF,D1             ; done
 			ELSE
 				PRINT_CRLF D5,A4
 			
-				LEA UNREC,A4              	    ; warn for unrecognised type
+				LEA UNREC(PC),A4              	; warn for unrecognised type
 				PRINT_STR A4,D5
 				PRINT_CHAR D1,D5
 				PRINT_CRLF D5,A4
@@ -456,17 +458,19 @@ WAIT_FOR_SRECORD                    			    ; wait for the start of a record, ind
     PRINT_CRLF D5,A4
 		
     IF.B D2 <NE> #$FF THEN.L
-		LEA CS_FAILURE,A4             			; warn for mismatched checksum
+		LEA CS_FAILURE(PC),A4                 	; warn for mismatched checksum
 		PRINT_STR A4,D5
 		PRINT_REG D0,D5,D2,D6,A4
 		PRINT_CRLF D5,A4
 		BRA MAIN_LOOP
 	ENDI
     
-    JMP (A3)
+    IF D1 <EQ> #0 THEN
+      BRA WAIT_FOR_SRECORD            
+    ENDI
 DOWNLOAD_DONE
     PRINT_REG D0,D5,D6,D2,A1        			    ; print out number of Srecords read
-    LEA READ,A1
+    LEA READ(PC),A1
     PRINT_STR A1,D5
     MOVE.L A0,D7                    			    ; set address accumulator to start address
     PRINT_REG D7,D5,D6,D2,A1        			    ; print out start address
@@ -502,7 +506,7 @@ Z
 		MOVE.L (A0)+,D1
 		  
 		IF.L D0 <NE> D1 THEN	  
-		    LEA RAM_ERROR,A1
+		    LEA RAM_ERROR(PC),A1
 		    PRINT_STR A1,D1
 		    MOVE.L A0,D1
 		    SUB.L #4,D1
@@ -537,7 +541,7 @@ L
     MOVE.W #$5555,$1554
     MOVE.W #$2020,$2AAA
     
-    LEA LOADING,A2                				; important for timing
+    LEA LOADING(PC),A2                		    ; important for timing
     PRINT_STR A2,D3
     
     WHILE D5 <GT> #0 DO
@@ -572,7 +576,7 @@ HEX_DIGIT
     SIMHALT                         			    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.57 (10/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.59 (11/04/2021)',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
         DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
