@@ -6,9 +6,12 @@
 *-----------------------------------------------------------
 ; to do
 ; burn EEPROM to alternative location ($1000) and update the start vector as the very last operation
+; load SP with some version indication
+; add command to write to eeprom to back patch start address
 ; something prints 'N' on starting...
-; press ? for help
+; also garbage on serial port when starting
 ; use DBLoop?
+
 
 ; ideas, but no room to do them
 ;------------------------------
@@ -580,37 +583,36 @@ L
 	PRINT_CRLF D3,A2
 
     WHILE D0 <GT> #0 DO
-		SUB.L #2,D0
+        SUB.L #2,D0
 	  
-		MOVE.B (A1),DISPLAY
-		
-		PROGRAM (A1),(A0),D2
+        MOVE.B (A1),DISPLAY
+        PROGRAM (A1),(A0),D2
 		      
-		ADD.L #2,A0
-		ADD.L #2,A1
+        ADD.L #2,A0
+        ADD.L #2,A1
 	ENDW
 	
-    PROGRAM #$1234, $0, D2                         ; we're done, can now update the SP and start vector
+    PROGRAM #$1234, $0, D2                          ; we're done, can now update the SP and start vector
     PROGRAM #$5678, $2, D2                         
 
-    PROGRAM D1, $4, D2                             ; we're done, can now update the SP and start vector
+    PROGRAM D1, $4, D2
     LSR.L #8,D1
     LSR.L #8,D1
     PROGRAM D1, $6, D2                         
 
-    MOVE.W #$AAAA,$2AAA                            ; and write protect
+    MOVE.W #$AAAA,$2AAA                             ; and write protect
     MOVE.W #$5555,$1554
     MOVE.W #$A0A0,$2AAA
             
     BRA MAIN_LOOP
         
 HEX_DIGIT
-    LSL.L #4,D7                    				; add the next digit in the next 4 bits
+    LSL.L #4,D7                    			    ; add the next digit in the next 4 bits
     HEX2BIN D2,D2,A0
     OR.B D2,D7  
     BRA GET_INPUT
 
-    SIMHALT                         			    ; halt simulator
+    SIMHALT                         		    ; halt simulator
 
 ; strings
 VERSION DC.B 'MDF-mon V1.59 (11/04/2021)',CR,LF,NULL
