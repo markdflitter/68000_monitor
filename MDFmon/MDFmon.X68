@@ -284,7 +284,7 @@ START
     MOVE.B #$CC,DUART_CSRB          			    ; 9600 baud
     MOVE.B #$5,DUART_CRB            			    ; enable rx & tx
 
-    PRINT_CHAR '.',D3               			    ; give the serial port chance to settle after reset
+    ;PRINT_CHAR '.',D3               			    ; give the serial port chance to settle after reset
 
     MOVE.B #1,DISPLAY
        
