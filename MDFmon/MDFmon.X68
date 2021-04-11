@@ -5,11 +5,10 @@
 * Description: 68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; add command to write to eeprom to back patch start address
-; shared code between load and patch
 ; tidy up comments again, sigh
 ; also garbage on serial port when starting
 ; use DBLoop?
+; think about size and do I need to slim things down
 
 
 ; ideas, but no room to do them
@@ -205,6 +204,29 @@ CONTINUE\@
     MOVE.B \1,DISPLAY           				    ; echo to the display
     
     ENDM
+    
+; unprotect the EEPROM
+UNPROTECT MACRO
+    MOVE.W #$AAAA,$2AAA                             ; remove write protect
+    NOP
+    MOVE.W #$5555,$1554
+    NOP
+    MOVE.W #$8080,$2AAA
+    NOP
+    MOVE.W #$AAAA,$2AAA
+    NOP
+    MOVE.W #$5555,$1554
+    NOP
+    MOVE.W #$2020,$2AAA
+    ENDM
+    
+; protect the EEPROM
+PROTECT MACRO
+    MOVE.W #$AAAA,$2AAA                             ; and write protect
+    MOVE.W #$5555,$1554
+    MOVE.W #$A0A0,$2AAA
+    ENDM
+
     
 ; read two hex digits from the download serial port and convert to a byte
 ; \1 result register, \2 = data register for read char, \3 = register to use for status poll, \4 = working data register, \5 = checksum register, \6 = working address register
@@ -563,17 +585,7 @@ L
     ADD.L #8,A1                                   ; skip the initial stack pointer and reset vector for now
     SUB.L #8,D0
     
-    MOVE.W #$AAAA,$2AAA                         ; remove write protect
-    NOP
-    MOVE.W #$5555,$1554
-    NOP
-    MOVE.W #$8080,$2AAA
-    NOP
-    MOVE.W #$AAAA,$2AAA
-    NOP
-    MOVE.W #$5555,$1554
-    NOP
-    MOVE.W #$2020,$2AAA
+    UNPROTECT
     
     LEA LOADING(PC),A2                		    ; the prints seem to be important for timing to unprotect the EEPROM
     PRINT_STR A2,D2
@@ -607,10 +619,8 @@ L
     LSR.L #8,D1
     PROGRAM D1, $4, D2                         
 
-    MOVE.W #$AAAA,$2AAA                             ; and write protect
-    MOVE.W #$5555,$1554
-    MOVE.W #$A0A0,$2AAA
-            
+    PROTECT
+      
     BRA MAIN_LOOP
     
 P
@@ -628,17 +638,8 @@ P
     MOVE.L D7,A0                    			    ; address accumulator -> target address register
     MOVE.L #0,D7                    			    ; clear the now used address accumulator
     
-    MOVE.W #$AAAA,$2AAA                             ; remove write protect
-    NOP
-    MOVE.W #$5555,$1554
-    NOP
-    MOVE.W #$8080,$2AAA
-    NOP
-    MOVE.W #$AAAA,$2AAA
-    NOP
-    MOVE.W #$5555,$1554
-    NOP
-    MOVE.W #$2020,$2AAA
+
+    UNPROTECT
           
     LEA LOADING(PC),A2                		    ; the prints seem to be important for timing to unprotect the EEPROM
     PRINT_STR A2,D2
@@ -656,10 +657,8 @@ P
      
     PROGRAM D0,(A0),D2
 	
-    MOVE.W #$AAAA,$2AAA                             ; and write protect
-    MOVE.W #$5555,$1554
-    MOVE.W #$A0A0,$2AAA
-            
+    PROTECT
+    
     BRA MAIN_LOOP
 
 HEX_DIGIT
