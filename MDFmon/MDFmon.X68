@@ -5,12 +5,9 @@
 * Description:	68000 monitor program
 *-----------------------------------------------------------
 ; to do
-; also garbage on serial port when starting
-; think about size and do I need to slim things down
 
-
-; ideas, but no room to do them
-;------------------------------
+; other ideas
+;------------
 ; use DBLoop?
 ; keep track of highest address hit during srec download
 ; implement backspace
@@ -289,7 +286,7 @@ START
 		MOVE.B D1,DUART_CRB							; reset everyting
 		NOP
 	ENDF
-
+	
 ;initialise UART
 	MOVE.B #$0,DUART_ACR
 	MOVE.B #$0,DUART_IMR							; no interrupts, please
@@ -298,21 +295,22 @@ START
 ; channel A
 	MOVE.B #$13,DUART_MRA							; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRA							; 1 stop bit
-	MOVE.B #$CC,DUART_CSRA							; 9600 baud
+	MOVE.B #$CC,DUART_CSRA							; 38400 baud
 	MOVE.B #$5,DUART_CRA							; enable rx & tx
 
 ; channel B
 	MOVE.B #$13,DUART_MRB			 				; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRB							; 1 stop bit
-	MOVE.B #$CC,DUART_CSRB							; 9600 baud
+	MOVE.B #$CC,DUART_CSRB							; 38400 baud
 	MOVE.B #$5,DUART_CRB							; enable rx & tx
 
-	;PRINT_CHAR '.',D3								; give the serial port chance to settle after reset
+	PRINT_CHAR #0,D1								; some non-printing char to flush out the serial port
+	PRINT_CHAR #0,D1
+	PRINT_CHAR #0,D1
 
 	MOVE.B #1,DISPLAY
 
-	PRINT_CRLF D3,A0
-
+	PRINT_CRLF D1,A0
 	LEA VERSION(PC),A0
 	PRINT_STR A0,D3
 
@@ -637,7 +635,6 @@ P
 	MOVE.L D7,A0									; address accumulator -> target address register
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-
 	UNPROTECT
 			 
 	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
@@ -669,7 +666,7 @@ HEX_DIGIT
 	SIMHALT											; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.65 (11/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.68 (11/04/2021)',CR,LF,NULL
 HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
 HELP	DC.B '?',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
