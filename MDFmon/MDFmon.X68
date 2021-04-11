@@ -246,7 +246,7 @@ DOWNLOAD_BYTE MACRO
 ; write word to EEPROM
 ; \1 word to write, \2 = target address, \3 = working data register
 PROGRAM MACRO
-  MOVE.W \1,\2									; write the data
+  MOVE.W \1,\2										; write the data
 
 WAIT_FOR_COMPLETE\@
 		MOVE.W \2,\3
@@ -266,8 +266,8 @@ WAIT_FOR_COMPLETE\@
 ; A0 - address of string to print 
 
 ; start vector
-STACK	DC.L $00000000							; STACK
-RESET	DC.L START								; RESET
+STACK	DC.L $00000000								; STACK
+RESET	DC.L START									; RESET
 
 ; start of program  
 START
@@ -278,30 +278,30 @@ START
 	MOVE.B #$A,DUART_CRB							; disable rx & tx
 	
 	FOR D1 = #$50 DOWNTO #$10 BY #$10 DO
-		MOVE.B D1,DUART_CRA						; reset everyting
+		MOVE.B D1,DUART_CRA							; reset everyting
 		NOP
 	ENDF
 
 	FOR D1 = #$50 DOWNTO #$10 BY #$10 DO
-		MOVE.B D1,DUART_CRB						; reset everyting
+		MOVE.B D1,DUART_CRB							; reset everyting
 		NOP
 	ENDF
 	
 ;initialise UART
 	MOVE.B #$0,DUART_ACR
 	MOVE.B #$0,DUART_IMR							; no interrupts, please
-	MOVE.B #$0,DUART_OPCR						; enable all outputs
+	MOVE.B #$0,DUART_OPCR							; enable all outputs
 
 ; channel A
-	MOVE.B #$13,DUART_MRA						; no flow control, no parity, 8 data bits
-	MOVE.B #$07,DUART_MRA						; 1 stop bit
-	MOVE.B #$CC,DUART_CSRA						; 38400 baud
+	MOVE.B #$13,DUART_MRA							; no flow control, no parity, 8 data bits
+	MOVE.B #$07,DUART_MRA							; 1 stop bit
+	MOVE.B #$CC,DUART_CSRA							; 38400 baud
 	MOVE.B #$5,DUART_CRA							; enable rx & tx
 
 ; channel B
-	MOVE.B #$13,DUART_MRB			 			; no flow control, no parity, 8 data bits
-	MOVE.B #$07,DUART_MRB						; 1 stop bit
-	MOVE.B #$CC,DUART_CSRB						; 38400 baud
+	MOVE.B #$13,DUART_MRB			 				; no flow control, no parity, 8 data bits
+	MOVE.B #$07,DUART_MRB							; 1 stop bit
+	MOVE.B #$CC,DUART_CSRB							; 38400 baud
 	MOVE.B #$5,DUART_CRB							; enable rx & tx
 
 	PRINT_CHAR #0,D1								; some non-printing char to flush out the serial port
@@ -327,7 +327,7 @@ MAIN_LOOP
 	PRINT_STR A0,D3
 
 GET_INPUT
-	WAIT_CHAR D2,D3								; fetch character from serial port -> D2
+	WAIT_CHAR D2,D3									; fetch character from serial port -> D2
 
 	IF.B D2 <GE> #'0' AND.B D2 <LE> #'9' THEN
 		BRA HEX_DIGIT
@@ -387,17 +387,17 @@ PRINTSTR
 R
 	MOVE.L D7,A0									; address accumulator -> address register
 	MOVE.L #0,D7									;clear the now used address accumulator
-	MOVE.L (A0),D2								; read the memory and print it
+	MOVE.L (A0),D2									; read the memory and print it
 	PRINT_REG D2,D3,D4,D5,A0
 	PRINT_CRLF D3,A0
 	BRA MAIN_LOOP
 
 W
-	MOVE #7,D6									; 7 bytes left to read
+	MOVE #7,D6										; 7 bytes left to read
 	
 READ_DATA_TO_POKE
-	LSL.L #4,D5									; make what we have so far more significant
-	WAIT_CHAR D2,D3								; next character -> D2
+	LSL.L #4,D5										; make what we have so far more significant
+	WAIT_CHAR D2,D3									; next character -> D2
 	HEX2BIN D2,D2,A0								; convert to binary -> D2
 	OR.B D2,D5
 	DBEQ D6,READ_DATA_TO_POKE
@@ -405,7 +405,7 @@ READ_DATA_TO_POKE
 	MOVE.L D7,A0									; address accumulator -> address register
 	MOVE.L #0,D7									; clear the now used address accumulator
 	
-	MOVE.L D5,(A0)								; write the data
+	MOVE.L D5,(A0)									; write the data
 
 	PRINT_CRLF D3,A0
 	BRA MAIN_LOOP
@@ -425,20 +425,20 @@ READ_DATA_TO_POKE
 ; D6 - temp
 ; D7 - temp
 S
-	MOVE.L 0,A0									; start address -> A0
+	MOVE.L 0,A0										; start address -> A0
 	MOVE.L D7,A1									; grab the address accumulator (offset) into A1
 	
 	MOVE.L #0,D0									; count of records read -> D0
 		
 WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	DOWNLOAD D1
-	CMP.B #'S',D1								; found S?
+	CMP.B #'S',D1									; found S?
 	BNE WAIT_FOR_SRECORD							; nope, keep waiting
 	
-	PRINT_CHAR #'S',D5							; print the S
-	ADD.L #1,D0									; read another S record, increment count
+	PRINT_CHAR #'S',D5								; print the S
+	ADD.L #1,D0										; read another S record, increment count
 	
-	DOWNLOAD D1									; read the record identifier and echo it back
+	DOWNLOAD D1										; read the record identifier and echo it back
 	PRINT_CHAR D1,D5
 
 	MOVE.L #0,D2									; clear the checksum
@@ -450,38 +450,38 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 		BRA WAIT_FOR_SRECORD
 	ELSE
 		IF.B D1 <EQ> #'1' OR.B D1 <EQ> #'2' THEN.L	; 16 or 24 bit address data record
-			SUB.L #3,D3							; subtract three bytes for 16 bit address and 1 byte checksum
+			SUB.L #3,D3								; subtract three bytes for 16 bit address and 1 byte checksum
 
 			MOVE.L #0,D4							; read two bytes of address
-			DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4		; first byte									
-			DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4		; second one
+			DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4			; first byte									
+			DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4			; second one
 
-			IF.B D1 <EQ> #'2'  THEN.L			; 24 bit address data record, read another byte
-				SUB.L #1,D3						; subtract an extra bytes for 24 bit address	
-				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4	; 3rd byte
+			IF.B D1 <EQ> #'2'  THEN.L				; 24 bit address data record, read another byte
+				SUB.L #1,D3							; subtract an extra bytes for 24 bit address	
+				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4		; 3rd byte
 			ENDI
 
 			MOVE.L D4,A2							; put the address in an address register
-			ADD.L A1,A2							; add in the offset
+			ADD.L A1,A2								; add in the offset
 
-			WHILE.B D3 <GT> #0 DO				; read the data bytes
-				DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4	; read it
+			WHILE.B D3 <GT> #0 DO					; read the data bytes
+				DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4		; read it
  
-				MOVE.B D1,(A2)+					; store it!
+				MOVE.B D1,(A2)+						; store it!
 
-				SUB.B #1,D3						; 1 less byte to go
+				SUB.B #1,D3							; 1 less byte to go
 			ENDW
 
 			MOVE.L #0,D1							; not done yet
 		ELSE
 			IF.B D1 <EQ> #'8' THEN.L				; termination record, exit
 				MOVE.L #0,D4						; read the 24 bit start address
-				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4	; top byte
-				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4	; middle byte
-				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4	; bottom byte
+				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4		; top byte
+				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4		; middle byte
+				DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4		; bottom byte
 
 				MOVE.L D4,A0						; start address -> A0
-				ADD.L A1,A0						; add in the offset
+				ADD.L A1,A0							; add in the offset
 
 				MOVE.L #$FFFFFFFF,D1				; done
 			ELSE
@@ -501,7 +501,7 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	PRINT_CRLF D5,A4
 
 	IF.B D2 <NE> #$FF THEN.L
-		LEA CS_FAILURE(PC),A4					; warn for mismatched checksum
+		LEA CS_FAILURE(PC),A4						; warn for mismatched checksum
 		PRINT_STR A4,D5
 		PRINT_REG D0,D5,D2,D6,A4
 		PRINT_CRLF D5,A4
@@ -523,13 +523,13 @@ DOWNLOAD_DONE
 
 G
 	MOVE.L D7,A0									; address accumulator -> address register
-	MOVE #0,D7									; clear the now used address accumulator
+	MOVE #0,D7										; clear the now used address accumulator
 	JMP (A0)										; jump to it!
 
 Z
-	MOVE.L #RAM,A0								; address of RAM
+	MOVE.L #RAM,A0									; address of RAM
 	
-	FOR.L D0 = #0 TO #$40000 BY #4 DO			; write
+	FOR.L D0 = #0 TO #$40000 BY #4 DO				; write
 		MOVE.L D0,D1								; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
@@ -538,9 +538,9 @@ Z
 		MOVE.L D0,(A0)+
 	ENDF
 
-	MOVE.L #RAM,A0				 				; address of RAM
+	MOVE.L #RAM,A0				 					; address of RAM
 
-	FOR.L D0 = #0 TO #$40000 BY #4 DO			; read back and check 
+	FOR.L D0 = #0 TO #$40000 BY #4 DO				; read back and check 
 		MOVE.L D0,D1				 				; progress update
 		LSR.L #8,D1
 		LSR.L #8,D1
@@ -565,14 +565,14 @@ L
 	MOVE.L #0,D1									; D1 will be the address to write 
 
 	FOR D2 = #0 TO #7 DO							; read 4 bytes, we'll split into 2 byte address (MS) and 2 byte length (LS)
-		LSL.L #4,D1								; make what we have so far more significant
-		WAIT_CHAR D3,D4							; next character -> D2
+		LSL.L #4,D1									; make what we have so far more significant
+		WAIT_CHAR D3,D4								; next character -> D2
 		HEX2BIN D3,D3,A0							; convert to binary -> D2
 		OR.B D3,D1
 	ENDF
 
 	MOVE.W D1,D0									; extract the LSword for the length
-	LSR.L #8,D1									; extract the MSword for the address
+	LSR.L #8,D1										; extract the MSword for the address
 	LSR.L #8,D1
 
 	PRINT_CRLF D2,A1
@@ -582,12 +582,12 @@ L
 	MOVE.L D7,A1									; address accumulator -> address register
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	ADD.L #8,A1									; skip the initial stack pointer and reset vector for now
+	ADD.L #8,A1										; skip the initial stack pointer and reset vector for now
 	SUB.L #8,D0
 
 	UNPROTECT
 
-	LEA LOADING(PC),A2							; the prints seem to be important for timing to unprotect the EEPROM
+	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
 
 	MOVE.L A1,D2
@@ -611,8 +611,8 @@ L
 		ADD.L #2,A1
 	ENDW
 
-	PROGRAM #0, $0, D2							; we're done, can now update the SP and start vector
-	PROGRAM #0, $2, D2							; setting this seems to break the download code, I guess the stack is being used somehow!!!
+	PROGRAM #0, $0, D2								; we're done, can now update the SP and start vector
+	PROGRAM #0, $2, D2								; setting this seems to break the download code, I guess the stack is being used somehow!!!
 
 	PROGRAM D1, $6, D2
 	LSR.L #8,D1
@@ -627,8 +627,8 @@ P
 	MOVE.L #0,D0									; D0 will be the data to write
 
 	FOR D1 = #0 TO #3 DO							; read 2 bytes
-		LSL.L #4,D0								; make what we have so far more significant
-		WAIT_CHAR D2,D3							; next character -> D2
+		LSL.L #4,D0									; make what we have so far more significant
+		WAIT_CHAR D2,D3								; next character -> D2
 		HEX2BIN D2,D2,A0							; convert to binary -> D2
 		OR.B D2,D0
 	ENDF
@@ -640,7 +640,7 @@ P
 
 	UNPROTECT
 			 
-	LEA LOADING(PC),A2							; the prints seem to be important for timing to unprotect the EEPROM
+	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
 
 	PRINT_CHAR '#',D3
@@ -665,15 +665,15 @@ M
 	MOVE.L #0,D1										; D1 will be the address to read 
 
 	FOR D2 = #0 TO #7 DO								; read 4 bytes, we'll split into 2 byte address (MS) and 2 byte length (LS)
-		LSL.L #4,D1									; make what we have so far more significant
-		WAIT_CHAR D3,D4								; next character -> D2
+		LSL.L #4,D1										; make what we have so far more significant
+		WAIT_CHAR D3,D4									; next character -> D2
 		HEX2BIN D3,D3,A0								; convert to binary -> D2
 		OR.B D3,D1
 	ENDF
 	PRINT_CRLF D2,A1
 
 	MOVE.W D1,D0										; extract the LSword for the length
-	LSR.L #8,D1										; extract the MSword for the address
+	LSR.L #8,D1											; extract the MSword for the address
 	LSR.L #8,D1
 
 	MOVE.L D1,A1
@@ -694,12 +694,12 @@ M
 
 
 HEX_DIGIT
-	LSL.L #4,D7										; add the next digit in the next 4 bits
+	LSL.L #4,D7											; add the next digit in the next 4 bits
 	HEX2BIN D2,D2,A0
 	OR.B D2,D7  
 	BRA GET_INPUT
 
-	SIMHALT											; halt simulator
+	SIMHALT												; halt simulator
 
 ; strings
 HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
@@ -725,9 +725,10 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.70 (11/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.70 (11/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
 
 
 *~Font name~Courier New~

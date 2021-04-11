@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 11/04/2021 17:49:16
+Created On: 11/04/2021 18:34:04
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title         MDFmon 
@@ -250,7 +250,7 @@ Created On: 11/04/2021 17:49:16
 00000000                           246  ; write word to EEPROM
 00000000                           247  ; \1 word to write, \2 = target address, \3 = working data register
 00000000                           248  PROGRAM MACRO
-00000000                           249    MOVE.W \1,\2                                  ; write the data
+00000000                           249    MOVE.W \1,\2                                      ; write the data
 00000000                           250  
 00000000                           251  WAIT_FOR_COMPLETE\@
 00000000                           252          MOVE.W \2,\3
@@ -270,8 +270,8 @@ Created On: 11/04/2021 17:49:16
 00000000                           266  ; A0 - address of string to print 
 00000000                           267  
 00000000                           268  ; start vector
-00000000= 00000000                 269  STACK   DC.L $00000000                          ; STACK
-00000004= 00000008                 270  RESET   DC.L START                              ; RESET
+00000000= 00000000                 269  STACK   DC.L $00000000                              ; STACK
+00000004= 00000008                 270  RESET   DC.L START                                  ; RESET
 00000008                           271  
 00000008                           272  ; start of program  
 00000008                           273  START
@@ -285,7 +285,7 @@ Created On: 11/04/2021 17:49:16
 00000020  323C 0050                281s     MOVE.W  #$50,D1
 00000024  6000 000E                282s     BRA _20000001
 00000028                           283s _20000000
-00000028  13C1 00C00005            284          MOVE.B D1,DUART_CRA                     ; reset everyting
+00000028  13C1 00C00005            284          MOVE.B D1,DUART_CRA                         ; reset everyting
 0000002E  4E71                     285          NOP
 00000030                           286      ENDF
 00000030  0441 0010                287s     SUB.W   #$10,D1
@@ -297,7 +297,7 @@ Created On: 11/04/2021 17:49:16
 0000003A  323C 0050                293s     MOVE.W  #$50,D1
 0000003E  6000 000E                294s     BRA _20000003
 00000042                           295s _20000002
-00000042  13C1 00C00015            296          MOVE.B D1,DUART_CRB                     ; reset everyting
+00000042  13C1 00C00015            296          MOVE.B D1,DUART_CRB                         ; reset everyting
 00000048  4E71                     297          NOP
 0000004A                           298      ENDF
 0000004A  0441 0010                299s     SUB.W   #$10,D1
@@ -308,18 +308,18 @@ Created On: 11/04/2021 17:49:16
 00000054                           304  ;initialise UART
 00000054  13FC 0000 00C00009       305      MOVE.B #$0,DUART_ACR
 0000005C  13FC 0000 00C0000B       306      MOVE.B #$0,DUART_IMR                            ; no interrupts, please
-00000064  13FC 0000 00C0001B       307      MOVE.B #$0,DUART_OPCR                       ; enable all outputs
+00000064  13FC 0000 00C0001B       307      MOVE.B #$0,DUART_OPCR                           ; enable all outputs
 0000006C                           308  
 0000006C                           309  ; channel A
-0000006C  13FC 0013 00C00001       310      MOVE.B #$13,DUART_MRA                       ; no flow control, no parity, 8 data bits
-00000074  13FC 0007 00C00001       311      MOVE.B #$07,DUART_MRA                       ; 1 stop bit
-0000007C  13FC 00CC 00C00003       312      MOVE.B #$CC,DUART_CSRA                      ; 38400 baud
+0000006C  13FC 0013 00C00001       310      MOVE.B #$13,DUART_MRA                           ; no flow control, no parity, 8 data bits
+00000074  13FC 0007 00C00001       311      MOVE.B #$07,DUART_MRA                           ; 1 stop bit
+0000007C  13FC 00CC 00C00003       312      MOVE.B #$CC,DUART_CSRA                          ; 38400 baud
 00000084  13FC 0005 00C00005       313      MOVE.B #$5,DUART_CRA                            ; enable rx & tx
 0000008C                           314  
 0000008C                           315  ; channel B
-0000008C  13FC 0013 00C00011       316      MOVE.B #$13,DUART_MRB                       ; no flow control, no parity, 8 data bits
-00000094  13FC 0007 00C00011       317      MOVE.B #$07,DUART_MRB                       ; 1 stop bit
-0000009C  13FC 00CC 00C00013       318      MOVE.B #$CC,DUART_CSRB                      ; 38400 baud
+0000008C  13FC 0013 00C00011       316      MOVE.B #$13,DUART_MRB                           ; no flow control, no parity, 8 data bits
+00000094  13FC 0007 00C00011       317      MOVE.B #$07,DUART_MRB                           ; 1 stop bit
+0000009C  13FC 00CC 00C00013       318      MOVE.B #$CC,DUART_CSRB                          ; 38400 baud
 000000A4  13FC 0005 00C00015       319      MOVE.B #$5,DUART_CRB                            ; enable rx & tx
 000000AC                           320  
 000000AC                           321m     PRINT_CHAR #0,D1                                ; some non-printing char to flush out the serial port
@@ -482,7 +482,7 @@ Created On: 11/04/2021 17:49:16
 0000019A                           478m     ENDM
 0000019A                           479  
 0000019A                           480  GET_INPUT
-0000019A                           481m     WAIT_CHAR D2,D3                             ; fetch character from serial port -> D2
+0000019A                           481m     WAIT_CHAR D2,D3                                 ; fetch character from serial port -> D2
 0000019A                           482m WAIT_FOR_READY_16                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 0000019A                 TRUE      483m     IFEQ DEBUG
 0000019A  1639 00C00003            484m         MOVE.B DUART_SRA,D3                         ; READ STATUS REGISTER
@@ -646,7 +646,7 @@ Created On: 11/04/2021 17:49:16
 000002AE                           642  R
 000002AE  2047                     643      MOVE.L D7,A0                                    ; address accumulator -> address register
 000002B0  7E00                     644      MOVE.L #0,D7                                    ;clear the now used address accumulator
-000002B2  2410                     645      MOVE.L (A0),D2                              ; read the memory and print it
+000002B2  2410                     645      MOVE.L (A0),D2                                  ; read the memory and print it
 000002B4                           646m     PRINT_REG D2,D3,D4,D5,A0
 000002B4  41FA 0F5A                647m     LEA OX(PC),A0
 000002B8                           648mm     PRINT_STR A0,D3
@@ -719,11 +719,11 @@ Created On: 11/04/2021 17:49:16
 0000031E  6000 FE5A                715      BRA MAIN_LOOP
 00000322                           716  
 00000322                           717  W
-00000322  3C3C 0007                718      MOVE #7,D6                                  ; 7 bytes left to read
+00000322  3C3C 0007                718      MOVE #7,D6                                      ; 7 bytes left to read
 00000326                           719      
 00000326                           720  READ_DATA_TO_POKE
-00000326  E98D                     721      LSL.L #4,D5                                 ; make what we have so far more significant
-00000328                           722m     WAIT_CHAR D2,D3                             ; next character -> D2
+00000326  E98D                     721      LSL.L #4,D5                                     ; make what we have so far more significant
+00000328                           722m     WAIT_CHAR D2,D3                                 ; next character -> D2
 00000328                           723m WAIT_FOR_READY_34                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000328                 TRUE      724m     IFEQ DEBUG
 00000328  1639 00C00003            725m         MOVE.B DUART_SRA,D3                         ; READ STATUS REGISTER
@@ -770,7 +770,7 @@ Created On: 11/04/2021 17:49:16
 0000036C  2047                     766      MOVE.L D7,A0                                    ; address accumulator -> address register
 0000036E  7E00                     767      MOVE.L #0,D7                                    ; clear the now used address accumulator
 00000370                           768      
-00000370  2085                     769      MOVE.L D5,(A0)                              ; write the data
+00000370  2085                     769      MOVE.L D5,(A0)                                  ; write the data
 00000372                           770  
 00000372                           771m     PRINT_CRLF D3,A0
 00000372  41FA 0E96                772m     LEA CRLF(PC),A0
@@ -812,7 +812,7 @@ Created On: 11/04/2021 17:49:16
 00000396                           808  ; D6 - temp
 00000396                           809  ; D7 - temp
 00000396                           810  S
-00000396  2078 0000                811      MOVE.L 0,A0                                 ; start address -> A0
+00000396  2078 0000                811      MOVE.L 0,A0                                     ; start address -> A0
 0000039A  2247                     812      MOVE.L D7,A1                                    ; grab the address accumulator (offset) into A1
 0000039C                           813      
 0000039C  7000                     814      MOVE.L #0,D0                                    ; count of records read -> D0
@@ -844,10 +844,10 @@ Created On: 11/04/2021 17:49:16
 000003CC  13C1 00E00001            840m     MOVE.B D1,DISPLAY                               ; ECHO TO THE DISPLAY
 000003D2                           841m 
 000003D2                           842m     ENDM
-000003D2  B23C 0053                843      CMP.B #'S',D1                               ; found S?
+000003D2  B23C 0053                843      CMP.B #'S',D1                                   ; found S?
 000003D6  66C6                     844      BNE WAIT_FOR_SRECORD                            ; nope, keep waiting
 000003D8                           845      
-000003D8                           846m     PRINT_CHAR #'S',D5                          ; print the S
+000003D8                           846m     PRINT_CHAR #'S',D5                              ; print the S
 000003D8                           847m WAIT_FOR_READY_43                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000003D8                 TRUE      848m     IFEQ DEBUG
 000003D8  1A39 00C00003            849m         MOVE.B DUART_SRA,D5                         ; READ STATUS REGISTER
@@ -860,9 +860,9 @@ Created On: 11/04/2021 17:49:16
 000003EC                           856m     ENDC
 000003EC                           857m 
 000003EC                           858m     ENDM
-000003EC  5280                     859      ADD.L #1,D0                                 ; read another S record, increment count
+000003EC  5280                     859      ADD.L #1,D0                                     ; read another S record, increment count
 000003EE                           860      
-000003EE                           861m     DOWNLOAD D1                                 ; read the record identifier and echo it back
+000003EE                           861m     DOWNLOAD D1                                     ; read the record identifier and echo it back
 000003EE                           862m WAIT_FOR_READY_44                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000003EE                           863m 
 000003EE  1239 00C00003            864m     MOVE.B DUART_SRA,D1                             ; CHECK FOR COMMAND
@@ -1004,10 +1004,10 @@ Created On: 11/04/2021 17:49:16
 000004DE  B23C 0032               1000s     CMP.B   #'2',D1
 000004E2  6600 01F0               1001s     BNE.L   _00000005
 000004E6                          1002s _00000004
-000004E6  5783                    1003              SUB.L #3,D3                         ; subtract three bytes for 16 bit address and 1 byte checksum
+000004E6  5783                    1003              SUB.L #3,D3                             ; subtract three bytes for 16 bit address and 1 byte checksum
 000004E8                          1004  
 000004E8  7800                    1005              MOVE.L #0,D4                            ; read two bytes of address
-000004EA                          1006m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; first byte                                    
+000004EA                          1006m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4         ; first byte                                    
 000004EA  1E3C 0002               1007m     MOVE.B #2,D7
 000004EE                          1008m     WHILE.B D7 <GT> 0 DO
 000004EE                          1009ms _10000002
@@ -1070,7 +1070,7 @@ Created On: 11/04/2021 17:49:16
 0000055A  D484                    1066m     ADD.L D4,D2
 0000055C                          1067m 
 0000055C                          1068m     ENDM
-0000055C                          1069m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; second one
+0000055C                          1069m             DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4         ; second one
 0000055C  1E3C 0002               1070m     MOVE.B #2,D7
 00000560                          1071m     WHILE.B D7 <GT> 0 DO
 00000560                          1072ms _10000004
@@ -1134,11 +1134,11 @@ Created On: 11/04/2021 17:49:16
 000005CE                          1130m 
 000005CE                          1131m     ENDM
 000005CE                          1132  
-000005CE                          1133              IF.B D1 <EQ> #'2'  THEN.L           ; 24 bit address data record, read another byte
+000005CE                          1133              IF.B D1 <EQ> #'2'  THEN.L               ; 24 bit address data record, read another byte
 000005CE  B23C 0032               1134s     CMP.B   #'2',D1
 000005D2  6600 0076               1135s     BNE.L   _00000006
-000005D6  5383                    1136                  SUB.L #1,D3                     ; subtract an extra bytes for 24 bit address    
-000005D8                          1137m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; 3rd byte
+000005D6  5383                    1136                  SUB.L #1,D3                         ; subtract an extra bytes for 24 bit address    
+000005D8                          1137m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; 3rd byte
 000005D8  1E3C 0002               1138m     MOVE.B #2,D7
 000005DC                          1139m     WHILE.B D7 <GT> 0 DO
 000005DC                          1140ms _10000006
@@ -1205,13 +1205,13 @@ Created On: 11/04/2021 17:49:16
 0000064A                          1201s _00000006
 0000064A                          1202  
 0000064A  2444                    1203              MOVE.L D4,A2                            ; put the address in an address register
-0000064C  D5C9                    1204              ADD.L A1,A2                         ; add in the offset
+0000064C  D5C9                    1204              ADD.L A1,A2                             ; add in the offset
 0000064E                          1205  
-0000064E                          1206              WHILE.B D3 <GT> #0 DO               ; read the data bytes
+0000064E                          1206              WHILE.B D3 <GT> #0 DO                   ; read the data bytes
 0000064E                          1207s _10000008
 0000064E  B63C 0000               1208s     CMP.B   #0,D3
 00000652  6F00 007A               1209s     BLE _10000009
-00000656                          1210m                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4 ; read it
+00000656                          1210m                 DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4     ; read it
 00000656  1E3C 0002               1211m     MOVE.B #2,D7
 0000065A                          1212m     WHILE.B D7 <GT> 0 DO
 0000065A                          1213ms _1000000A
@@ -1275,9 +1275,9 @@ Created On: 11/04/2021 17:49:16
 000006C8                          1271m 
 000006C8                          1272m     ENDM
 000006C8                          1273   
-000006C8  14C1                    1274                  MOVE.B D1,(A2)+                 ; store it!
+000006C8  14C1                    1274                  MOVE.B D1,(A2)+                     ; store it!
 000006CA                          1275  
-000006CA  5303                    1276                  SUB.B #1,D3                     ; 1 less byte to go
+000006CA  5303                    1276                  SUB.B #1,D3                         ; 1 less byte to go
 000006CC                          1277              ENDW
 000006CC  6080                    1278s     BRA _10000008
 000006CE                          1279s _10000009
@@ -1290,7 +1290,7 @@ Created On: 11/04/2021 17:49:16
 000006D4  B23C 0038               1286s     CMP.B   #'8',D1
 000006D8  6600 0164               1287s     BNE.L   _00000008
 000006DC  7800                    1288                  MOVE.L #0,D4                        ; read the 24 bit start address
-000006DE                          1289m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; top byte
+000006DE                          1289m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; top byte
 000006DE  1E3C 0002               1290m     MOVE.B #2,D7
 000006E2                          1291m     WHILE.B D7 <GT> 0 DO
 000006E2                          1292ms _1000000C
@@ -1353,7 +1353,7 @@ Created On: 11/04/2021 17:49:16
 0000074E  D484                    1349m     ADD.L D4,D2
 00000750                          1350m 
 00000750                          1351m     ENDM
-00000750                          1352m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; middle byte
+00000750                          1352m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; middle byte
 00000750  1E3C 0002               1353m     MOVE.B #2,D7
 00000754                          1354m     WHILE.B D7 <GT> 0 DO
 00000754                          1355ms _1000000E
@@ -1416,7 +1416,7 @@ Created On: 11/04/2021 17:49:16
 000007C0  D484                    1412m     ADD.L D4,D2
 000007C2                          1413m 
 000007C2                          1414m     ENDM
-000007C2                          1415m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4 ; bottom byte
+000007C2                          1415m                 DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4     ; bottom byte
 000007C2  1E3C 0002               1416m     MOVE.B #2,D7
 000007C6                          1417m     WHILE.B D7 <GT> 0 DO
 000007C6                          1418ms _10000010
@@ -1481,7 +1481,7 @@ Created On: 11/04/2021 17:49:16
 00000834                          1477m     ENDM
 00000834                          1478  
 00000834  2044                    1479                  MOVE.L D4,A0                        ; start address -> A0
-00000836  D1C9                    1480                  ADD.L A1,A0                     ; add in the offset
+00000836  D1C9                    1480                  ADD.L A1,A0                         ; add in the offset
 00000838                          1481  
 00000838  72FF                    1482                  MOVE.L #$FFFFFFFF,D1                ; done
 0000083A                          1483              ELSE
@@ -1667,7 +1667,7 @@ Created On: 11/04/2021 17:49:16
 00000946                          1663      IF.B D2 <NE> #$FF THEN.L
 00000946  B43C 00FF               1664s     CMP.B   #$FF,D2
 0000094A  6700 0090               1665s     BEQ.L   _0000000A
-0000094E  49FA 085B               1666          LEA CS_FAILURE(PC),A4                   ; warn for mismatched checksum
+0000094E  49FA 085B               1666          LEA CS_FAILURE(PC),A4                       ; warn for mismatched checksum
 00000952                          1667m         PRINT_STR A4,D5
 00000952                          1668m LOOP_107
 00000952  0C14 0000               1669m     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -1910,13 +1910,13 @@ Created On: 11/04/2021 17:49:16
 00000AC2                          1906  
 00000AC2                          1907  G
 00000AC2  2047                    1908      MOVE.L D7,A0                                    ; address accumulator -> address register
-00000AC4  3E3C 0000               1909      MOVE #0,D7                                  ; clear the now used address accumulator
+00000AC4  3E3C 0000               1909      MOVE #0,D7                                      ; clear the now used address accumulator
 00000AC8  4ED0                    1910      JMP (A0)                                        ; jump to it!
 00000ACA                          1911  
 00000ACA                          1912  Z
-00000ACA  207C 00200000           1913      MOVE.L #RAM,A0                              ; address of RAM
+00000ACA  207C 00200000           1913      MOVE.L #RAM,A0                                  ; address of RAM
 00000AD0                          1914      
-00000AD0                          1915      FOR.L D0 = #0 TO #$40000 BY #4 DO           ; write
+00000AD0                          1915      FOR.L D0 = #0 TO #$40000 BY #4 DO               ; write
 00000AD0  7000                    1916s     MOVE.L  #0,D0
 00000AD2  6000 0012               1917s     BRA _20000005
 00000AD6                          1918s _20000004
@@ -1932,9 +1932,9 @@ Created On: 11/04/2021 17:49:16
 00000AE6  B0BC 00040000           1928s     CMP.L   #$40000,D0
 00000AEC  6FE8                    1929s     BLE _20000004
 00000AEE                          1930  
-00000AEE  207C 00200000           1931      MOVE.L #RAM,A0                              ; address of RAM
+00000AEE  207C 00200000           1931      MOVE.L #RAM,A0                                  ; address of RAM
 00000AF4                          1932  
-00000AF4                          1933      FOR.L D0 = #0 TO #$40000 BY #4 DO           ; read back and check 
+00000AF4                          1933      FOR.L D0 = #0 TO #$40000 BY #4 DO               ; read back and check 
 00000AF4  7000                    1934s     MOVE.L  #0,D0
 00000AF6  6000 00A6               1935s     BRA _20000007
 00000AFA                          1936s _20000006
@@ -2058,8 +2058,8 @@ Created On: 11/04/2021 17:49:16
 00000BB0  343C 0000               2054s     MOVE.W  #0,D2
 00000BB4  6000 0046               2055s     BRA _20000009
 00000BB8                          2056s _20000008
-00000BB8  E989                    2057          LSL.L #4,D1                             ; make what we have so far more significant
-00000BBA                          2058m         WAIT_CHAR D3,D4                         ; next character -> D2
+00000BB8  E989                    2057          LSL.L #4,D1                                 ; make what we have so far more significant
+00000BBA                          2058m         WAIT_CHAR D3,D4                             ; next character -> D2
 00000BBA                          2059m WAIT_FOR_READY_142                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000BBA                 TRUE     2060m     IFEQ DEBUG
 00000BBA  1839 00C00003           2061m         MOVE.B DUART_SRA,D4                         ; READ STATUS REGISTER
@@ -2108,7 +2108,7 @@ Created On: 11/04/2021 17:49:16
 00000C00  6FB6                    2104s     BLE _20000008
 00000C02                          2105  
 00000C02  3001                    2106      MOVE.W D1,D0                                    ; extract the LSword for the length
-00000C04  E089                    2107      LSR.L #8,D1                                 ; extract the MSword for the address
+00000C04  E089                    2107      LSR.L #8,D1                                     ; extract the MSword for the address
 00000C06  E089                    2108      LSR.L #8,D1
 00000C08                          2109  
 00000C08                          2110m     PRINT_CRLF D2,A1
@@ -2140,7 +2140,7 @@ Created On: 11/04/2021 17:49:16
 00000C2A  2247                    2136      MOVE.L D7,A1                                    ; address accumulator -> address register
 00000C2C  7E00                    2137      MOVE.L #0,D7                                    ; clear the now used address accumulator
 00000C2E                          2138  
-00000C2E  5089                    2139      ADD.L #8,A1                                 ; skip the initial stack pointer and reset vector for now
+00000C2E  5089                    2139      ADD.L #8,A1                                     ; skip the initial stack pointer and reset vector for now
 00000C30  5180                    2140      SUB.L #8,D0
 00000C32                          2141  
 00000C32                          2142m     UNPROTECT
@@ -2157,7 +2157,7 @@ Created On: 11/04/2021 17:49:16
 00000C5A  31FC 2020 2AAA          2153m     MOVE.W #$2020,$2AAA
 00000C60                          2154m     ENDM
 00000C60                          2155  
-00000C60  45FA 0594               2156      LEA LOADING(PC),A2                          ; the prints seem to be important for timing to unprotect the EEPROM
+00000C60  45FA 0594               2156      LEA LOADING(PC),A2                              ; the prints seem to be important for timing to unprotect the EEPROM
 00000C64                          2157m     PRINT_STR A2,D2
 00000C64                          2158m LOOP_150
 00000C64  0C12 0000               2159m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2329,7 +2329,7 @@ Created On: 11/04/2021 17:49:16
 00000D62                          2325  
 00000D62  13D1 00E00001           2326          MOVE.B (A1),DISPLAY
 00000D68                          2327m         PROGRAM (A1),(A0),D2
-00000D68  3091                    2328m   MOVE.W (A1),(A0)                                  ; WRITE THE DATA
+00000D68  3091                    2328m   MOVE.W (A1),(A0)                                      ; WRITE THE DATA
 00000D6A                          2329m 
 00000D6A                          2330m WAIT_FOR_COMPLETE_167
 00000D6A  3410                    2331m         MOVE.W (A0),D2
@@ -2348,8 +2348,8 @@ Created On: 11/04/2021 17:49:16
 00000D78  60DE                    2344s     BRA _10000014
 00000D7A                          2345s _10000015
 00000D7A                          2346  
-00000D7A                          2347m     PROGRAM #0, $0, D2                          ; we're done, can now update the SP and start vector
-00000D7A  31FC 0000 0000          2348m   MOVE.W #0,$0                                  ; WRITE THE DATA
+00000D7A                          2347m     PROGRAM #0, $0, D2                              ; we're done, can now update the SP and start vector
+00000D7A  31FC 0000 0000          2348m   MOVE.W #0,$0                                      ; WRITE THE DATA
 00000D80                          2349m 
 00000D80                          2350m WAIT_FOR_COMPLETE_168
 00000D80  3438 0000               2351m         MOVE.W $0,D2
@@ -2361,8 +2361,8 @@ Created On: 11/04/2021 17:49:16
 00000D8E                          2357m         ENDI
 00000D8E                          2358ms _0000000E
 00000D8E                          2359m         ENDM
-00000D8E                          2360m     PROGRAM #0, $2, D2                          ; setting this seems to break the download code, I guess the stack is being used somehow!!!
-00000D8E  31FC 0000 0002          2361m   MOVE.W #0,$2                                  ; WRITE THE DATA
+00000D8E                          2360m     PROGRAM #0, $2, D2                              ; setting this seems to break the download code, I guess the stack is being used somehow!!!
+00000D8E  31FC 0000 0002          2361m   MOVE.W #0,$2                                      ; WRITE THE DATA
 00000D94                          2362m 
 00000D94                          2363m WAIT_FOR_COMPLETE_169
 00000D94  3438 0002               2364m         MOVE.W $2,D2
@@ -2376,7 +2376,7 @@ Created On: 11/04/2021 17:49:16
 00000DA2                          2372m         ENDM
 00000DA2                          2373  
 00000DA2                          2374m     PROGRAM D1, $6, D2
-00000DA2  31C1 0006               2375m   MOVE.W D1,$6                                  ; WRITE THE DATA
+00000DA2  31C1 0006               2375m   MOVE.W D1,$6                                      ; WRITE THE DATA
 00000DA6                          2376m 
 00000DA6                          2377m WAIT_FOR_COMPLETE_170
 00000DA6  3438 0006               2378m         MOVE.W $6,D2
@@ -2391,7 +2391,7 @@ Created On: 11/04/2021 17:49:16
 00000DB2  E089                    2387      LSR.L #8,D1
 00000DB4  E089                    2388      LSR.L #8,D1
 00000DB6                          2389m     PROGRAM D1, $4, D2
-00000DB6  31C1 0004               2390m   MOVE.W D1,$4                                  ; WRITE THE DATA
+00000DB6  31C1 0004               2390m   MOVE.W D1,$4                                      ; WRITE THE DATA
 00000DBA                          2391m 
 00000DBA                          2392m WAIT_FOR_COMPLETE_171
 00000DBA  3438 0004               2393m         MOVE.W $4,D2
@@ -2419,8 +2419,8 @@ Created On: 11/04/2021 17:49:16
 00000DDE  323C 0000               2415s     MOVE.W  #0,D1
 00000DE2  6000 0046               2416s     BRA _2000000B
 00000DE6                          2417s _2000000A
-00000DE6  E988                    2418          LSL.L #4,D0                             ; make what we have so far more significant
-00000DE8                          2419m         WAIT_CHAR D2,D3                         ; next character -> D2
+00000DE6  E988                    2418          LSL.L #4,D0                                 ; make what we have so far more significant
+00000DE8                          2419m         WAIT_CHAR D2,D3                             ; next character -> D2
 00000DE8                          2420m WAIT_FOR_READY_173                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000DE8                 TRUE     2421m     IFEQ DEBUG
 00000DE8  1639 00C00003           2422m         MOVE.B DUART_SRA,D3                         ; READ STATUS REGISTER
@@ -2509,7 +2509,7 @@ Created On: 11/04/2021 17:49:16
 00000E7C  31FC 2020 2AAA          2505m     MOVE.W #$2020,$2AAA
 00000E82                          2506m     ENDM
 00000E82                          2507               
-00000E82  45FA 0372               2508      LEA LOADING(PC),A2                          ; the prints seem to be important for timing to unprotect the EEPROM
+00000E82  45FA 0372               2508      LEA LOADING(PC),A2                              ; the prints seem to be important for timing to unprotect the EEPROM
 00000E86                          2509m     PRINT_STR A2,D2
 00000E86                          2510m LOOP_181
 00000E86  0C12 0000               2511m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2686,7 +2686,7 @@ Created On: 11/04/2021 17:49:16
 00000F8C                          2682m     ENDM
 00000F8C                          2683  
 00000F8C                          2684m     PROGRAM D0,(A0),D2
-00000F8C  3080                    2685m   MOVE.W D0,(A0)                                    ; WRITE THE DATA
+00000F8C  3080                    2685m   MOVE.W D0,(A0)                                        ; WRITE THE DATA
 00000F8E                          2686m 
 00000F8E                          2687m WAIT_FOR_COMPLETE_199
 00000F8E  3410                    2688m         MOVE.W (A0),D2
@@ -2715,8 +2715,8 @@ Created On: 11/04/2021 17:49:16
 00000FB2  343C 0000               2711s     MOVE.W  #0,D2
 00000FB6  6000 0046               2712s     BRA _2000000D
 00000FBA                          2713s _2000000C
-00000FBA  E989                    2714          LSL.L #4,D1                                 ; make what we have so far more significant
-00000FBC                          2715m         WAIT_CHAR D3,D4                             ; next character -> D2
+00000FBA  E989                    2714          LSL.L #4,D1                                     ; make what we have so far more significant
+00000FBC                          2715m         WAIT_CHAR D3,D4                                 ; next character -> D2
 00000FBC                          2716m WAIT_FOR_READY_201                                  ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000FBC                 TRUE     2717m     IFEQ DEBUG
 00000FBC  1839 00C00003           2718m         MOVE.B DUART_SRA,D4                         ; READ STATUS REGISTER
@@ -2788,7 +2788,7 @@ Created On: 11/04/2021 17:49:16
 00001024                          2784m     ENDM
 00001024                          2785  
 00001024  3001                    2786      MOVE.W D1,D0                                        ; extract the LSword for the length
-00001026  E089                    2787      LSR.L #8,D1                                     ; extract the MSword for the address
+00001026  E089                    2787      LSR.L #8,D1                                         ; extract the MSword for the address
 00001028  E089                    2788      LSR.L #8,D1
 0000102A                          2789  
 0000102A  2241                    2790      MOVE.L D1,A1
@@ -2814,7 +2814,7 @@ Created On: 11/04/2021 17:49:16
 0000104A                          2810  
 0000104A                          2811  
 0000104A                          2812  HEX_DIGIT
-0000104A  E98F                    2813      LSL.L #4,D7                                     ; add the next digit in the next 4 bits
+0000104A  E98F                    2813      LSL.L #4,D7                                         ; add the next digit in the next 4 bits
 0000104C                          2814m     HEX2BIN D2,D2,A0
 0000104C  41FA 0191               2815m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 00001050  0402 0030               2816m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
@@ -2824,7 +2824,7 @@ Created On: 11/04/2021 17:49:16
 0000105E  8E02                    2820      OR.B D2,D7  
 00001060  6000 F138               2821      BRA GET_INPUT
 00001064                          2822  
-00001064  FFFF FFFF               2823      SIMHALT                                         ; halt simulator
+00001064  FFFF FFFF               2823      SIMHALT                                             ; halt simulator
 00001068                          2824  
 00001068                          2825  ; strings
 00001068= 50 72 65 73 73 20 ...   2826  HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
@@ -2850,7 +2850,7 @@ Created On: 11/04/2021 17:49:16
 0000120D= 3E 20 00                2846  PROMPT  DC.B '> ',NULL
 00001210= 30 78 00                2847  ox      DC.B '0x',NULL
 00001213= 20 2D 3E 20 00          2848  to      DC.B ' -> ',NULL
-00001218= 4D 44 46 2D 6D 6F ...   2849  VERSION DC.B 'MDF-mon V1.70 (11/04/2021)',CR,LF,NULL
+00001218= 4D 44 46 2D 6D 6F ...   2849  VERSION DC.B 'MDF-mon V1.70 (11/04/2021)',CR,LF,NULL    ; this is the last line on purpose, so if it prints, we can be sure we got it all
 00001235                          2850  
 00001235                          2851      END START                                       ; last line of source
 
