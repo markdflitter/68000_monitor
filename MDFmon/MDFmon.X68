@@ -562,13 +562,18 @@ L
     SUB.L #8,D0
     
     MOVE.W #$AAAA,$2AAA
+    NOP
     MOVE.W #$5555,$1554
+    NOP
     MOVE.W #$8080,$2AAA
+    NOP
     MOVE.W #$AAAA,$2AAA
+    NOP
     MOVE.W #$5555,$1554
+    NOP
     MOVE.W #$2020,$2AAA
     
-    LEA LOADING(PC),A2                		    ; the prints are important for timing to unprotect the EEPROM
+    LEA LOADING(PC),A2                		    ; the prints seem to be important for timing to unprotect the EEPROM
     PRINT_STR A2,D2
     
     MOVE.L A1,D2          		
@@ -577,7 +582,7 @@ L
     LEA TO(PC),A2
     PRINT_STR A2,D3
     
-    	MOVE.L A0,D2          		
+    MOVE.L A0,D2          		
     PRINT_REG D2,D3,D4,D5,A2
 
 	PRINT_CRLF D3,A2
@@ -592,13 +597,13 @@ L
         ADD.L #2,A1
 	ENDW
 	
-    PROGRAM #$1234, $0, D2                          ; we're done, can now update the SP and start vector
-    PROGRAM #$5678, $2, D2                         
+    PROGRAM #0, $0, D2                         ; we're done, can now update the SP and start vector
+    PROGRAM #0, $2, D2                         ; setting this seems to break the download code, I guess the stack is being used somehow!!!
 
-    PROGRAM D1, $4, D2
+    PROGRAM D1, $6, D2
     LSR.L #8,D1
     LSR.L #8,D1
-    PROGRAM D1, $6, D2                         
+    PROGRAM D1, $4, D2                         
 
     MOVE.W #$AAAA,$2AAA                             ; and write protect
     MOVE.W #$5555,$1554
@@ -615,7 +620,7 @@ HEX_DIGIT
     SIMHALT                         		    ; halt simulator
 
 ; strings
-VERSION DC.B 'MDF-mon V1.59 (11/04/2021)',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.64 (11/04/2021)',CR,LF,NULL
 HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
 HELP    DC.B '?',TAB,TAB,TAB,'help',CR,LF
         DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
@@ -639,6 +644,7 @@ ox      DC.B '0x',NULL
 to      DC.B ' -> ',NULL
     
     END    START                                ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
