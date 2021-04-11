@@ -679,7 +679,7 @@ M
 	MOVE.L D1,A1
 	
 	MOVE.L D7,A0										; address accumulator -> target address register
-	MOVE.L #0,D7										; clear the now used address accumulator
+	;MOVE.L #0,D7										; we're not going to clear it, so we can do go
 
 	WHILE D0 <GT> #0 DO
 		SUB.L #2,D0
@@ -688,10 +688,7 @@ M
 		MOVE.W (A1)+,(A0)+
 	ENDW
 	
-	MOVE.L D1,D7										; put the start address in the address accumulator
-
 	BRA MAIN_LOOP
-
 
 HEX_DIGIT
 	LSL.L #4,D7											; add the next digit in the next 4 bits
@@ -725,9 +722,10 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.70 (11/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.71 (11/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
 
 
 
