@@ -719,7 +719,7 @@ HELP	DC.B '?',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[v]',TAB,TAB,TAB,'version',CR,LF
 		DC.B 'xxxxxxxx[r]',TAB,TAB,'read long',CR,LF
 		DC.B 'xxxxxxxx[w]xxxxxxxx',TAB,'write long',CR,LF
-		DC.B 'xxxxxxxx[s]',TAB,TAB,TAB,'download S records',CR,LF
+		DC.B 'xxxxxxxx[s]',TAB,TAB,'download S records',CR,LF
 		DC.B 'xxxxxxxx[g]',TAB,TAB,'go',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
@@ -740,6 +740,7 @@ to		DC.B ' -> ',NULL
 VERSION DC.B 'MDF-mon V1.75 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
 
 
 
