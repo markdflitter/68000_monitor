@@ -5,6 +5,7 @@
 * Description:	68000 monitor program
 *-----------------------------------------------------------
 ; to do
+; take advantage of my whole megabyte of memory!
 
 ; other ideas
 ;------------
@@ -542,26 +543,27 @@ G
 Z
 	MOVE.L #RAM,A0									; address of RAM
 	
-	FOR.L D0 = #0 TO #$40000 BY #4 DO				; write
+	FOR.L D0 = #0 TO #$FFFFB BY #4 DO				; write
 		MOVE.L D0,D1								; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
 		MOVE.B D1,DISPLAY
-
-		MOVE.L D0,(A0)+
+		
+		MOVE.L A0,(A0)+
 	ENDF
 
 	MOVE.L #RAM,A0				 					; address of RAM
 
-	FOR.L D0 = #0 TO #$40000 BY #4 DO				; read back and check 
+	FOR.L D0 = #0 TO #$FFFFB BY #4 DO				; read back and check 
 		MOVE.L D0,D1				 				; progress update
 		LSR.L #8,D1
 		LSR.L #8,D1
 		MOVE.B D1,DISPLAY
 
+		MOVE.L A0,D2
 		MOVE.L (A0)+,D1
 
-		IF.L D0 <NE> D1 THEN
+		IF.L D2 <NE> D1 THEN
 			LEA RAM_ERROR(PC),A1
 			PRINT_STR A1,D1
 			MOVE.L A0,D1
@@ -735,9 +737,11 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.72 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.75 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
+
 
 
 
