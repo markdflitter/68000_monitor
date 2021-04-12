@@ -724,7 +724,7 @@ HELP	DC.B '?',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
-		DC.B 'xxxxxxxx[m]xxxx',TAB,TAB,'monitor to RAM',CR,LF,NULL
+		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -737,9 +737,10 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.75 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.76 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
 
 
 
