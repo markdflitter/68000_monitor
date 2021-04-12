@@ -389,7 +389,20 @@ R
 	MOVE.L #0,D7									;clear the now used address accumulator
 	MOVE.L (A0),D2									; read the memory and print it
 	PRINT_REG D2,D3,D4,D5,A0
+	
+	PRINT_CHAR #32,D3
+
+	ROL.L #8,D2
+	PRINT_CHAR D2,D3
+	ROL.L #8,D2
+	PRINT_CHAR D2,D3
+	ROL.L #8,D2
+	PRINT_CHAR D2,D3
+	ROL.L #8,D2
+	PRINT_CHAR D2,D3
+
 	PRINT_CRLF D3,A0
+	
 	BRA MAIN_LOOP
 
 W
@@ -722,9 +735,11 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.71 (11/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.72 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
+
 
 
 
