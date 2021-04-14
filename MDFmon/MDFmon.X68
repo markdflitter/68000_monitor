@@ -267,7 +267,7 @@ WAIT_FOR_COMPLETE\@
 ; A0 - address of string to print 
 
 ; start vector
-STACK	DC.L $00000000								; STACK
+STACK	DC.L 0										; STACK
 RESET	DC.L START									; RESET
 
 ; start of program  
@@ -368,6 +368,9 @@ GET_INPUT
 
 	CMP.B #'z',D2
 	BEQ Z   
+
+	CMP.B #'j',D2
+	BEQ j
 
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
@@ -543,7 +546,7 @@ G
 Z
 	MOVE.L #RAM,A0									; address of RAM
 	
-	FOR.L D0 = #0 TO #$FFFFB BY #4 DO				; write
+	FOR.L D0 = #0 TO #$FFFFC BY #4 DO				; write
 		MOVE.L D0,D1								; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
@@ -554,7 +557,7 @@ Z
 
 	MOVE.L #RAM,A0				 					; address of RAM
 
-	FOR.L D0 = #0 TO #$FFFFB BY #4 DO				; read back and check 
+	FOR.L D0 = #0 TO #$FFFFC BY #4 DO				; read back and check 
 		MOVE.L D0,D1				 				; progress update
 		LSR.L #8,D1
 		LSR.L #8,D1
@@ -704,6 +707,18 @@ M
 	ENDW
 	
 	BRA MAIN_LOOP
+	
+j
+	MOVE.L D7,A0										; grab the address accumulator and then clear it
+	MOVE.L #0,D7
+	MOVE.L #$2FFFFC,A7   								; set up the stack pointer 
+	MOVE.L #$2FFFFC,A6   								; set up the frame pointer
+	JSR (A0)
+	
+	LEA BACK(PC),A0
+	PRINT_STR A0,D0
+	
+	BRA MAIN_LOOP
 
 HEX_DIGIT
 	LSL.L #4,D7											; add the next digit in the next 4 bits
@@ -724,7 +739,8 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
-		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF,NULL
+		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
+		DC.B 'xxxxxxxx[j]',TAB,TAB,'JST to C code',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -737,9 +753,11 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.76 (12/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+BACK 	DC.B 'back from the dead!',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.78 (14/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
 
 
 
