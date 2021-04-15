@@ -545,17 +545,19 @@ G
 
 Z
 	MOVE.L #RAM,A0									; address of RAM
-	
+	ADD.L #$100000,A0
+
 	FOR.L D0 = #0 TO #$FFFFC BY #4 DO				; write
 		MOVE.L D0,D1								; progress update
 		LSR.L #8,D1 
 		LSR.L #8,D1
 		MOVE.B D1,DISPLAY
 		
-		MOVE.L A0,(A0)+
+		MOVE.L A0,-(A0)
 	ENDF
 
 	MOVE.L #RAM,A0				 					; address of RAM
+	ADD.L #$100000,A0
 
 	FOR.L D0 = #0 TO #$FFFFC BY #4 DO				; read back and check 
 		MOVE.L D0,D1				 				; progress update
@@ -564,7 +566,7 @@ Z
 		MOVE.B D1,DISPLAY
 
 		MOVE.L A0,D2
-		MOVE.L (A0)+,D1
+		MOVE.L -(A0),D1
 
 		IF.L D2 <NE> D1 THEN
 			LEA RAM_ERROR(PC),A1
@@ -708,11 +710,12 @@ M
 	
 	BRA MAIN_LOOP
 	
-j
+J
 	MOVE.L D7,A0										; grab the address accumulator and then clear it
 	MOVE.L #0,D7
 	MOVE.L #$2FFFFC,A7   								; set up the stack pointer 
 	MOVE.L #$2FFFFC,A6   								; set up the frame pointer
+
 	JSR (A0)
 	
 	LEA BACK(PC),A0
@@ -754,9 +757,10 @@ PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
 BACK 	DC.B 'back from the dead!',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.78 (14/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.81 (15/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START										; last line of source
+
 
 
 
