@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 17/04/2021 19:04:07
+Created On: 18/04/2021 13:52:00
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title         MDFmon 
@@ -2763,9 +2763,9 @@ Created On: 17/04/2021 19:04:07
 000011BC= 30 78 00                2759  ox      DC.B '0x',NULL
 000011BF= 20 2D 3E 20 00          2760  to      DC.B ' -> ',NULL
 000011C4= 62 61 63 6B 20 66 ...   2761  BACK    DC.B 'back from the dead!',CR,LF,NULL
-000011DA= 4D 44 46 2D 6D 6F ...   2762  VERSION DC.B 'MDF-mon V1.83 (17/04/2021)',CR,LF,NULL    ; this is the last line on purpose, so if it prints, we can be sure we got it all
+000011DA= 4D 44 46 2D 6D 6F ...   2762  VERSION DC.B 'MDF-mon V1.84 (18/04/2021)',CR,LF,NULL    ; this is the last line on purpose, so if it prints, we can be sure we got it all
 000011F7                          2763  
-000011F7                          2764      END START                                       ; last line of source
+000011F7                          2764      END START                                           ; last line of source
 
 No errors detected
 No warnings generated

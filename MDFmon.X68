@@ -757,9 +757,10 @@ PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
 BACK 	DC.B 'back from the dead!',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.83 (17/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.84 (18/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START				    						; last line of source
+
 
 
 
