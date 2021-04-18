@@ -369,9 +369,6 @@ GET_INPUT
 	CMP.B #'z',D2
 	BEQ Z   
 
-	CMP.B #'j',D2
-	BEQ j
-
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
 
@@ -539,10 +536,16 @@ DOWNLOAD_DONE
 	BRA MAIN_LOOP
 
 G
-	MOVE.L D7,A0									; address accumulator -> address register
-	MOVE #0,D7										; clear the now used address accumulator
-	JMP (A0)										; jump to it!
+	MOVE.L D7,A0										; grab the address accumulator and then clear it
+	MOVE.L #0,D7
+	MOVE.L #$2FFFFC,A7   								; set up the stack pointer 
 
+	JSR (A0)
+	
+	LEA BACK(PC),A0
+	PRINT_STR A0,D0
+	
+	BRA MAIN_LOOP
 Z
 	MOVE.L #RAM,A0									; address of RAM
 	ADD.L #$100000,A0
@@ -710,19 +713,6 @@ M
 	
 	BRA MAIN_LOOP
 	
-J
-	MOVE.L D7,A0										; grab the address accumulator and then clear it
-	MOVE.L #0,D7
-	MOVE.L #$2FFFFC,A7   								; set up the stack pointer 
-	MOVE.L #$2FFFFC,A6   								; set up the frame pointer
-
-	JSR (A0)
-	
-	LEA BACK(PC),A0
-	PRINT_STR A0,D0
-	
-	BRA MAIN_LOOP
-
 HEX_DIGIT
 	LSL.L #4,D7											; add the next digit in the next 4 bits
 	HEX2BIN D2,D2,A0
@@ -743,7 +733,6 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
 		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
-		DC.B 'xxxxxxxx[j]',TAB,TAB,'JST to C code',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -757,9 +746,10 @@ PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
 BACK 	DC.B 'back from the dead!',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.84 (18/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.85 (18/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START				    						; last line of source
+
 
 
 
