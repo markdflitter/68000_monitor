@@ -538,14 +538,9 @@ DOWNLOAD_DONE
 G
 	MOVE.L D7,A0										; grab the address accumulator and then clear it
 	MOVE.L #0,D7
-	MOVE.L #$2FFFFC,A7   								; set up the stack pointer 
 
-	JSR (A0)
-	
-	LEA BACK(PC),A0
-	PRINT_STR A0,D0
-	
-	BRA MAIN_LOOP
+	JMP (A0)
+		
 Z
 	MOVE.L #RAM,A0									; address of RAM
 	ADD.L #$100000,A0
@@ -745,10 +740,10 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-BACK 	DC.B 'back from the dead!',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.85 (18/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.87 (20/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 
 	END	START				    						; last line of source
+
 
 
 
