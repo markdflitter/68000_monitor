@@ -1,4 +1,4 @@
-*-----------------------------------------------------------
+*------------------------------------------------------------
 * Title			MDFmon 
 * Written by 	Mark Flitter
 * Date			March 2021
@@ -232,7 +232,7 @@ DOWNLOAD_BYTE MACRO
 	WHILE.B \4 <GT> 0 DO
 		LSL.L #4,\1									; it's OK to do this first, because we are either starting from 0, 
 		DOWNLOAD \2									; or we are reading the next byte along, so need to shift up the previous one
-		;PRINT_CHAR \2,\3
+		PRINT_CHAR \2,\3
 		HEX2BIN \2,\2,\6
 		OR.B \2,\1
 		SUB.B #1,\4
@@ -267,12 +267,16 @@ WAIT_FOR_COMPLETE\@
 ; A0 - address of string to print 
 
 ; start vector
-STACK	DC.L 0										; STACK
+STACK	DC.L $2FFFFC								; STACK
 RESET	DC.L START									; RESET
+VECS	DC.L BUS_ERROR_HANDLER						; BUS ERROR
+		DC.L BUS_ERROR_HANDLER						; ADDRESS ERROR
 
 ; start of program  
 START
 	MOVE.B #0,DISPLAY
+
+	MOVE.L #$2FFFFC,A7								; reset the stack pointer, in case we got here through a bus error
 
 ; reset the UART in case of warm start
 	MOVE.B #$A,DUART_CRA							; disable rx & tx
@@ -310,10 +314,15 @@ START
 	PRINT_CHAR #0,D1
 
 	MOVE.B #1,DISPLAY
-
+	
 	PRINT_CRLF D1,A0
 	LEA VERSION(PC),A0
 	PRINT_STR A0,D3
+
+	LEA END,A0
+	MOVE.L A0,D0
+	PRINT_REG D0,D1,D2,D3,A0
+	PRINT_CRLF D1,A0
 
 	LEA HELPPROMPT(PC),A0
 	PRINT_STR A0,D3
@@ -368,6 +377,9 @@ GET_INPUT
 
 	CMP.B #'z',D2
 	BEQ Z   
+
+	CMP.B #'x',D2
+	BEQ X
 
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
@@ -449,18 +461,18 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	CMP.B #'S',D1									; found S?
 	BNE WAIT_FOR_SRECORD							; nope, keep waiting
 	
-	;PRINT_CHAR #'S',D5								; print the S
+	PRINT_CHAR #'S',D5								; print the S
 	ADD.L #1,D0										; read another S record, increment count
 	
 	DOWNLOAD D1										; read the record identifier and echo it back
-	;PRINT_CHAR D1,D5
+	PRINT_CHAR D1,D5
 
 	MOVE.L #0,D2									; clear the checksum
 
 	DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4
 
 	IF.B D1 <EQ> #'0' THEN.L						; header, just ignore it
-		;PRINT_CRLF D5,A4
+		PRINT_CRLF D5,A4
 		BRA WAIT_FOR_SRECORD
 	ELSE
 		IF.B D1 <EQ> #'1' OR.B D1 <EQ> #'2' THEN.L	; 16 or 24 bit address data record
@@ -499,7 +511,7 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 
 				MOVE.L #$FFFFFFFF,D1				; done
 			ELSE
-				;PRINT_CRLF D5,A4
+				PRINT_CRLF D5,A4
 
 				LEA UNREC(PC),A4					; warn for unrecognised type
 				PRINT_STR A4,D5
@@ -512,13 +524,14 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	ENDI
 
 	DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4
-	;PRINT_CRLF D5,A4
+	PRINT_CRLF D5,A4
 
 	IF.B D2 <NE> #$FF THEN.L
 		LEA CS_FAILURE(PC),A4						; warn for mismatched checksum
 		PRINT_STR A4,D5
-		PRINT_REG D0,D5,D2,D6,A4
+		PRINT_REG D0,D5,D3,D6,A4
 		PRINT_CRLF D5,A4
+		
 		BRA MAIN_LOOP
 	ENDI
 
@@ -596,12 +609,10 @@ L
 	PRINT_CRLF D2,A1
 
 	MOVE.L D1,A0									; target address
+	MOVE.L D1,A3									; keep a copy for later
 
 	MOVE.L D7,A1									; address accumulator -> address register
 	MOVE.L #0,D7									; clear the now used address accumulator
-
-	ADD.L #8,A1										; skip the initial stack pointer and reset vector for now
-	SUB.L #8,D0
 
 	UNPROTECT
 
@@ -628,15 +639,35 @@ L
 		ADD.L #2,A0
 		ADD.L #2,A1
 	ENDW
+													; we're done, can now update the SP and start vector
+	PROGRAM #$FFFC, $2, D2							; SP
+	PROGRAM #$002F, $0, D2			
 
-	PROGRAM #0, $0, D2								; we're done, can now update the SP and start vector
-	PROGRAM #0, $2, D2								; setting this seems to break the download code, I guess the stack is being used somehow!!!
-
-	PROGRAM D1, $6, D2
+	PROGRAM D1, $6, D2								; PC
 	LSR.L #8,D1
 	LSR.L #8,D1
 	PROGRAM D1, $4, D2
+	
+	LEA BUS_ERROR_HANDLER,A0						; set the bus error handler - this is deliberately not relative to get the offset from $ORG	
+	LEA START,A1
+	ADD.L A3,A0
+	SUB.L A1,A0	
+	MOVE.L A0,D0
+	PROGRAM D0, $A, D2								; write it
+	LSR.L #8,D0
+	LSR.L #8,D0
+	PROGRAM D0, $8, D2
 
+	LEA BUS_ERROR_HANDLER,A0						; set the bus error handler - this is deliberately not relative to get the offset from $ORG	
+	LEA START,A1
+	ADD.L A3,A0
+	SUB.L A1,A0	
+	MOVE.L A0,D0
+	PROGRAM D0, $E, D2								; write it
+	LSR.L #8,D0
+	LSR.L #8,D0
+	PROGRAM D0, $C, D2
+														
 	PROTECT
 
 	BRA MAIN_LOOP
@@ -661,7 +692,6 @@ P
 	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
 
-	PRINT_CHAR '#',D3
 	PRINT_REG D0,D3,D4,D5,A2
 
 	LEA TO(PC),A2
@@ -707,7 +737,25 @@ M
 	ENDW
 	
 	BRA MAIN_LOOP
-	
+
+X
+	LEA STATUS_REGISTER(PC),A2
+	PRINT_STR A2,D3
+
+	MOVE SR,D0
+	PRINT_REG D0,D3,D4,D5,A2
+	PRINT_CRLF D3,A2
+
+	LEA STACK_POINTER(PC),A2
+	PRINT_STR A2,D3
+
+	MOVE.L SP,D0
+	PRINT_REG D0,D3,D4,D5,A2
+	PRINT_CRLF D3,A2
+
+	BRA MAIN_LOOP
+
+		
 HEX_DIGIT
 	LSL.L #4,D7											; add the next digit in the next 4 bits
 	HEX2BIN D2,D2,A0
@@ -716,6 +764,25 @@ HEX_DIGIT
 
 	SIMHALT												; halt simulator
 
+; exceptions
+BUS_ERROR_HANDLER
+
+	LEA BUS_ERROR(PC),A0
+	PRINT_STR A0,D0
+	
+	MOVE.L 2(SP),D1
+	PRINT_REG D1,D2,D3,D4,A0
+
+	LEA FROM(PC),A0
+	PRINT_STR A0,D0
+
+	MOVE.L 10(SP),D1
+	PRINT_REG D1,D2,D3,D4,A0
+	PRINT_CRLF D0,A0
+	
+	MOVE.L 4,A0
+	JMP (A0)
+		
 ; strings
 HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
 HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
@@ -728,6 +795,7 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
 		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
+		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -740,9 +808,15 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
-VERSION DC.B 'MDF-mon V1.87 (20/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
-
+STACK_POINTER DC.B 'SP: ',NULL
+STATUS_REGISTER DC.B 'SR: ',NULL
+BUS_ERROR DC.B 'Bus/address error at address ',NULL	
+FROM DC.B ' from ',NULL
+VERSION DC.B 'MDF-mon V1.98 (24/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 
 
