@@ -27,6 +27,7 @@ LF					EQU 10
 
 ROM					EQU $0
 RAM					EQU $200000
+STACK_ADDRESS		EQU $2E0000
 
 DUART_BASE			EQU $C00000
 DUART_MRA_			EQU $0
@@ -278,10 +279,10 @@ PROGRAM_VECTOR MACRO
 ; A0 - address of string to print 
 
 ; start vector
-STACK	DC.L $2FFFFC								; STACK
-RESET	DC.L START									; RESET
+STACK	DC.L STACK_ADDRESS						; STACK
+RESET	DC.L START								; RESET
 VECS	DC.L BUS_ERROR_HANDLER						; BUS ERROR
-		DC.L BUS_ERROR_HANDLER						; ADDRESS ERROR
+		DC.L BUS_ERROR_HANDLER					; ADDRESS ERROR
 		DC.L ILLEGAL_HANDLER						; ILLEGAL INSTRUCTION
 		DC.L UNHANDLED_HANDLER
 		DC.L UNHANDLED_HANDLER
@@ -538,11 +539,11 @@ USER		DC.L UNHANDLED_HANDLER
 START
 	MOVE.B #0,DISPLAY
 
-	MOVE.L #$2FFFFC,A7								; reset the stack pointer, in case we got here through an exception
+	MOVE.L #STACK_ADDRESS,A7
 
 ; reset the UART in case of warm start
-	MOVE.B #$A,DUART_CRA							; disable rx & tx
-	MOVE.B #$A,DUART_CRB							; disable rx & tx
+	MOVE.B #$A,DUART_CRA								; disable rx & tx
+	MOVE.B #$A,DUART_CRB								; disable rx & tx
 	
 	FOR D1 = #$50 DOWNTO #$10 BY #$10 DO
 		MOVE.B D1,DUART_CRA							; reset everyting
@@ -556,22 +557,22 @@ START
 	
 ;initialise UART
 	MOVE.B #$0,DUART_ACR
-	MOVE.B #$0,DUART_IMR							; no interrupts, please
+	MOVE.B #$0,DUART_IMR								; no interrupts, please
 	MOVE.B #$0,DUART_OPCR							; enable all outputs
 
 ; channel A
 	MOVE.B #$13,DUART_MRA							; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRA							; 1 stop bit
 	MOVE.B #$CC,DUART_CSRA							; 38400 baud
-	MOVE.B #$5,DUART_CRA							; enable rx & tx
+	MOVE.B #$5,DUART_CRA								; enable rx & tx
 
 ; channel B
 	MOVE.B #$13,DUART_MRB			 				; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRB							; 1 stop bit
 	MOVE.B #$CC,DUART_CSRB							; 38400 baud
-	MOVE.B #$5,DUART_CRB							; enable rx & tx
+	MOVE.B #$5,DUART_CRB								; enable rx & tx
 
-	PRINT_CHAR #0,D1								; some non-printing char to flush out the serial port
+	PRINT_CHAR #0,D1									; some non-printing char to flush out the serial port
 	PRINT_CHAR #0,D1
 	PRINT_CHAR #0,D1
 
@@ -591,7 +592,7 @@ START
 
 	PRINT_CRLF D3,A0
 
-	MOVE.L #0,D7									; address accumulator
+	MOVE.L #0,D7										; address accumulator
 
 	MOVE.B #2,DISPLAY
 MAIN_LOOP
@@ -908,11 +909,16 @@ L
 
 	LEA SP(PC),A2
 	PRINT_STR A2,D2
+	
+	LEA STACK,A0
+	ADD.L A4,A0
+	MOVE.L (A0),D0
+	PRINT_REG D0,D2,D3,D4,A3
 	PRINT_CRLF D2,A2
 	
-	PROGRAM #$FFFC, $2, D2							; SP, should read this from above
-	PROGRAM #$002F, $0, D2			
-
+	MOVE.L #0,A0
+	PROGRAM_VECTOR D0,A0,D2
+	
 	LEA VECTORS(PC),A2
 	PRINT_STR A2,D2
 
@@ -1112,7 +1118,7 @@ READING DC.B 'reading ',NULL
 WRITING DC.B 'writing ',NULL
 FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled exception at ',NULL
-VERSION DC.B 'MDF-mon V1.109 (25/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.112 (25/04/2021)',CR,LF,NULL		; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
