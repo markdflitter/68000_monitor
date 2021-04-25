@@ -795,7 +795,7 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
 		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
-		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
+		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -812,9 +812,10 @@ STACK_POINTER DC.B 'SP: ',NULL
 STATUS_REGISTER DC.B 'SR: ',NULL
 BUS_ERROR DC.B 'Bus/address error at address ',NULL	
 FROM DC.B ' from ',NULL
-VERSION DC.B 'MDF-mon V1.98 (24/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.101 (25/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
