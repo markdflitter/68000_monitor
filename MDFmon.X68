@@ -882,6 +882,9 @@ L
 	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
 
+	LEA CODE(PC),A2
+	PRINT_STR A2,D2
+	
 	MOVE.L A1,D2
 	PRINT_REG D2,D3,D4,D5,A2
 
@@ -902,24 +905,32 @@ L
 		ADD.L #2,A0
 		ADD.L #2,A1
 	ENDW
-													; we're done, can now update the SP
+
+	LEA SP(PC),A2
+	PRINT_STR A2,D2
+	PRINT_CRLF D2,A2
+	
 	PROGRAM #$FFFC, $2, D2							; SP, should read this from above
 	PROGRAM #$002F, $0, D2			
 
+	LEA VECTORS(PC),A2
+	PRINT_STR A2,D2
+
 	FOR A0 = #RESET TO #START-4 BY #4 DO
-		MOVE.L A0,D0	
-		PRINT_REG D0,D2,D3,D4,A3
 
 		MOVE.L A0,A1
 		ADD.L A4,A1
-		
-		MOVE.L A1,D0	
-		PRINT_REG D0,D2,D3,D4,A3
-		
+			
 		MOVE.L (A1),D0	
 		ADD.L D1,D0
 		SUB.L #START,D0
 		PRINT_REG D0,D2,D3,D4,A3
+
+		LEA TO(PC),A3
+		PRINT_STR A3,D3
+
+		MOVE.L A0,D2
+		PRINT_REG D2,D3,D4,D5,A3
 		
 		PRINT_CRLF D2,A3
 		
@@ -1087,6 +1098,9 @@ RAM_ERROR	DC.B '! RAM error at: ',NULL
 BIN2HEX_LUT	DC.B '0123456789ABCDEF'
 HEX2BIN_LUT	DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING	DC.B 'Loading EEPROM...',CR,LF,NULL
+CODE		DC.B 'Writing code: ',NULL
+SP		DC.B 'Setting initial stack pointer to ',NULL
+VECTORS	DC.B 'Writing vectors',CR,LF,NULL
 CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
