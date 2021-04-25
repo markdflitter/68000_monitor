@@ -419,21 +419,20 @@ R
 	BRA MAIN_LOOP
 
 W
-	MOVE #7,D6										; 7 bytes left to read
-	
-READ_DATA_TO_POKE
-	LSL.L #4,D5										; make what we have so far more significant
-	WAIT_CHAR D2,D3									; next character -> D2
-	HEX2BIN D2,D2,A0								; convert to binary -> D2
-	OR.B D2,D5
-	DBEQ D6,READ_DATA_TO_POKE
-	
-	MOVE.L D7,A0									; address accumulator -> address register
-	MOVE.L #0,D7									; clear the now used address accumulator
-	
-	MOVE.L D5,(A0)									; write the data
+	FOR D6 = #0 TO #7 DO								; read 4 bytes
+		LSL.L #4,D5										; make what we have so far more significant
+		WAIT_CHAR D2,D3									; next character -> D2
+		HEX2BIN D2,D2,A0								; convert to binary -> D2
+		OR.B D2,D5
+	ENDF
 
 	PRINT_CRLF D3,A0
+
+	MOVE.L D7,A0									; address accumulator -> address register
+	MOVE.L #0,D7									; clear the now used address accumulator
+
+	MOVE.L D5,(A0)									; write the data
+
 	BRA MAIN_LOOP
 
 ; register map for S
@@ -768,8 +767,23 @@ HEX_DIGIT
 BUS_ERROR_HANDLER
 
 	LEA BUS_ERROR(PC),A0
-	PRINT_STR A0,D0
+	PRINT_STR A0,D1
+
+	MOVE.L #0,D0
+	MOVE.W (SP),D0
+
+	BTST #4,D0
+	BEQ WRITE
 	
+	LEA READING(PC),A0
+	PRINT_STR A0,D1
+
+	BRA CONTINUE	
+WRITE
+	LEA WRITING(PC),A0
+	PRINT_STR A0,D1
+
+CONTINUE
 	MOVE.L 2(SP),D1
 	PRINT_REG D1,D2,D3,D4,A0
 
@@ -799,20 +813,22 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
-CS_FAILURE	DC.B 'W: CS failure at ',NULL
-RAM_ERROR	DC.B 'W: RAM error at: ',NULL
+CS_FAILURE	DC.B '! CS failure at ',NULL
+RAM_ERROR	DC.B '! RAM error at: ',NULL
 BIN2HEX_LUT	DC.B '0123456789ABCDEF'
 HEX2BIN_LUT	DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-LOADING	DC.B 'Loading EEPROM...',CR,LF,NULL
+LOADING	DC.B 'Loadi:wng EEPROM...',CR,LF,NULL
 CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
 STACK_POINTER DC.B 'SP: ',NULL
 STATUS_REGISTER DC.B 'SR: ',NULL
-BUS_ERROR DC.B 'Bus/address error at address ',NULL	
+BUS_ERROR DC.B '* Bus/address error ',NULL
+READING DC.B 'reading ',NULL
+WRITING DC.B 'writing ',NULL
 FROM DC.B ' from ',NULL
-VERSION DC.B 'MDF-mon V1.101 (25/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.103 (25/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
