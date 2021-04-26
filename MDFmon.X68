@@ -38,6 +38,8 @@ DUART_TXA_			EQU $3
 DUART_RXA_			EQU $3
 DUART_ACR_			EQU $4
 DUART_IMR_			EQU $5
+DUART_CTUR_			EQU $6
+DUART_CTLR_			EQU $7
 DUART_MRB_			EQU $8
 DUART_CSRB_			EQU $9
 DUART_SRB_			EQU $9
@@ -65,6 +67,8 @@ DUART_RXB			EQU DUART_BASE+2*DUART_RXB_+1
 
 DUART_ACR			EQU DUART_BASE+2*DUART_ACR_+1
 DUART_IMR			EQU DUART_BASE+2*DUART_IMR_+1
+DUART_CTUR			EQU DUART_BASE+2*DUART_CTUR_+1
+DUART_CTLR			EQU DUART_BASE+2*DUART_CTLR_+1
 DUART_IVR			EQU DUART_BASE+2*DUART_IVR_+1
 DUART_OPCR			EQU DUART_BASE+2*DUART_OPCR_+1
 DUART_SET_OPR		EQU DUART_BASE+2*DUART_SET_OPR_+1
@@ -343,7 +347,7 @@ VECS	DC.L BUS_ERROR_HANDLER						; BUS ERROR
 		DC.L UNHANDLED_HANDLER
 		DC.L UNHANDLED_HANDLER
 		DC.L UNHANDLED_HANDLER
-USER		DC.L UNHANDLED_HANDLER
+USER	DC.L UNHANDLED_HANDLER
 		DC.L UNHANDLED_HANDLER
 		DC.L UNHANDLED_HANDLER
 		DC.L UNHANDLED_HANDLER
@@ -556,23 +560,27 @@ START
 	ENDF
 	
 ;initialise UART
-	MOVE.B #$0,DUART_ACR
-	MOVE.B #$0,DUART_IMR								; no interrupts, please
-	MOVE.B #$0,DUART_OPCR							; enable all outputs
+	MOVE.B #$0,DUART_IMR							; no interrupts, please
+	MOVE.B #$FF,DUART_CTUR
+	MOVE.B #$FF,DUART_CTLR
+	MOVE.B #$70,DUART_ACR
+	MOVE.B #$4,DUART_OPCR							; enable counter
 
 ; channel A
 	MOVE.B #$13,DUART_MRA							; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRA							; 1 stop bit
 	MOVE.B #$CC,DUART_CSRA							; 38400 baud
-	MOVE.B #$5,DUART_CRA								; enable rx & tx
+	MOVE.B #$5,DUART_CRA							; enable rx & tx
 
 ; channel B
 	MOVE.B #$13,DUART_MRB			 				; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRB							; 1 stop bit
 	MOVE.B #$CC,DUART_CSRB							; 38400 baud
-	MOVE.B #$5,DUART_CRB								; enable rx & tx
+	MOVE.B #$5,DUART_CRB							; enable rx & tx
 
-	PRINT_CHAR #0,D1									; some non-printing char to flush out the serial port
+	;MOVE.B DUART_SET_OPR,D0							; start timer
+
+	PRINT_CHAR #0,D1								; some non-printing char to flush out the serial port
 	PRINT_CHAR #0,D1
 	PRINT_CHAR #0,D1
 
@@ -641,8 +649,12 @@ GET_INPUT
 	CMP.B #'z',D2
 	BEQ Z   
 
-	CMP.B #'x',D2
-	BEQ X
+	CMP.B #',',D2
+	BEQ ON
+
+	CMP.B #'.',D2
+	BEQ OFF
+
 
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
@@ -650,6 +662,22 @@ GET_INPUT
 	BRA MAIN_LOOP
 
 ; commands
+ON
+	LEA FROM(PC),A0
+	PRINT_STR A0,D3
+
+	MOVE.B #$8,DUART_SET_OPR
+
+	BRA MAIN_LOOP
+	
+
+OFF
+	LEA FROM(PC),A0
+	PRINT_STR A0,D3
+
+	MOVE.B #$8,DUART_RESET_OPR
+	BRA MAIN_LOOP
+
 H
 	LEA HELP(PC),A0
 	BRA PRINTSTR
@@ -1143,6 +1171,8 @@ END		DC.B 0
 
 
 404
+
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
