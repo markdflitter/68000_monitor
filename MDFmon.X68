@@ -541,13 +541,15 @@ USER	DC.L TICK_HANDLER
 		DC.L UNHANDLED_HANDLER
 ; start of program  
 START
+	MOVE.L #STACK_ADDRESS,A7
 	MOVE.B #0,DISPLAY
 
-	MOVE.L #STACK_ADDRESS,A7
+	MOVE.L #0,D0
+	MOVE.B DUART_IVR,D0								; warm start?
 
 ; reset the UART in case of warm start
-	MOVE.B #$A,DUART_CRA								; disable rx & tx
-	MOVE.B #$A,DUART_CRB								; disable rx & tx
+	MOVE.B #$A,DUART_CRA							; disable rx & tx
+	MOVE.B #$A,DUART_CRB							; disable rx & tx
 	
 	FOR D1 = #$50 DOWNTO #$10 BY #$10 DO
 		MOVE.B D1,DUART_CRA							; reset everyting
@@ -569,13 +571,13 @@ START
 ; channel A
 	MOVE.B #$13,DUART_MRA							; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRA							; 1 stop bit
-	MOVE.B #$CC,DUART_CSRA							; 38400 baud
+	MOVE.B #$66,DUART_CSRA							; 115K  baud
 	MOVE.B #$5,DUART_CRA							; enable rx & tx
 
 ; channel B
 	MOVE.B #$13,DUART_MRB			 				; no flow control, no parity, 8 data bits
 	MOVE.B #$07,DUART_MRB							; 1 stop bit
-	MOVE.B #$CC,DUART_CSRB							; 38400 baud
+	MOVE.B #$66,DUART_CSRB							; 115K baud
 	MOVE.B #$5,DUART_CRB							; enable rx & tx
 	MOVE.B #64,DUART_IVR
 	MOVE.B #8,DUART_IMR
@@ -583,6 +585,16 @@ START
 	PRINT_CHAR #0,D1								; some non-printing char to flush out the serial port
 	PRINT_CHAR #0,D1
 	PRINT_CHAR #0,D1
+	
+	IF D0 <EQ> #$0F THEN
+		MOVE.B DUART_CRA,D0							; BRG test mode
+
+		LEA COLD_START(PC),A0
+		PRINT_STR A0,D0
+	ELSE
+		LEA WARM_START(PC),A0
+		PRINT_STR A0,D0
+	ENDI
 
 	MOVE.B #1,DISPLAY
 	
@@ -600,11 +612,10 @@ START
 
 	PRINT_CRLF D3,A0
 
-	MOVE.L #0,D7										; address accumulator
+	MOVE.L #0,D7									; address accumulator
 
 	MOVE.B #2,DISPLAY
 	
-	;AND.W #$F8FF,SR
 MAIN_LOOP
 	LEA PROMPT(PC),A0
 	PRINT_STR A0,D3
@@ -656,6 +667,12 @@ GET_INPUT
 
 	CMP.B #'i',D2
 	BEQ I
+
+	CMP.B #'o',D2
+	BEQ O
+
+	CMP.B #'#',D2
+	BEQ HASH
 
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
@@ -887,14 +904,19 @@ L
 	MOVE.L D1,A3									; keep a copy for later
 
 	MOVE.L D7,A1									; address accumulator -> address register
-	ADD.L #START,A1								; skip the vectors
+	ADD.L #START,A1									; skip the vectors
 	MOVE.L D7,A4									; keep a clean copy for later
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	UNPROTECT
+	UNPROTECT										; important to only unprotect when we are fully committed (ie, can't escape)
+							
+	FOR D7 = #$0 TO #$FFFFFFFF DO					; dead timing loop to wait for unprotect
+		NOP
+	ENDF
 
-	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
+	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
+	
 
 	LEA CODE(PC),A2
 	PRINT_STR A2,D2
@@ -915,7 +937,9 @@ L
 
 		MOVE.B (A1),DISPLAY
 		PROGRAM (A1),(A0),D2
-
+		
+		;PRINT_CHAR #'.',D7
+		
 		ADD.L #2,A0
 		ADD.L #2,A1
 	ENDW
@@ -975,7 +999,11 @@ P
 	MOVE.L D7,A0									; address accumulator -> target address register
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	UNPROTECT
+	UNPROTECT										; important to only unprotect when we are fully committed (ie, can't escape)
+							
+	FOR D7 = #$0 TO #$FFFFFFFF DO					; dead timing loop to wait for unprotect
+		NOP
+	ENDF
 			 
 	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
@@ -1047,6 +1075,15 @@ X
 I
 	AND.W #$F8FF,SR
 	BRA MAIN_LOOP
+	
+O
+	OR.W #$0700,SR
+	BRA MAIN_LOOP
+		
+HASH
+	PROTECT
+	BRA MAIN_LOOP
+
 
 
 HEX_DIGIT
@@ -1133,8 +1170,11 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
+		DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
 		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
 		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF,NULL
+		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF,NULL
+		DC.B '[o]',TAB,TAB,TAB,'disable interrupts',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -1160,9 +1200,13 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.118 (27/04/2021)',CR,LF,NULL		; this is the last line on purpose, so if it prints, we can be sure we got it all
+COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
+WARM_START DC.B 'Warm start - phew',CR,LF,NULL
+VERSION DC.B 'MDF-mon V1.124 (28/04/2021)',CR,LF,NULL		; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 *~Font name~Courier New~
 *~Font size~10~
