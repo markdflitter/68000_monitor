@@ -1,6 +1,6 @@
 00000400 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 28/04/2021 18:46:57
+Created On: 28/04/2021 18:39:36
 
 00000000                             1  *------------------------------------------------------------
 00000000                             2  * Title         MDFmon 
@@ -645,7 +645,7 @@ Created On: 28/04/2021 18:46:57
 0000050A  6600 002C                641s     BNE _00000000
 0000050E  1039 00C00005            642          MOVE.B DUART_CRA,D0                         ; BRG test mode
 00000514                           643  
-00000514  41FA 18BF                644          LEA COLD_START(PC),A0
+00000514  41FA 18C1                644          LEA COLD_START(PC),A0
 00000518                           645m         PRINT_STR A0,D0
 00000518                           646m LOOP_4
 00000518  0C10 0000                647m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -669,7 +669,7 @@ Created On: 28/04/2021 18:46:57
 00000534                           665      ELSE
 00000534  6000 0022                666s     BRA _00000001
 00000538                           667s _00000000
-00000538  41FA 18AF                668          LEA WARM_START(PC),A0
+00000538  41FA 18B1                668          LEA WARM_START(PC),A0
 0000053C                           669m         PRINT_STR A0,D0
 0000053C                           670m LOOP_6
 0000053C  0C10 0000                671m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -696,7 +696,7 @@ Created On: 28/04/2021 18:46:57
 00000558  13FC 0001 00E00001       692      MOVE.B #1,DISPLAY
 00000560                           693      
 00000560                           694m     PRINT_CRLF D1,A0
-00000560  41FA 17DB                695m     LEA CRLF(PC),A0
+00000560  41FA 17DD                695m     LEA CRLF(PC),A0
 00000564                           696mm     PRINT_STR A0,D1
 00000564                           697mm LOOP_9
 00000564  0C10 0000                698mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -718,7 +718,7 @@ Created On: 28/04/2021 18:46:57
 00000580                           714mm EXIT_9
 00000580                           715mm     ENDM
 00000580                           716m     ENDM
-00000580  41FA 187B                717      LEA VERSION(PC),A0
+00000580  41FA 187D                717      LEA VERSION(PC),A0
 00000584                           718m     PRINT_STR A0,D3
 00000584                           719m LOOP_11
 00000584  0C10 0000                720m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -740,10 +740,10 @@ Created On: 28/04/2021 18:46:57
 000005A0                           736m EXIT_11
 000005A0                           737m     ENDM
 000005A0                           738  
-000005A0  41F9 00001E1B            739      LEA END,A0
+000005A0  41F9 00001E1D            739      LEA END,A0
 000005A6  2008                     740      MOVE.L A0,D0
 000005A8                           741m     PRINT_REG D0,D1,D2,D3,A0
-000005A8  41FA 1799                742m     LEA OX(PC),A0
+000005A8  41FA 179B                742m     LEA OX(PC),A0
 000005AC                           743mm     PRINT_STR A0,D1
 000005AC                           744mm LOOP_14
 000005AC  0C10 0000                745mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -767,7 +767,7 @@ Created On: 28/04/2021 18:46:57
 000005C8  7607                     763m     MOVE.L #7,D3                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000005CA                           764m LOOP_13
 000005CA                           765mm     BIN2HEX D0,D2,A0
-000005CA  41FA 16F3                766mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+000005CA  41FA 16F5                766mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 000005CE  E998                     767mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000005D0  1400                     768mm     MOVE.B D0,D2
 000005D2  0282 0000000F            769mm     ANDI.L #$F,D2
@@ -789,7 +789,7 @@ Created On: 28/04/2021 18:46:57
 000005EE  57CB FFDA                785m     DBEQ D3,LOOP_13
 000005F2                           786m     ENDM
 000005F2                           787m     PRINT_CRLF D1,A0
-000005F2  41FA 1749                788m     LEA CRLF(PC),A0
+000005F2  41FA 174B                788m     LEA CRLF(PC),A0
 000005F6                           789mm     PRINT_STR A0,D1
 000005F6                           790mm LOOP_19
 000005F6  0C10 0000                791mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -835,7 +835,7 @@ Created On: 28/04/2021 18:46:57
 00000632                           831m     ENDM
 00000632                           832  
 00000632                           833m     PRINT_CRLF D3,A0
-00000632  41FA 1709                834m     LEA CRLF(PC),A0
+00000632  41FA 170B                834m     LEA CRLF(PC),A0
 00000636                           835mm     PRINT_STR A0,D3
 00000636                           836mm LOOP_24
 00000636  0C10 0000                837mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -863,7 +863,7 @@ Created On: 28/04/2021 18:46:57
 00000654  13FC 0002 00E00001       859      MOVE.B #2,DISPLAY
 0000065C                           860      
 0000065C                           861  MAIN_LOOP
-0000065C  41FA 16E2                862      LEA PROMPT(PC),A0
+0000065C  41FA 16E4                862      LEA PROMPT(PC),A0
 00000660                           863m     PRINT_STR A0,D3
 00000660                           864m LOOP_26
 00000660  0C10 0000                865m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -952,7 +952,7 @@ Created On: 28/04/2021 18:46:57
 000006EC  6700 1012                948      BEQ M
 000006F0                           949  
 000006F0                           950m     PRINT_CRLF D3,A0
-000006F0  41FA 164B                951m     LEA CRLF(PC),A0
+000006F0  41FA 164D                951m     LEA CRLF(PC),A0
 000006F4                           952mm     PRINT_STR A0,D3
 000006F4                           953mm LOOP_32
 000006F4  0C10 0000                954mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -1005,7 +1005,7 @@ Created On: 28/04/2021 18:46:57
 00000758  B43C 0023               1001      CMP.B #'#',D2
 0000075C  6700 1166               1002      BEQ HASH
 00000760                          1003  
-00000760  41FA 14FB               1004      LEA HUH(PC),A0
+00000760  41FA 14FD               1004      LEA HUH(PC),A0
 00000764                          1005m     PRINT_STR A0,D3
 00000764                          1006m LOOP_34
 00000764  0C10 0000               1007m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -1035,7 +1035,7 @@ Created On: 28/04/2021 18:46:57
 00000788  6000 0006               1031      BRA PRINTSTR
 0000078C                          1032  
 0000078C                          1033  V
-0000078C  41FA 166F               1034      LEA VERSION(PC),A0
+0000078C  41FA 1671               1034      LEA VERSION(PC),A0
 00000790                          1035  PRINTSTR
 00000790                          1036m     PRINT_STR A0,D3    
 00000790                          1037m LOOP_36
@@ -1064,7 +1064,7 @@ Created On: 28/04/2021 18:46:57
 000007B2  7E00                    1060      MOVE.L #0,D7                                    ;clear the now used address accumulator
 000007B4  2410                    1061      MOVE.L (A0),D2                                  ; read the memory and print it
 000007B6                          1062m     PRINT_REG D2,D3,D4,D5,A0
-000007B6  41FA 158B               1063m     LEA OX(PC),A0
+000007B6  41FA 158D               1063m     LEA OX(PC),A0
 000007BA                          1064mm     PRINT_STR A0,D3
 000007BA                          1065mm LOOP_39
 000007BA  0C10 0000               1066mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -1088,7 +1088,7 @@ Created On: 28/04/2021 18:46:57
 000007D6  7A07                    1084m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000007D8                          1085m LOOP_38
 000007D8                          1086mm     BIN2HEX D2,D4,A0
-000007D8  41FA 14E5               1087mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+000007D8  41FA 14E7               1087mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 000007DC  E99A                    1088mm     ROL.L #4,D2                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000007DE  1802                    1089mm     MOVE.B D2,D4
 000007E0  0284 0000000F           1090mm     ANDI.L #$F,D4
@@ -1182,7 +1182,7 @@ Created On: 28/04/2021 18:46:57
 00000864                          1178m     ENDM
 00000864                          1179  
 00000864                          1180m     PRINT_CRLF D3,A0
-00000864  41FA 14D7               1181m     LEA CRLF(PC),A0
+00000864  41FA 14D9               1181m     LEA CRLF(PC),A0
 00000868                          1182mm     PRINT_STR A0,D3
 00000868                          1183mm LOOP_49
 00000868  0C10 0000               1184mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -1249,7 +1249,7 @@ Created On: 28/04/2021 18:46:57
 000008BE                          1245m     ENDC
 000008BE                          1246m     ENDM
 000008BE                          1247m         HEX2BIN D2,D2,A0                                ; convert to binary -> D2
-000008BE  41FA 140F               1248m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+000008BE  41FA 1411               1248m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 000008C2  0402 0030               1249m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 000008C6  C4BC 000000FF           1250m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
 000008CC  1430 2000               1251m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1262,7 +1262,7 @@ Created On: 28/04/2021 18:46:57
 000008D8  6FB6                    1258s     BLE _20000004
 000008DA                          1259  
 000008DA                          1260m     PRINT_CRLF D3,A0
-000008DA  41FA 1461               1261m     LEA CRLF(PC),A0
+000008DA  41FA 1463               1261m     LEA CRLF(PC),A0
 000008DE                          1262mm     PRINT_STR A0,D3
 000008DE                          1263mm LOOP_56
 000008DE  0C10 0000               1264mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -1446,7 +1446,7 @@ Created On: 28/04/2021 18:46:57
 000009F8                          1442mm 
 000009F8                          1443mm     ENDM
 000009F8                          1444mm         HEX2BIN D5,D5,A4
-000009F8  49FA 12D5               1445mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+000009F8  49FA 12D7               1445mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 000009FC  0405 0030               1446mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000A00  CABC 000000FF           1447mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000A06  1A34 5000               1448mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1467,7 +1467,7 @@ Created On: 28/04/2021 18:46:57
 00000A16  B23C 0030               1463s     CMP.B   #'0',D1
 00000A1A  6600 002A               1464s     BNE.L   _00000004
 00000A1E                          1465m         PRINT_CRLF D5,A4
-00000A1E  49FA 131D               1466m     LEA CRLF(PC),A4
+00000A1E  49FA 131F               1466m     LEA CRLF(PC),A4
 00000A22                          1467mm     PRINT_STR A4,D5
 00000A22                          1468mm LOOP_70
 00000A22  0C14 0000               1469mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -1549,7 +1549,7 @@ Created On: 28/04/2021 18:46:57
 00000AAC                          1545mm 
 00000AAC                          1546mm     ENDM
 00000AAC                          1547mm         HEX2BIN D5,D5,A4
-00000AAC  49FA 1221               1548mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000AAC  49FA 1223               1548mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000AB0  0405 0030               1549mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000AB4  CABC 000000FF           1550mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000ABA  1A34 5000               1551mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1612,7 +1612,7 @@ Created On: 28/04/2021 18:46:57
 00000B1E                          1608mm 
 00000B1E                          1609mm     ENDM
 00000B1E                          1610mm         HEX2BIN D5,D5,A4
-00000B1E  49FA 11AF               1611mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000B1E  49FA 11B1               1611mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000B22  0405 0030               1612mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000B26  CABC 000000FF           1613mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000B2C  1A34 5000               1614mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1680,7 +1680,7 @@ Created On: 28/04/2021 18:46:57
 00000B9A                          1676mm 
 00000B9A                          1677mm     ENDM
 00000B9A                          1678mm         HEX2BIN D5,D5,A4
-00000B9A  49FA 1133               1679mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000B9A  49FA 1135               1679mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000B9E  0405 0030               1680mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000BA2  CABC 000000FF           1681mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000BA8  1A34 5000               1682mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1753,7 +1753,7 @@ Created On: 28/04/2021 18:46:57
 00000C18                          1749mm 
 00000C18                          1750mm     ENDM
 00000C18                          1751mm         HEX2BIN D5,D5,A4
-00000C18  49FA 10B5               1752mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000C18  49FA 10B7               1752mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000C1C  0405 0030               1753mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000C20  CABC 000000FF           1754mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000C26  1A34 5000               1755mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1832,7 +1832,7 @@ Created On: 28/04/2021 18:46:57
 00000CA0                          1828mm 
 00000CA0                          1829mm     ENDM
 00000CA0                          1830mm         HEX2BIN D5,D5,A4
-00000CA0  49FA 102D               1831mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000CA0  49FA 102F               1831mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000CA4  0405 0030               1832mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000CA8  CABC 000000FF           1833mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000CAE  1A34 5000               1834mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1895,7 +1895,7 @@ Created On: 28/04/2021 18:46:57
 00000D12                          1891mm 
 00000D12                          1892mm     ENDM
 00000D12                          1893mm         HEX2BIN D5,D5,A4
-00000D12  49FA 0FBB               1894mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000D12  49FA 0FBD               1894mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000D16  0405 0030               1895mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000D1A  CABC 000000FF           1896mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000D20  1A34 5000               1897mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1958,7 +1958,7 @@ Created On: 28/04/2021 18:46:57
 00000D84                          1954mm 
 00000D84                          1955mm     ENDM
 00000D84                          1956mm         HEX2BIN D5,D5,A4
-00000D84  49FA 0F49               1957mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000D84  49FA 0F4B               1957mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000D88  0405 0030               1958mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000D8C  CABC 000000FF           1959mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000D92  1A34 5000               1960mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -1983,7 +1983,7 @@ Created On: 28/04/2021 18:46:57
 00000DA8  6000 0078               1979s     BRA _0000000B
 00000DAC                          1980s _0000000A
 00000DAC                          1981m                 PRINT_CRLF D5,A4
-00000DAC  49FA 0F8F               1982m     LEA CRLF(PC),A4
+00000DAC  49FA 0F91               1982m     LEA CRLF(PC),A4
 00000DB0                          1983mm     PRINT_STR A4,D5
 00000DB0                          1984mm LOOP_108
 00000DB0  0C14 0000               1985mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2006,7 +2006,7 @@ Created On: 28/04/2021 18:46:57
 00000DCC                          2002mm     ENDM
 00000DCC                          2003m     ENDM
 00000DCC                          2004  
-00000DCC  49FA 0EB8               2005                  LEA UNREC(PC),A4                    ; warn for unrecognised type
+00000DCC  49FA 0EBA               2005                  LEA UNREC(PC),A4                    ; warn for unrecognised type
 00000DD0                          2006m                 PRINT_STR A4,D5
 00000DD0                          2007m LOOP_110
 00000DD0  0C14 0000               2008m     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2041,7 +2041,7 @@ Created On: 28/04/2021 18:46:57
 00000DFE                          2037m 
 00000DFE                          2038m     ENDM
 00000DFE                          2039m                 PRINT_CRLF D5,A4
-00000DFE  49FA 0F3D               2040m     LEA CRLF(PC),A4
+00000DFE  49FA 0F3F               2040m     LEA CRLF(PC),A4
 00000E02                          2041mm     PRINT_STR A4,D5
 00000E02                          2042mm LOOP_114
 00000E02  0C14 0000               2043mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2119,7 +2119,7 @@ Created On: 28/04/2021 18:46:57
 00000E76                          2115mm 
 00000E76                          2116mm     ENDM
 00000E76                          2117mm         HEX2BIN D5,D5,A4
-00000E76  49FA 0E57               2118mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000E76  49FA 0E59               2118mm     LEA HEX2BIN_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000E7A  0405 0030               2119mm     SUB.B #'0',D5                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00000E7E  CABC 000000FF           2120mm     AND.L #$FF,D5                                   ; IGNORE THE TOP 3 BYTES
 00000E84  1A34 5000               2121mm     MOVE.B 0(A4,D5),D5                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -2136,7 +2136,7 @@ Created On: 28/04/2021 18:46:57
 00000E94                          2132m 
 00000E94                          2133m     ENDM
 00000E94                          2134m     PRINT_CRLF D5,A4
-00000E94  49FA 0EA7               2135m     LEA CRLF(PC),A4
+00000E94  49FA 0EA9               2135m     LEA CRLF(PC),A4
 00000E98                          2136mm     PRINT_STR A4,D5
 00000E98                          2137mm LOOP_122
 00000E98  0C14 0000               2138mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2162,7 +2162,7 @@ Created On: 28/04/2021 18:46:57
 00000EB4                          2158      IF.B D2 <NE> #$FF THEN.L
 00000EB4  B43C 00FF               2159s     CMP.B   #$FF,D2
 00000EB8  6700 0090               2160s     BEQ.L   _0000000C
-00000EBC  49FA 0DDF               2161          LEA CS_FAILURE(PC),A4                       ; warn for mismatched checksum
+00000EBC  49FA 0DE1               2161          LEA CS_FAILURE(PC),A4                       ; warn for mismatched checksum
 00000EC0                          2162m         PRINT_STR A4,D5
 00000EC0                          2163m LOOP_124
 00000EC0  0C14 0000               2164m     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2184,7 +2184,7 @@ Created On: 28/04/2021 18:46:57
 00000EDC                          2180m EXIT_124
 00000EDC                          2181m     ENDM
 00000EDC                          2182m         PRINT_REG D0,D5,D3,D6,A4
-00000EDC  49FA 0E65               2183m     LEA OX(PC),A4
+00000EDC  49FA 0E67               2183m     LEA OX(PC),A4
 00000EE0                          2184mm     PRINT_STR A4,D5
 00000EE0                          2185mm LOOP_127
 00000EE0  0C14 0000               2186mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2208,7 +2208,7 @@ Created On: 28/04/2021 18:46:57
 00000EFC  7C07                    2204m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00000EFE                          2205m LOOP_126
 00000EFE                          2206mm     BIN2HEX D0,D3,A4
-00000EFE  49FA 0DBF               2207mm     LEA BIN2HEX_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
+00000EFE  49FA 0DC1               2207mm     LEA BIN2HEX_LUT(PC),A4                          ; LOAD THE LOOKUP TABLE
 00000F02  E998                    2208mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00000F04  1600                    2209mm     MOVE.B D0,D3
 00000F06  0283 0000000F           2210mm     ANDI.L #$F,D3
@@ -2230,7 +2230,7 @@ Created On: 28/04/2021 18:46:57
 00000F22  57CE FFDA               2226m     DBEQ D6,LOOP_126
 00000F26                          2227m     ENDM
 00000F26                          2228m         PRINT_CRLF D5,A4
-00000F26  49FA 0E15               2229m     LEA CRLF(PC),A4
+00000F26  49FA 0E17               2229m     LEA CRLF(PC),A4
 00000F2A                          2230mm     PRINT_STR A4,D5
 00000F2A                          2231mm LOOP_132
 00000F2A  0C14 0000               2232mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2265,7 +2265,7 @@ Created On: 28/04/2021 18:46:57
 00000F56                          2261s _0000000D
 00000F56                          2262  DOWNLOAD_DONE
 00000F56                          2263m     PRINT_REG D0,D5,D6,D2,A1                        ; print out number of Srecords read
-00000F56  43FA 0DEB               2264m     LEA OX(PC),A1
+00000F56  43FA 0DED               2264m     LEA OX(PC),A1
 00000F5A                          2265mm     PRINT_STR A1,D5
 00000F5A                          2266mm LOOP_135
 00000F5A  0C11 0000               2267mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2289,7 +2289,7 @@ Created On: 28/04/2021 18:46:57
 00000F76  7407                    2285m     MOVE.L #7,D2                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00000F78                          2286m LOOP_134
 00000F78                          2287mm     BIN2HEX D0,D6,A1
-00000F78  43FA 0D45               2288mm     LEA BIN2HEX_LUT(PC),A1                          ; LOAD THE LOOKUP TABLE
+00000F78  43FA 0D47               2288mm     LEA BIN2HEX_LUT(PC),A1                          ; LOAD THE LOOKUP TABLE
 00000F7C  E998                    2289mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00000F7E  1C00                    2290mm     MOVE.B D0,D6
 00000F80  0286 0000000F           2291mm     ANDI.L #$F,D6
@@ -2310,7 +2310,7 @@ Created On: 28/04/2021 18:46:57
 00000F9C                          2306mm     ENDM
 00000F9C  57CA FFDA               2307m     DBEQ D2,LOOP_134
 00000FA0                          2308m     ENDM
-00000FA0  43FA 0CC2               2309      LEA READ(PC),A1
+00000FA0  43FA 0CC4               2309      LEA READ(PC),A1
 00000FA4                          2310m     PRINT_STR A1,D5
 00000FA4                          2311m LOOP_139
 00000FA4  0C11 0000               2312m     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2333,7 +2333,7 @@ Created On: 28/04/2021 18:46:57
 00000FC0                          2329m     ENDM
 00000FC0  2E08                    2330      MOVE.L A0,D7                                    ; set address accumulator to start address
 00000FC2                          2331m     PRINT_REG D7,D5,D6,D2,A1                        ; print out start address
-00000FC2  43FA 0D7F               2332m     LEA OX(PC),A1
+00000FC2  43FA 0D81               2332m     LEA OX(PC),A1
 00000FC6                          2333mm     PRINT_STR A1,D5
 00000FC6                          2334mm LOOP_142
 00000FC6  0C11 0000               2335mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2357,7 +2357,7 @@ Created On: 28/04/2021 18:46:57
 00000FE2  7407                    2353m     MOVE.L #7,D2                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00000FE4                          2354m LOOP_141
 00000FE4                          2355mm     BIN2HEX D7,D6,A1
-00000FE4  43FA 0CD9               2356mm     LEA BIN2HEX_LUT(PC),A1                          ; LOAD THE LOOKUP TABLE
+00000FE4  43FA 0CDB               2356mm     LEA BIN2HEX_LUT(PC),A1                          ; LOAD THE LOOKUP TABLE
 00000FE8  E99F                    2357mm     ROL.L #4,D7                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00000FEA  1C07                    2358mm     MOVE.B D7,D6
 00000FEC  0286 0000000F           2359mm     ANDI.L #$F,D6
@@ -2379,7 +2379,7 @@ Created On: 28/04/2021 18:46:57
 00001008  57CA FFDA               2375m     DBEQ D2,LOOP_141
 0000100C                          2376m     ENDM
 0000100C                          2377m     PRINT_CRLF D5,A4
-0000100C  49FA 0D2F               2378m     LEA CRLF(PC),A4
+0000100C  49FA 0D31               2378m     LEA CRLF(PC),A4
 00001010                          2379mm     PRINT_STR A4,D5
 00001010                          2380mm LOOP_147
 00001010  0C14 0000               2381mm     CMP.B #NULL,(A4)                                ; 0 -> DONE
@@ -2448,7 +2448,7 @@ Created On: 28/04/2021 18:46:57
 00001082                          2444          IF.L D2 <NE> D1 THEN
 00001082  B481                    2445s     CMP.L   D1,D2
 00001084  6700 0090               2446s     BEQ _0000000E
-00001088  43FA 0C24               2447              LEA RAM_ERROR(PC),A1
+00001088  43FA 0C26               2447              LEA RAM_ERROR(PC),A1
 0000108C                          2448m             PRINT_STR A1,D1
 0000108C                          2449m LOOP_149
 0000108C  0C11 0000               2450m     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2472,7 +2472,7 @@ Created On: 28/04/2021 18:46:57
 000010A8  2208                    2468              MOVE.L A0,D1
 000010AA  5981                    2469              SUB.L #4,D1
 000010AC                          2470m             PRINT_REG D1,D3,D2,D6,A1                ; print out failure address
-000010AC  43FA 0C95               2471m     LEA OX(PC),A1
+000010AC  43FA 0C97               2471m     LEA OX(PC),A1
 000010B0                          2472mm     PRINT_STR A1,D3
 000010B0                          2473mm LOOP_152
 000010B0  0C11 0000               2474mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2496,7 +2496,7 @@ Created On: 28/04/2021 18:46:57
 000010CC  7C07                    2492m     MOVE.L #7,D6                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000010CE                          2493m LOOP_151
 000010CE                          2494mm     BIN2HEX D1,D2,A1
-000010CE  43FA 0BEF               2495mm     LEA BIN2HEX_LUT(PC),A1                          ; LOAD THE LOOKUP TABLE
+000010CE  43FA 0BF1               2495mm     LEA BIN2HEX_LUT(PC),A1                          ; LOAD THE LOOKUP TABLE
 000010D2  E999                    2496mm     ROL.L #4,D1                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000010D4  1401                    2497mm     MOVE.B D1,D2
 000010D6  0282 0000000F           2498mm     ANDI.L #$F,D2
@@ -2518,7 +2518,7 @@ Created On: 28/04/2021 18:46:57
 000010F2  57CE FFDA               2514m     DBEQ D6,LOOP_151
 000010F6                          2515m     ENDM
 000010F6                          2516m             PRINT_CRLF D3,A1
-000010F6  43FA 0C45               2517m     LEA CRLF(PC),A1
+000010F6  43FA 0C47               2517m     LEA CRLF(PC),A1
 000010FA                          2518mm     PRINT_STR A1,D3
 000010FA                          2519mm LOOP_157
 000010FA  0C11 0000               2520mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2595,7 +2595,7 @@ Created On: 28/04/2021 18:46:57
 00001160                          2591m     ENDC
 00001160                          2592m     ENDM
 00001160                          2593m         HEX2BIN D3,D3,A0                            ; convert to binary -> D2
-00001160  41FA 0B6D               2594m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+00001160  41FA 0B6F               2594m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 00001164  0403 0030               2595m     SUB.B #'0',D3                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00001168  C6BC 000000FF           2596m     AND.L #$FF,D3                                   ; IGNORE THE TOP 3 BYTES
 0000116E  1630 3000               2597m     MOVE.B 0(A0,D3),D3                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -2612,7 +2612,7 @@ Created On: 28/04/2021 18:46:57
 00001180  E089                    2608      LSR.L #8,D1
 00001182                          2609  
 00001182                          2610m     PRINT_CRLF D2,A1
-00001182  43FA 0BB9               2611m     LEA CRLF(PC),A1
+00001182  43FA 0BBB               2611m     LEA CRLF(PC),A1
 00001186                          2612mm     PRINT_STR A1,D2
 00001186                          2613mm LOOP_164
 00001186  0C11 0000               2614mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -2668,7 +2668,7 @@ Created On: 28/04/2021 18:46:57
 000011EC  BE7C FFFF               2664s     CMP.W   #$FFFFFFFF,D7
 000011F0  6FF6                    2665s     BLE _2000000C
 000011F2                          2666  
-000011F2  45FA 0AF2               2667      LEA LOADING(PC),A2
+000011F2  45FA 0AF4               2667      LEA LOADING(PC),A2
 000011F6                          2668m     PRINT_STR A2,D2
 000011F6                          2669m LOOP_167
 000011F6  0C12 0000               2670m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2691,7 +2691,7 @@ Created On: 28/04/2021 18:46:57
 00001212                          2687m     ENDM
 00001212                          2688      
 00001212                          2689  
-00001212  45FA 0AE6               2690      LEA CODE(PC),A2
+00001212  45FA 0AE8               2690      LEA CODE(PC),A2
 00001216                          2691m     PRINT_STR A2,D2
 00001216                          2692m LOOP_169
 00001216  0C12 0000               2693m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2715,7 +2715,7 @@ Created On: 28/04/2021 18:46:57
 00001232                          2711      
 00001232  2409                    2712      MOVE.L A1,D2
 00001234                          2713m     PRINT_REG D2,D3,D4,D5,A2
-00001234  45FA 0B0D               2714m     LEA OX(PC),A2
+00001234  45FA 0B0F               2714m     LEA OX(PC),A2
 00001238                          2715mm     PRINT_STR A2,D3
 00001238                          2716mm LOOP_172
 00001238  0C12 0000               2717mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2739,7 +2739,7 @@ Created On: 28/04/2021 18:46:57
 00001254  7A07                    2735m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00001256                          2736m LOOP_171
 00001256                          2737mm     BIN2HEX D2,D4,A2
-00001256  45FA 0A67               2738mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
+00001256  45FA 0A69               2738mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
 0000125A  E99A                    2739mm     ROL.L #4,D2                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 0000125C  1802                    2740mm     MOVE.B D2,D4
 0000125E  0284 0000000F           2741mm     ANDI.L #$F,D4
@@ -2761,7 +2761,7 @@ Created On: 28/04/2021 18:46:57
 0000127A  57CD FFDA               2757m     DBEQ D5,LOOP_171
 0000127E                          2758m     ENDM
 0000127E                          2759  
-0000127E  45FA 0AC6               2760      LEA TO(PC),A2
+0000127E  45FA 0AC8               2760      LEA TO(PC),A2
 00001282                          2761m     PRINT_STR A2,D3
 00001282                          2762m LOOP_176
 00001282  0C12 0000               2763m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2785,7 +2785,7 @@ Created On: 28/04/2021 18:46:57
 0000129E                          2781  
 0000129E  2408                    2782      MOVE.L A0,D2
 000012A0                          2783m     PRINT_REG D2,D3,D4,D5,A2
-000012A0  45FA 0AA1               2784m     LEA OX(PC),A2
+000012A0  45FA 0AA3               2784m     LEA OX(PC),A2
 000012A4                          2785mm     PRINT_STR A2,D3
 000012A4                          2786mm LOOP_179
 000012A4  0C12 0000               2787mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2809,7 +2809,7 @@ Created On: 28/04/2021 18:46:57
 000012C0  7A07                    2805m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000012C2                          2806m LOOP_178
 000012C2                          2807mm     BIN2HEX D2,D4,A2
-000012C2  45FA 09FB               2808mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
+000012C2  45FA 09FD               2808mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
 000012C6  E99A                    2809mm     ROL.L #4,D2                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000012C8  1802                    2810mm     MOVE.B D2,D4
 000012CA  0284 0000000F           2811mm     ANDI.L #$F,D4
@@ -2832,7 +2832,7 @@ Created On: 28/04/2021 18:46:57
 000012EA                          2828m     ENDM
 000012EA                          2829  
 000012EA                          2830m     PRINT_CRLF D3,A2
-000012EA  45FA 0A51               2831m     LEA CRLF(PC),A2
+000012EA  45FA 0A53               2831m     LEA CRLF(PC),A2
 000012EE                          2832mm     PRINT_STR A2,D3
 000012EE                          2833mm LOOP_184
 000012EE  0C12 0000               2834mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2884,7 +2884,7 @@ Created On: 28/04/2021 18:46:57
 0000132A  60DE                    2880s     BRA _10000014
 0000132C                          2881s _10000015
 0000132C                          2882  
-0000132C  45FA 09DB               2883      LEA SP(PC),A2
+0000132C  45FA 09DD               2883      LEA SP(PC),A2
 00001330                          2884m     PRINT_STR A2,D2
 00001330                          2885m LOOP_187
 00001330  0C12 0000               2886m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -2910,7 +2910,7 @@ Created On: 28/04/2021 18:46:57
 00001350  D1CC                    2906      ADD.L A4,A0
 00001352  2010                    2907      MOVE.L (A0),D0
 00001354                          2908m     PRINT_REG D0,D2,D3,D4,A3
-00001354  47FA 09ED               2909m     LEA OX(PC),A3
+00001354  47FA 09EF               2909m     LEA OX(PC),A3
 00001358                          2910mm     PRINT_STR A3,D2
 00001358                          2911mm LOOP_190
 00001358  0C13 0000               2912mm     CMP.B #NULL,(A3)                                ; 0 -> DONE
@@ -2934,7 +2934,7 @@ Created On: 28/04/2021 18:46:57
 00001374  7807                    2930m     MOVE.L #7,D4                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00001376                          2931m LOOP_189
 00001376                          2932mm     BIN2HEX D0,D3,A3
-00001376  47FA 0947               2933mm     LEA BIN2HEX_LUT(PC),A3                          ; LOAD THE LOOKUP TABLE
+00001376  47FA 0949               2933mm     LEA BIN2HEX_LUT(PC),A3                          ; LOAD THE LOOKUP TABLE
 0000137A  E998                    2934mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 0000137C  1600                    2935mm     MOVE.B D0,D3
 0000137E  0283 0000000F           2936mm     ANDI.L #$F,D3
@@ -2956,7 +2956,7 @@ Created On: 28/04/2021 18:46:57
 0000139A  57CC FFDA               2952m     DBEQ D4,LOOP_189
 0000139E                          2953m     ENDM
 0000139E                          2954m     PRINT_CRLF D2,A2
-0000139E  45FA 099D               2955m     LEA CRLF(PC),A2
+0000139E  45FA 099F               2955m     LEA CRLF(PC),A2
 000013A2                          2956mm     PRINT_STR A2,D2
 000013A2                          2957mm LOOP_195
 000013A2  0C12 0000               2958mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3013,7 +3013,7 @@ Created On: 28/04/2021 18:46:57
 000013E4                          3009mm         ENDM
 000013E4                          3010m     ENDM
 000013E4                          3011      
-000013E4  45FA 0945               3012      LEA VECTORS(PC),A2
+000013E4  45FA 0947               3012      LEA VECTORS(PC),A2
 000013E8                          3013m     PRINT_STR A2,D2
 000013E8                          3014m LOOP_200
 000013E8  0C12 0000               3015m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3047,7 +3047,7 @@ Created On: 28/04/2021 18:46:57
 00001412  D081                    3043          ADD.L D1,D0
 00001414  0480 00000400           3044          SUB.L #START,D0
 0000141A                          3045m         PRINT_REG D0,D2,D3,D4,A3
-0000141A  47FA 0927               3046m     LEA OX(PC),A3
+0000141A  47FA 0929               3046m     LEA OX(PC),A3
 0000141E                          3047mm     PRINT_STR A3,D2
 0000141E                          3048mm LOOP_203
 0000141E  0C13 0000               3049mm     CMP.B #NULL,(A3)                                ; 0 -> DONE
@@ -3071,7 +3071,7 @@ Created On: 28/04/2021 18:46:57
 0000143A  7807                    3067m     MOVE.L #7,D4                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 0000143C                          3068m LOOP_202
 0000143C                          3069mm     BIN2HEX D0,D3,A3
-0000143C  47FA 0881               3070mm     LEA BIN2HEX_LUT(PC),A3                          ; LOAD THE LOOKUP TABLE
+0000143C  47FA 0883               3070mm     LEA BIN2HEX_LUT(PC),A3                          ; LOAD THE LOOKUP TABLE
 00001440  E998                    3071mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00001442  1600                    3072mm     MOVE.B D0,D3
 00001444  0283 0000000F           3073mm     ANDI.L #$F,D3
@@ -3093,7 +3093,7 @@ Created On: 28/04/2021 18:46:57
 00001460  57CC FFDA               3089m     DBEQ D4,LOOP_202
 00001464                          3090m     ENDM
 00001464                          3091  
-00001464  47FA 08E0               3092          LEA TO(PC),A3
+00001464  47FA 08E2               3092          LEA TO(PC),A3
 00001468                          3093m         PRINT_STR A3,D3
 00001468                          3094m LOOP_207
 00001468  0C13 0000               3095m     CMP.B #NULL,(A3)                                ; 0 -> DONE
@@ -3117,7 +3117,7 @@ Created On: 28/04/2021 18:46:57
 00001484                          3113  
 00001484  2408                    3114          MOVE.L A0,D2
 00001486                          3115m         PRINT_REG D2,D3,D4,D5,A3
-00001486  47FA 08BB               3116m     LEA OX(PC),A3
+00001486  47FA 08BD               3116m     LEA OX(PC),A3
 0000148A                          3117mm     PRINT_STR A3,D3
 0000148A                          3118mm LOOP_210
 0000148A  0C13 0000               3119mm     CMP.B #NULL,(A3)                                ; 0 -> DONE
@@ -3141,7 +3141,7 @@ Created On: 28/04/2021 18:46:57
 000014A6  7A07                    3137m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000014A8                          3138m LOOP_209
 000014A8                          3139mm     BIN2HEX D2,D4,A3
-000014A8  47FA 0815               3140mm     LEA BIN2HEX_LUT(PC),A3                          ; LOAD THE LOOKUP TABLE
+000014A8  47FA 0817               3140mm     LEA BIN2HEX_LUT(PC),A3                          ; LOAD THE LOOKUP TABLE
 000014AC  E99A                    3141mm     ROL.L #4,D2                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000014AE  1802                    3142mm     MOVE.B D2,D4
 000014B0  0284 0000000F           3143mm     ANDI.L #$F,D4
@@ -3164,7 +3164,7 @@ Created On: 28/04/2021 18:46:57
 000014D0                          3160m     ENDM
 000014D0                          3161          
 000014D0                          3162m         PRINT_CRLF D2,A3
-000014D0  47FA 086B               3163m     LEA CRLF(PC),A3
+000014D0  47FA 086D               3163m     LEA CRLF(PC),A3
 000014D4                          3164mm     PRINT_STR A3,D2
 000014D4                          3165mm LOOP_215
 000014D4  0C13 0000               3166mm     CMP.B #NULL,(A3)                                ; 0 -> DONE
@@ -3277,7 +3277,7 @@ Created On: 28/04/2021 18:46:57
 00001568                          3273m     ENDC
 00001568                          3274m     ENDM
 00001568                          3275m         HEX2BIN D2,D2,A0                            ; convert to binary -> D2
-00001568  41FA 0765               3276m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+00001568  41FA 0767               3276m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 0000156C  0402 0030               3277m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00001570  C4BC 000000FF           3278m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
 00001576  1430 2000               3279m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -3290,7 +3290,7 @@ Created On: 28/04/2021 18:46:57
 00001582  6FB6                    3286s     BLE _20000010
 00001584                          3287  
 00001584                          3288m     PRINT_CRLF D2,A1
-00001584  43FA 07B7               3289m     LEA CRLF(PC),A1
+00001584  43FA 07B9               3289m     LEA CRLF(PC),A1
 00001588                          3290mm     PRINT_STR A1,D2
 00001588                          3291mm LOOP_226
 00001588  0C11 0000               3292mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -3341,7 +3341,7 @@ Created On: 28/04/2021 18:46:57
 000015E2  BE7C FFFF               3337s     CMP.W   #$FFFFFFFF,D7
 000015E6  6FF6                    3338s     BLE _20000012
 000015E8                          3339               
-000015E8  45FA 06FC               3340      LEA LOADING(PC),A2                              ; the prints seem to be important for timing to unprotect the EEPROM
+000015E8  45FA 06FE               3340      LEA LOADING(PC),A2                              ; the prints seem to be important for timing to unprotect the EEPROM
 000015EC                          3341m     PRINT_STR A2,D2
 000015EC                          3342m LOOP_229
 000015EC  0C12 0000               3343m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3364,7 +3364,7 @@ Created On: 28/04/2021 18:46:57
 00001608                          3360m     ENDM
 00001608                          3361  
 00001608                          3362m     PRINT_REG D0,D3,D4,D5,A2
-00001608  45FA 0739               3363m     LEA OX(PC),A2
+00001608  45FA 073B               3363m     LEA OX(PC),A2
 0000160C                          3364mm     PRINT_STR A2,D3
 0000160C                          3365mm LOOP_232
 0000160C  0C12 0000               3366mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3388,7 +3388,7 @@ Created On: 28/04/2021 18:46:57
 00001628  7A07                    3384m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 0000162A                          3385m LOOP_231
 0000162A                          3386mm     BIN2HEX D0,D4,A2
-0000162A  45FA 0693               3387mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
+0000162A  45FA 0695               3387mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
 0000162E  E998                    3388mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00001630  1800                    3389mm     MOVE.B D0,D4
 00001632  0284 0000000F           3390mm     ANDI.L #$F,D4
@@ -3410,7 +3410,7 @@ Created On: 28/04/2021 18:46:57
 0000164E  57CD FFDA               3406m     DBEQ D5,LOOP_231
 00001652                          3407m     ENDM
 00001652                          3408  
-00001652  45FA 06F2               3409      LEA TO(PC),A2
+00001652  45FA 06F4               3409      LEA TO(PC),A2
 00001656                          3410m     PRINT_STR A2,D3
 00001656                          3411m LOOP_236
 00001656  0C12 0000               3412m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3434,7 +3434,7 @@ Created On: 28/04/2021 18:46:57
 00001672                          3430  
 00001672  2408                    3431      MOVE.L A0,D2
 00001674                          3432m     PRINT_REG D2,D3,D4,D5,A2
-00001674  45FA 06CD               3433m     LEA OX(PC),A2
+00001674  45FA 06CF               3433m     LEA OX(PC),A2
 00001678                          3434mm     PRINT_STR A2,D3
 00001678                          3435mm LOOP_239
 00001678  0C12 0000               3436mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3458,7 +3458,7 @@ Created On: 28/04/2021 18:46:57
 00001694  7A07                    3454m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00001696                          3455m LOOP_238
 00001696                          3456mm     BIN2HEX D2,D4,A2
-00001696  45FA 0627               3457mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
+00001696  45FA 0629               3457mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
 0000169A  E99A                    3458mm     ROL.L #4,D2                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 0000169C  1802                    3459mm     MOVE.B D2,D4
 0000169E  0284 0000000F           3460mm     ANDI.L #$F,D4
@@ -3481,7 +3481,7 @@ Created On: 28/04/2021 18:46:57
 000016BE                          3477m     ENDM
 000016BE                          3478  
 000016BE                          3479m     PRINT_CRLF D3,A2
-000016BE  45FA 067D               3480m     LEA CRLF(PC),A2
+000016BE  45FA 067F               3480m     LEA CRLF(PC),A2
 000016C2                          3481mm     PRINT_STR A2,D3
 000016C2                          3482mm LOOP_244
 000016C2  0C12 0000               3483mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3571,7 +3571,7 @@ Created On: 28/04/2021 18:46:57
 0000173A                          3567m     ENDC
 0000173A                          3568m     ENDM
 0000173A                          3569m         HEX2BIN D3,D3,A0                                ; convert to binary -> D2
-0000173A  41FA 0593               3570m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+0000173A  41FA 0595               3570m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 0000173E  0403 0030               3571m     SUB.B #'0',D3                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 00001742  C6BC 000000FF           3572m     AND.L #$FF,D3                                   ; IGNORE THE TOP 3 BYTES
 00001748  1630 3000               3573m     MOVE.B 0(A0,D3),D3                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -3583,7 +3583,7 @@ Created On: 28/04/2021 18:46:57
 00001750  B47C 0007               3579s     CMP.W   #7,D2
 00001754  6FB6                    3580s     BLE _20000014
 00001756                          3581m     PRINT_CRLF D2,A1
-00001756  43FA 05E5               3582m     LEA CRLF(PC),A1
+00001756  43FA 05E7               3582m     LEA CRLF(PC),A1
 0000175A                          3583mm     PRINT_STR A1,D2
 0000175A                          3584mm LOOP_253
 0000175A  0C11 0000               3585mm     CMP.B #NULL,(A1)                                ; 0 -> DONE
@@ -3630,7 +3630,7 @@ Created On: 28/04/2021 18:46:57
 00001794  6000 EEC6               3626      BRA MAIN_LOOP
 00001798                          3627  
 00001798                          3628  X
-00001798  45FA 05B6               3629      LEA STATUS_REGISTER(PC),A2
+00001798  45FA 05B8               3629      LEA STATUS_REGISTER(PC),A2
 0000179C                          3630m     PRINT_STR A2,D3
 0000179C                          3631m LOOP_255
 0000179C  0C12 0000               3632m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3654,7 +3654,7 @@ Created On: 28/04/2021 18:46:57
 000017B8                          3650  
 000017B8  40C0                    3651      MOVE SR,D0
 000017BA                          3652m     PRINT_REG D0,D3,D4,D5,A2
-000017BA  45FA 0587               3653m     LEA OX(PC),A2
+000017BA  45FA 0589               3653m     LEA OX(PC),A2
 000017BE                          3654mm     PRINT_STR A2,D3
 000017BE                          3655mm LOOP_258
 000017BE  0C12 0000               3656mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3678,7 +3678,7 @@ Created On: 28/04/2021 18:46:57
 000017DA  7A07                    3674m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000017DC                          3675m LOOP_257
 000017DC                          3676mm     BIN2HEX D0,D4,A2
-000017DC  45FA 04E1               3677mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
+000017DC  45FA 04E3               3677mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
 000017E0  E998                    3678mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 000017E2  1800                    3679mm     MOVE.B D0,D4
 000017E4  0284 0000000F           3680mm     ANDI.L #$F,D4
@@ -3700,7 +3700,7 @@ Created On: 28/04/2021 18:46:57
 00001800  57CD FFDA               3696m     DBEQ D5,LOOP_257
 00001804                          3697m     ENDM
 00001804                          3698m     PRINT_CRLF D3,A2
-00001804  45FA 0537               3699m     LEA CRLF(PC),A2
+00001804  45FA 0539               3699m     LEA CRLF(PC),A2
 00001808                          3700mm     PRINT_STR A2,D3
 00001808                          3701mm LOOP_263
 00001808  0C12 0000               3702mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3723,7 +3723,7 @@ Created On: 28/04/2021 18:46:57
 00001824                          3719mm     ENDM
 00001824                          3720m     ENDM
 00001824                          3721  
-00001824  45FA 0525               3722      LEA STACK_POINTER(PC),A2
+00001824  45FA 0527               3722      LEA STACK_POINTER(PC),A2
 00001828                          3723m     PRINT_STR A2,D3
 00001828                          3724m LOOP_265
 00001828  0C12 0000               3725m     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3747,7 +3747,7 @@ Created On: 28/04/2021 18:46:57
 00001844                          3743  
 00001844  200F                    3744      MOVE.L SP,D0
 00001846                          3745m     PRINT_REG D0,D3,D4,D5,A2
-00001846  45FA 04FB               3746m     LEA OX(PC),A2
+00001846  45FA 04FD               3746m     LEA OX(PC),A2
 0000184A                          3747mm     PRINT_STR A2,D3
 0000184A                          3748mm LOOP_268
 0000184A  0C12 0000               3749mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3771,7 +3771,7 @@ Created On: 28/04/2021 18:46:57
 00001866  7A07                    3767m     MOVE.L #7,D5                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 00001868                          3768m LOOP_267
 00001868                          3769mm     BIN2HEX D0,D4,A2
-00001868  45FA 0455               3770mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
+00001868  45FA 0457               3770mm     LEA BIN2HEX_LUT(PC),A2                          ; LOAD THE LOOKUP TABLE
 0000186C  E998                    3771mm     ROL.L #4,D0                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 0000186E  1800                    3772mm     MOVE.B D0,D4
 00001870  0284 0000000F           3773mm     ANDI.L #$F,D4
@@ -3793,7 +3793,7 @@ Created On: 28/04/2021 18:46:57
 0000188C  57CD FFDA               3789m     DBEQ D5,LOOP_267
 00001890                          3790m     ENDM
 00001890                          3791m     PRINT_CRLF D3,A2
-00001890  45FA 04AB               3792m     LEA CRLF(PC),A2
+00001890  45FA 04AD               3792m     LEA CRLF(PC),A2
 00001894                          3793mm     PRINT_STR A2,D3
 00001894                          3794mm LOOP_273
 00001894  0C12 0000               3795mm     CMP.B #NULL,(A2)                                ; 0 -> DONE
@@ -3840,7 +3840,7 @@ Created On: 28/04/2021 18:46:57
 000018DA                          3836  HEX_DIGIT
 000018DA  E98F                    3837      LSL.L #4,D7                                         ; add the next digit in the next 4 bits
 000018DC                          3838m     HEX2BIN D2,D2,A0
-000018DC  41FA 03F1               3839m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+000018DC  41FA 03F3               3839m     LEA HEX2BIN_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 000018E0  0402 0030               3840m     SUB.B #'0',D2                                   ; WORK OUT OFFSET AND MASK OFF ANYTHING ROGUE
 000018E4  C4BC 000000FF           3841m     AND.L #$FF,D2                                   ; IGNORE THE TOP 3 BYTES
 000018EA  1430 2000               3842m     MOVE.B 0(A0,D2),D2                              ; USE THAT AS AN INDEX INTO THE LUT   
@@ -3853,7 +3853,7 @@ Created On: 28/04/2021 18:46:57
 000018F8                          3849  ; exceptions    
 000018F8                          3850  BUS_ERROR_HANDLER
 000018F8                          3851  
-000018F8  41FA 0462               3852      LEA BUS_ERROR(PC),A0
+000018F8  41FA 0464               3852      LEA BUS_ERROR(PC),A0
 000018FC                          3853m     PRINT_STR A0,D1
 000018FC                          3854m LOOP_277
 000018FC  0C10 0000               3855m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -3881,7 +3881,7 @@ Created On: 28/04/2021 18:46:57
 0000191C  0800 0004               3877      BTST #4,D0
 00001920  6700 0026               3878      BEQ WRITE
 00001924                          3879      
-00001924  41FA 044B               3880      LEA READING(PC),A0
+00001924  41FA 044D               3880      LEA READING(PC),A0
 00001928                          3881m     PRINT_STR A0,D1
 00001928                          3882m LOOP_279
 00001928  0C10 0000               3883m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -3905,7 +3905,7 @@ Created On: 28/04/2021 18:46:57
 00001944                          3901  
 00001944  6000 0022               3902      BRA CONTINUE    
 00001948                          3903  WRITE
-00001948  41FA 0430               3904      LEA WRITING(PC),A0
+00001948  41FA 0432               3904      LEA WRITING(PC),A0
 0000194C                          3905m     PRINT_STR A0,D1
 0000194C                          3906m LOOP_281
 0000194C  0C10 0000               3907m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -3930,7 +3930,7 @@ Created On: 28/04/2021 18:46:57
 00001968                          3926  CONTINUE
 00001968  222F 0002               3927      MOVE.L 2(SP),D1
 0000196C                          3928m     PRINT_REG D1,D2,D3,D4,A0
-0000196C  41FA 03D5               3929m     LEA OX(PC),A0
+0000196C  41FA 03D7               3929m     LEA OX(PC),A0
 00001970                          3930mm     PRINT_STR A0,D2
 00001970                          3931mm LOOP_284
 00001970  0C10 0000               3932mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -3954,7 +3954,7 @@ Created On: 28/04/2021 18:46:57
 0000198C  7807                    3950m     MOVE.L #7,D4                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 0000198E                          3951m LOOP_283
 0000198E                          3952mm     BIN2HEX D1,D3,A0
-0000198E  41FA 032F               3953mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+0000198E  41FA 0331               3953mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 00001992  E999                    3954mm     ROL.L #4,D1                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00001994  1601                    3955mm     MOVE.B D1,D3
 00001996  0283 0000000F           3956mm     ANDI.L #$F,D3
@@ -3976,7 +3976,7 @@ Created On: 28/04/2021 18:46:57
 000019B2  57CC FFDA               3972m     DBEQ D4,LOOP_283
 000019B6                          3973m     ENDM
 000019B6                          3974  
-000019B6  41FA 03CB               3975      LEA FROM(PC),A0
+000019B6  41FA 03CD               3975      LEA FROM(PC),A0
 000019BA                          3976m     PRINT_STR A0,D0
 000019BA                          3977m LOOP_288
 000019BA  0C10 0000               3978m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4000,7 +4000,7 @@ Created On: 28/04/2021 18:46:57
 000019D6                          3996  
 000019D6  222F 000A               3997      MOVE.L 10(SP),D1
 000019DA                          3998m     PRINT_REG D1,D2,D3,D4,A0
-000019DA  41FA 0367               3999m     LEA OX(PC),A0
+000019DA  41FA 0369               3999m     LEA OX(PC),A0
 000019DE                          4000mm     PRINT_STR A0,D2
 000019DE                          4001mm LOOP_291
 000019DE  0C10 0000               4002mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4024,7 +4024,7 @@ Created On: 28/04/2021 18:46:57
 000019FA  7807                    4020m     MOVE.L #7,D4                                    ; LOOP ROUND ALL 8 HEX CHARACTERS OF 4 BITS EACH
 000019FC                          4021m LOOP_290
 000019FC                          4022mm     BIN2HEX D1,D3,A0
-000019FC  41FA 02C1               4023mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
+000019FC  41FA 02C3               4023mm     LEA BIN2HEX_LUT(PC),A0                          ; LOAD THE LOOKUP TABLE
 00001A00  E999                    4024mm     ROL.L #4,D1                                     ; SHIFT THE TOP 4 BITS DOWN TO BOTTOM OF THE REGISTER THE AND MASK OFF EVERYTHING ELSE
 00001A02  1601                    4025mm     MOVE.B D1,D3
 00001A04  0283 0000000F           4026mm     ANDI.L #$F,D3
@@ -4046,7 +4046,7 @@ Created On: 28/04/2021 18:46:57
 00001A20  57CC FFDA               4042m     DBEQ D4,LOOP_290
 00001A24                          4043m     ENDM
 00001A24                          4044m     PRINT_CRLF D0,A0
-00001A24  41FA 0317               4045m     LEA CRLF(PC),A0
+00001A24  41FA 0319               4045m     LEA CRLF(PC),A0
 00001A28                          4046mm     PRINT_STR A0,D0
 00001A28                          4047mm LOOP_296
 00001A28  0C10 0000               4048mm     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4079,7 +4079,7 @@ Created On: 28/04/2021 18:46:57
 00001A5A  4ED0                    4075      JMP (A0)
 00001A5C                          4076          
 00001A5C                          4077  UNHANDLED_HANDLER
-00001A5C  41FA 032C               4078      LEA UNHANDLED(PC),A0
+00001A5C  41FA 032E               4078      LEA UNHANDLED(PC),A0
 00001A60                          4079m     PRINT_STR A0,D1
 00001A60                          4080m LOOP_298
 00001A60  0C10 0000               4081m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4104,7 +4104,7 @@ Created On: 28/04/2021 18:46:57
 00001A7C  4E73                    4100      RTE 
 00001A7E                          4101      
 00001A7E                          4102  UNINITIALISED_HANDLER
-00001A7E  41FA 0320               4103      LEA UNINITIALISED(PC),A0
+00001A7E  41FA 0322               4103      LEA UNINITIALISED(PC),A0
 00001A82                          4104m     PRINT_STR A0,D1
 00001A82                          4105m LOOP_300
 00001A82  0C10 0000               4106m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4129,7 +4129,7 @@ Created On: 28/04/2021 18:46:57
 00001A9E  4E73                    4125      RTE 
 00001AA0                          4126  
 00001AA0                          4127  SPURIOUS_HANDLER
-00001AA0  41FA 031E               4128      LEA SPURIOUS(PC),A0
+00001AA0  41FA 0320               4128      LEA SPURIOUS(PC),A0
 00001AA4                          4129m     PRINT_STR A0,D1
 00001AA4                          4130m LOOP_302
 00001AA4  0C10 0000               4131m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4154,7 +4154,7 @@ Created On: 28/04/2021 18:46:57
 00001AC0  4E73                    4150      RTE 
 00001AC2                          4151      
 00001AC2                          4152  TICK_HANDLER
-00001AC2  41FA 0291               4153      LEA TICK(PC),A0
+00001AC2  41FA 0293               4153      LEA TICK(PC),A0
 00001AC6                          4154m     PRINT_STR A0,D1
 00001AC6                          4155m LOOP_304
 00001AC6  0C10 0000               4156m     CMP.B #NULL,(A0)                                ; 0 -> DONE
@@ -4190,41 +4190,41 @@ Created On: 28/04/2021 18:46:57
 00001B82= 5B 7A 5D 09 09 09 ...   4186          DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 00001B94= 78 78 78 78 78 78 ...   4187          DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 00001BB5= 78 78 78 78 78 78 ...   4188          DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
-00001BD4= 78 78 78 78 78 78 ...   4189          DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
-00001BF8= 23 09 09 09 77 72 ...   4190          DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
-00001C12= 5B 78 5D 09 09 09 ...   4191          DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
-00001C29= 5B 69 5D 09 09 09 ...   4192          DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF
-00001C42= 5B 6F 5D 09 09 09 ...   4193          DC.B '[o]',TAB,TAB,TAB,'disable interrupts',CR,LF,NULL
-00001C5D= 48 75 68 3F 0D 0A 00    4194  HUH  DC.B 'Huh?',CR,LF,NULL
-00001C64= 20 53 20 72 65 63 ...   4195  READ    DC.B ' S records read, start address = ',NULL
-00001C86= 57 3A 20 55 6E 6B ...   4196  UNREC   DC.B 'W: Unknown Srec type: ',NULL
-00001C9D= 21 20 43 53 20 66 ...   4197  CS_FAILURE  DC.B '! CS failure at ',NULL
-00001CAE= 21 20 52 41 4D 20 ...   4198  RAM_ERROR   DC.B '! RAM error at: ',NULL
-00001CBF= 30 31 32 33 34 35 ...   4199  BIN2HEX_LUT DC.B '0123456789ABCDEF'
-00001CCF= 00 01 02 03 04 05 ...   4200  HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
-00001CE6= 4C 6F 61 64 69 6E ...   4201  LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
-00001CFA= 57 72 69 74 69 6E ...   4202  CODE        DC.B 'Writing code: ',NULL
-00001D09= 53 65 74 74 69 6E ...   4203  SP      DC.B 'Setting initial stack pointer to ',NULL
-00001D2B= 57 72 69 74 69 6E ...   4204  VECTORS DC.B 'Writing vectors',CR,LF,NULL
-00001D3D= 0D 0A 00                4205  CRLF    DC.B CR,LF,NULL
-00001D40= 3E 20 00                4206  PROMPT  DC.B '> ',NULL
-00001D43= 30 78 00                4207  ox      DC.B '0x',NULL
-00001D46= 20 2D 3E 20 00          4208  to      DC.B ' -> ',NULL
-00001D4B= 53 50 3A 20 00          4209  STACK_POINTER DC.B 'SP: ',NULL
-00001D50= 53 52 3A 20 00          4210  STATUS_REGISTER DC.B 'SR: ',NULL
-00001D55= 74 69 63 6B 0D 0A 00    4211  TICK DC.B 'tick',CR,LF,NULL
-00001D5C= 2A 20 42 75 73 2F ...   4212  BUS_ERROR DC.B '* Bus/address error ',NULL
-00001D71= 72 65 61 64 69 6E ...   4213  READING DC.B 'reading ',NULL
-00001D7A= 77 72 69 74 69 6E ...   4214  WRITING DC.B 'writing ',NULL
-00001D83= 20 66 72 6F 6D 20 00    4215  FROM DC.B ' from ',NULL
-00001D8A= 2A 20 55 6E 68 61 ...   4216  UNHANDLED DC.B '* Unhandled interrupt',NULL
-00001DA0= 2A 20 20 55 6E 69 ...   4217  UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
-00001DC0= 2A 20 53 70 75 72 ...   4218  SPURIOUS DC.B '* Spurious interrupt',NULL
-00001DD5= 43 6F 6C 64 20 73 ...   4219  COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
-00001DE9= 57 61 72 6D 20 73 ...   4220  WARM_START DC.B 'Warm start - phew',CR,LF,NULL
-00001DFD= 4D 44 46 2D 6D 6F ...   4221  VERSION DC.B 'MDF-mon V1.125 (28/04/2021)',CR,LF,NULL       ; this is the last line on purpose, so if it prints, we can be sure we got it all
-00001E1B= 00                      4222  END     DC.B 0
-00001E1C                          4223      END START                                           ; last line of source
+00001BD4= 23 09 09 09 77 72 ...   4189          DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
+00001BEE= 78 78 78 78 78 78 ...   4190          DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
+00001C12= 5B 78 5D 09 09 09 ...   4191          DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF,NULL
+00001C2A= 5B 69 5D 09 09 09 ...   4192          DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF,NULL
+00001C44= 5B 6F 5D 09 09 09 ...   4193          DC.B '[o]',TAB,TAB,TAB,'disable interrupts',CR,LF,NULL
+00001C5F= 48 75 68 3F 0D 0A 00    4194  HUH  DC.B 'Huh?',CR,LF,NULL
+00001C66= 20 53 20 72 65 63 ...   4195  READ    DC.B ' S records read, start address = ',NULL
+00001C88= 57 3A 20 55 6E 6B ...   4196  UNREC   DC.B 'W: Unknown Srec type: ',NULL
+00001C9F= 21 20 43 53 20 66 ...   4197  CS_FAILURE  DC.B '! CS failure at ',NULL
+00001CB0= 21 20 52 41 4D 20 ...   4198  RAM_ERROR   DC.B '! RAM error at: ',NULL
+00001CC1= 30 31 32 33 34 35 ...   4199  BIN2HEX_LUT DC.B '0123456789ABCDEF'
+00001CD1= 00 01 02 03 04 05 ...   4200  HEX2BIN_LUT DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
+00001CE8= 4C 6F 61 64 69 6E ...   4201  LOADING DC.B 'Loading EEPROM...',CR,LF,NULL
+00001CFC= 57 72 69 74 69 6E ...   4202  CODE        DC.B 'Writing code: ',NULL
+00001D0B= 53 65 74 74 69 6E ...   4203  SP      DC.B 'Setting initial stack pointer to ',NULL
+00001D2D= 57 72 69 74 69 6E ...   4204  VECTORS DC.B 'Writing vectors',CR,LF,NULL
+00001D3F= 0D 0A 00                4205  CRLF    DC.B CR,LF,NULL
+00001D42= 3E 20 00                4206  PROMPT  DC.B '> ',NULL
+00001D45= 30 78 00                4207  ox      DC.B '0x',NULL
+00001D48= 20 2D 3E 20 00          4208  to      DC.B ' -> ',NULL
+00001D4D= 53 50 3A 20 00          4209  STACK_POINTER DC.B 'SP: ',NULL
+00001D52= 53 52 3A 20 00          4210  STATUS_REGISTER DC.B 'SR: ',NULL
+00001D57= 74 69 63 6B 0D 0A 00    4211  TICK DC.B 'tick',CR,LF,NULL
+00001D5E= 2A 20 42 75 73 2F ...   4212  BUS_ERROR DC.B '* Bus/address error ',NULL
+00001D73= 72 65 61 64 69 6E ...   4213  READING DC.B 'reading ',NULL
+00001D7C= 77 72 69 74 69 6E ...   4214  WRITING DC.B 'writing ',NULL
+00001D85= 20 66 72 6F 6D 20 00    4215  FROM DC.B ' from ',NULL
+00001D8C= 2A 20 55 6E 68 61 ...   4216  UNHANDLED DC.B '* Unhandled interrupt',NULL
+00001DA2= 2A 20 20 55 6E 69 ...   4217  UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
+00001DC2= 2A 20 53 70 75 72 ...   4218  SPURIOUS DC.B '* Spurious interrupt',NULL
+00001DD7= 43 6F 6C 64 20 73 ...   4219  COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
+00001DEB= 57 61 72 6D 20 73 ...   4220  WARM_START DC.B 'Warm start - phew',CR,LF,NULL
+00001DFF= 4D 44 46 2D 6D 6F ...   4221  VERSION DC.B 'MDF-mon V1.124 (28/04/2021)',CR,LF,NULL       ; this is the last line on purpose, so if it prints, we can be sure we got it all
+00001E1D= 00                      4222  END     DC.B 0
+00001E1E                          4223      END START                                           ; last line of source
 
 No errors detected
 No warnings generated
@@ -4234,11 +4234,11 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 BIN2HEX             0
-BIN2HEX_LUT         1CBF
-BUS_ERROR           1D5C
+BIN2HEX_LUT         1CC1
+BUS_ERROR           1D5E
 BUS_ERROR_HANDLER   18F8
-CODE                1CFA
-COLD_START          1DD5
+CODE                1CFC
+COLD_START          1DD7
 CONTINUE            1968
 CONTINUE_103        D5A
 CONTINUE_117        E4C
@@ -4252,8 +4252,8 @@ CONTINUE_88         BEE
 CONTINUE_93         C76
 CONTINUE_98         CE8
 CR                  D
-CRLF                1D3D
-CS_FAILURE          1C9D
+CRLF                1D3F
+CS_FAILURE          1C9F
 DEBUG               0
 DISPLAY             E00001
 DISPLAY_            0
@@ -4302,7 +4302,7 @@ DUART_TXA           C00007
 DUART_TXA_          3
 DUART_TXB           C00017
 DUART_TXB_          B
-END                 1E1B
+END                 1E1D
 EXIT_108            DCC
 EXIT_11             5A0
 EXIT_110            DEC
@@ -4372,7 +4372,7 @@ EXIT_56             8FA
 EXIT_6              558
 EXIT_70             A3E
 EXIT_9              580
-FROM                1D83
+FROM                1D85
 G                   1030
 GET_INPUT           67C
 H                   784
@@ -4380,14 +4380,14 @@ HASH                18C4
 HELP                1AFD
 HELPPROMPT          1AEA
 HEX2BIN             10B
-HEX2BIN_LUT         1CCF
+HEX2BIN_LUT         1CD1
 HEX_DIGIT           18DA
-HUH                 1C5D
+HUH                 1C5F
 I                   18B4
 ILLEGAL_HANDLER     1A4C
 L                   1126
 LF                  A
-LOADING             1CE6
+LOADING             1CE8
 LOOP_108            DB0
 LOOP_11             584
 LOOP_110            DD0
@@ -4478,7 +4478,7 @@ M                   1700
 MAIN_LOOP           65C
 NULL                0
 O                   18BC
-OX                  1D43
+OX                  1D45
 P                   1530
 PRINTSTR            790
 PRINT_CHAR          203
@@ -4487,40 +4487,40 @@ PRINT_REG           438
 PRINT_STR           3CB
 PROGRAM             C4D
 PROGRAM_VECTOR      CE4
-PROMPT              1D40
+PROMPT              1D42
 PROTECT             A40
 R                   7B0
 RAM                 200000
-RAM_ERROR           1CAE
-READ                1C64
-READING             1D71
+RAM_ERROR           1CB0
+READ                1C66
+READING             1D73
 READ_CHAR           62D
 RESET               4
 ROM                 0
 S                   904
-SP                  1D09
-SPURIOUS            1DC0
+SP                  1D0B
+SPURIOUS            1DC2
 SPURIOUS_HANDLER    1AA0
 STACK               0
 STACK_ADDRESS       2E0000
-STACK_POINTER       1D4B
+STACK_POINTER       1D4D
 START               400
-STATUS_REGISTER     1D50
+STATUS_REGISTER     1D52
 TAB                 9
-TICK                1D55
+TICK                1D57
 TICK_HANDLER        1AC2
-TO                  1D46
-UNHANDLED           1D8A
+TO                  1D48
+UNHANDLED           1D8C
 UNHANDLED_HANDLER   1A5C
-UNINITIALISED       1DA0
+UNINITIALISED       1DA2
 UNINITIALISED_HANDLER  1A7E
 UNPROTECT           979
-UNREC               1C86
+UNREC               1C88
 USER                100
 V                   78C
 VECS                8
-VECTORS             1D2B
-VERSION             1DFD
+VECTORS             1D2D
+VERSION             1DFF
 W                   888
 WAIT_CHAR           4E9
 WAIT_FOR_COMPLETE_186  131C
@@ -4657,9 +4657,9 @@ WAIT_FOR_READY_93   C5A
 WAIT_FOR_READY_95   C8E
 WAIT_FOR_READY_98   CCC
 WAIT_FOR_SRECORD    90C
-WARM_START          1DE9
+WARM_START          1DEB
 WRITE               1948
-WRITING             1D7A
+WRITING             1D7C
 X                   1798
 Z                   1036
 _00000000           538

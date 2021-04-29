@@ -1170,10 +1170,10 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
-		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
 		DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
-		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
-		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF
+		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
+		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF,NULL
+		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF,NULL
 		DC.B '[o]',TAB,TAB,TAB,'disable interrupts',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
@@ -1202,7 +1202,7 @@ UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
 COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
 WARM_START DC.B 'Warm start - phew',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.125 (28/04/2021)',CR,LF,NULL		; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.124 (28/04/2021)',CR,LF,NULL		; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
