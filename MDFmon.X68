@@ -471,11 +471,11 @@ GET_INPUT
 ; commands
 H
 	LEA HELP(PC),A0
-	BRA PRINTSTR
+	BRA PRINTIT
 
 V
 	LEA VERSION(PC),A0
-PRINTSTR
+PRINTIT
 	PRINT_STR A0,D3	   
 	BRA MAIN_LOOP
 
@@ -630,7 +630,7 @@ DOWNLOAD_DONE
 	BRA MAIN_LOOP
 
 G
-	MOVE.L D7,A0										; grab the address accumulator and then clear it
+	MOVE.L D7,A0									; grab the address accumulator and then clear it
 	MOVE.L #0,D7
 
 	JMP (A0)
@@ -694,13 +694,13 @@ L
 	MOVE.L D1,A3									; keep a copy for later
 
 	MOVE.L D7,A1									; address accumulator -> address register
-	ADD.L #START,A1								; skip the vectors
+	ADD.L #START,A1									; skip the vectors
 	MOVE.L D7,A4									; keep a clean copy for later
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	UNPROTECT									; important to only unprotect when we are fully committed (ie, can't escape)
+	UNPROTECT										; important to only unprotect when we are fully committed (ie, can't escape)
 					
-	FOR D7 = #$0 TO #$FFFFFFFF DO				; dead timing loop to wait for unprotect
+	FOR D7 = #$0 TO #$FFFFFFFF DO					; dead timing loop to wait for unprotect
 		NOP
 	ENDF
 				
@@ -752,6 +752,8 @@ L
 
 		MOVE.L A0,D2
 		
+		MOVE.L A0,D2
+		MOVE.B D2,DISPLAY
 		PROGRAM_VECTOR D0,A0,D2
 	ENDF
 										
@@ -763,8 +765,8 @@ P
 	MOVE.L #0,D0									; D0 will be the data to write
 
 	FOR D1 = #0 TO #3 DO							; read 2 bytes
-		LSL.L #4,D0								; make what we have so far more significant
-		WAIT_CHAR D2,D3							; next character -> D2
+		LSL.L #4,D0									; make what we have so far more significant
+		WAIT_CHAR D2,D3								; next character -> D2
 		HEX2BIN D2,D2,A0							; convert to binary -> D2
 		OR.B D2,D0
 	ENDF
@@ -774,13 +776,13 @@ P
 	MOVE.L D7,A0									; address accumulator -> target address register
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	UNPROTECT									; important to only unprotect when we are fully committed (ie, can't escape)
+	UNPROTECT										; important to only unprotect when we are fully committed (ie, can't escape)
 							
-	FOR D7 = #$0 TO #$FFFFFFFF DO				; dead timing loop to wait for unprotect
+	FOR D7 = #$0 TO #$FFFFFFFF DO					; dead timing loop to wait for unprotect
 		NOP
 	ENDF
 			 
-	LEA LOADING(PC),A2							; the prints seem to be important for timing to unprotect the EEPROM
+	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
 
 	PRINT_REG D0,D3,D4,D5,A2
@@ -815,7 +817,6 @@ X
 	PRINT_CRLF D3,A2
 
 	BRA MAIN_LOOP
-
 		
 I
 	MOVE.B #8,DUART_IMR
@@ -838,8 +839,6 @@ HEX_DIGIT
 	HEX2BIN D2,D2,A0
 	OR.B D2,D7  
 	BRA GET_INPUT
-
-	SIMHALT												; halt simulator
 
 ; exceptions	
 BUS_ERROR_HANDLER
@@ -883,28 +882,24 @@ ILLEGAL_HANDLER
 		
 UNHANDLED_HANDLER
 	LEA UNHANDLED(PC),A0
-	PRINT_STR A0,D1
-
-	RTE	
+	JMP PRINTIT_RTE
 	
 UNINITIALISED_HANDLER
 	LEA UNINITIALISED(PC),A0
-	PRINT_STR A0,D1
+	JMP PRINTIT_RTE
 
-	RTE	
+TICK_HANDLER
+	MOVE.B DUART_RESET_OPR,D0
+	LEA TICK(PC),A0
+	JMP PRINTIT_RTE
 
 SPURIOUS_HANDLER
 	LEA SPURIOUS(PC),A0
+PRINTIT_RTE
 	PRINT_STR A0,D1
-
 	RTE	
 	
-TICK_HANDLER
-	LEA TICK(PC),A0
-	PRINT_STR A0,D1
-	
-	MOVE.B DUART_RESET_OPR,D0
-	RTE	
+	SIMHALT												; halt simulator
 
 ; strings
 HELPPROMPT DC.B 'Press ? for help',CR,LF,NULL
@@ -915,8 +910,8 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B 'xxxxxxxx[s]',TAB,TAB,'download S records',CR,LF
 		DC.B 'xxxxxxxx[g]',TAB,TAB,'go',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
-		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
-		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
+		DC.B 'xxxxxxxx[l]xxxxxxxx',TAB,TAB,'load to EEPROM',CR,LF
+		DC.B 'xxxxxxxx[p]xxxxxxxx',TAB,TAB,'patch EEPROM',CR,LF
 		DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
 		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
 		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF
@@ -944,7 +939,7 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.129 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.130 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
