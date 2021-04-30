@@ -883,7 +883,8 @@ L
 		OR.B D3,D1
 	ENDF
 
-	MOVE.W D1,D0									; extract the LSword for the length
+	MOVE.W D1,D0									; extract the LSword for the length	
+	SUB.L #START,D0									; remove the vector table from the length
 	LSR.L #8,D1										; extract the MSword for the address
 	LSR.L #8,D1
 
@@ -906,7 +907,6 @@ L
 	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
 	
-
 	LEA CODE(PC),A2
 	PRINT_STR A2,D2
 	
@@ -918,6 +918,10 @@ L
 
 	MOVE.L A0,D2
 	PRINT_REG D2,D3,D4,D5,A2
+
+	LEA FOR(PC),A2
+	PRINT_STR A2,D3
+	PRINT_REG D0,D3,D4,D5,A2
 
 	PRINT_CRLF D3,A2
 
@@ -1181,6 +1185,7 @@ CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
 to		DC.B ' -> ',NULL
+for		DC.B ' for ',NULL
 STACK_POINTER DC.B 'SP: ',NULL
 STATUS_REGISTER DC.B 'SR: ',NULL
 TICK DC.B 'tick',CR,LF,NULL
@@ -1193,7 +1198,7 @@ UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
 COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
 WARM_START DC.B 'Warm start - phew',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.126 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.128 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
