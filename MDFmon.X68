@@ -386,12 +386,6 @@ START
 	
 	IF D0 <EQ> #$0F THEN
 		MOVE.B DUART_CRA,D0							; BRG test mode
-
-		LEA COLD_START(PC),A0
-		PRINT_STR A0,D0
-	ELSE
-		LEA WARM_START(PC),A0
-		PRINT_STR A0,D0
 	ENDI
 
 	MOVE.B #1,DISPLAY
@@ -703,22 +697,21 @@ L
 	MOVE.L D1,A3									; keep a copy for later
 
 	MOVE.L D7,A1									; address accumulator -> address register
-	ADD.L #START,A1									; skip the vectors
+	ADD.L #START,A1								; skip the vectors
 	MOVE.L D7,A4									; keep a clean copy for later
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	UNPROTECT										; important to only unprotect when we are fully committed (ie, can't escape)
-							
-	FOR D7 = #$0 TO #$FFFFFFFF DO					; dead timing loop to wait for unprotect
+	UNPROTECT									; important to only unprotect when we are fully committed (ie, can't escape)
+					
+	FOR D7 = #$0 TO #$FFFFFFFF DO				; dead timing loop to wait for unprotect
 		NOP
 	ENDF
-
+				
 	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
-	
-	LEA CODE(PC),A2
+	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
-	
+		
 	MOVE.L A1,D2
 	PRINT_REG D2,D3,D4,D5,A2
 
@@ -739,28 +732,18 @@ L
 
 		MOVE.B (A1),DISPLAY
 		PROGRAM (A1),(A0),D2
-		
-		;PRINT_CHAR #'.',D7
-		
+				
 		ADD.L #2,A0
 		ADD.L #2,A1
 	ENDW
-
-	LEA SP(PC),A2
-	PRINT_STR A2,D2
 	
 	LEA STACK,A0
 	ADD.L A4,A0
 	MOVE.L (A0),D0
-	PRINT_REG D0,D2,D3,D4,A3
-	PRINT_CRLF D2,A2
 	
 	MOVE.L #0,A0
 	PROGRAM_VECTOR D0,A0,D2
 	
-	LEA VECTORS(PC),A2
-	PRINT_STR A2,D2
-
 	FOR A0 = #RESET TO #START-4 BY #4 DO
 
 		MOVE.L A0,A1
@@ -769,15 +752,8 @@ L
 		MOVE.L (A1),D0	
 		ADD.L D1,D0
 		SUB.L #START,D0
-		PRINT_REG D0,D2,D3,D4,A3
-
-		LEA TO(PC),A3
-		PRINT_STR A3,D3
 
 		MOVE.L A0,D2
-		PRINT_REG D2,D3,D4,D5,A3
-		
-		PRINT_CRLF D2,A3
 		
 		PROGRAM_VECTOR D0,A0,D2
 	ENDF
@@ -790,8 +766,8 @@ P
 	MOVE.L #0,D0									; D0 will be the data to write
 
 	FOR D1 = #0 TO #3 DO							; read 2 bytes
-		LSL.L #4,D0									; make what we have so far more significant
-		WAIT_CHAR D2,D3								; next character -> D2
+		LSL.L #4,D0								; make what we have so far more significant
+		WAIT_CHAR D2,D3							; next character -> D2
 		HEX2BIN D2,D2,A0							; convert to binary -> D2
 		OR.B D2,D0
 	ENDF
@@ -801,13 +777,13 @@ P
 	MOVE.L D7,A0									; address accumulator -> target address register
 	MOVE.L #0,D7									; clear the now used address accumulator
 
-	UNPROTECT										; important to only unprotect when we are fully committed (ie, can't escape)
+	UNPROTECT									; important to only unprotect when we are fully committed (ie, can't escape)
 							
-	FOR D7 = #$0 TO #$FFFFFFFF DO					; dead timing loop to wait for unprotect
+	FOR D7 = #$0 TO #$FFFFFFFF DO				; dead timing loop to wait for unprotect
 		NOP
 	ENDF
 			 
-	LEA LOADING(PC),A2								; the prints seem to be important for timing to unprotect the EEPROM
+	LEA LOADING(PC),A2							; the prints seem to be important for timing to unprotect the EEPROM
 	PRINT_STR A2,D2
 
 	PRINT_REG D0,D3,D4,D5,A2
@@ -987,9 +963,6 @@ RAM_ERROR	DC.B '! RAM error at: ',NULL
 BIN2HEX_LUT	DC.B '0123456789ABCDEF'
 HEX2BIN_LUT	DC.B 0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,$A,$B,$C,$D,$E,$F
 LOADING	DC.B 'Loading EEPROM...',CR,LF,NULL
-CODE		DC.B 'Writing code: ',NULL
-SP		DC.B 'Setting initial stack pointer to ',NULL
-VECTORS	DC.B 'Writing vectors',CR,LF,NULL
 CRLF	DC.B CR,LF,NULL
 PROMPT	DC.B '> ',NULL
 ox		DC.B '0x',NULL
@@ -1005,9 +978,7 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
-WARM_START DC.B 'Warm start - phew',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.128 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.129 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
