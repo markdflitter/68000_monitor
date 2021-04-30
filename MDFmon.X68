@@ -4,16 +4,6 @@
 * Date			March 2021
 * Description:	68000 monitor program
 *-----------------------------------------------------------
-; to do
-
-; other ideas
-;------------
-; use DBLoop?
-; keep track of highest address hit during srec download
-; implement backspace
-; fix being able to enter random chars when W'ing
-; ram check at startup?  Not sure if this is a good idea!
-; check for escape during Z and L?  Not sure if W is a good idea either
 
 	ORG  $0
 
@@ -562,7 +552,7 @@ START
 	ENDF
 	
 ;initialise UART
-;	MOVE.B #$0,DUART_IMR							; no interrupts, please
+	MOVE.B #$0,DUART_IMR							; no interrupts, please
 	MOVE.B #$FF,DUART_CTUR
 	MOVE.B #$FF,DUART_CTLR
 	MOVE.B #$70,DUART_ACR
@@ -580,7 +570,6 @@ START
 	MOVE.B #$66,DUART_CSRB							; 115K baud
 	MOVE.B #$5,DUART_CRB							; enable rx & tx
 	MOVE.B #64,DUART_IVR
-	MOVE.B #8,DUART_IMR
 
 	PRINT_CHAR #0,D1								; some non-printing char to flush out the serial port
 	PRINT_CHAR #0,D1
@@ -1073,10 +1062,12 @@ X
 
 		
 I
+	MOVE.B #8,DUART_IMR
 	AND.W #$F8FF,SR
 	BRA MAIN_LOOP
 	
 O
+	MOVE.B #0,DUART_IMR
 	OR.W #$0700,SR
 	BRA MAIN_LOOP
 		
@@ -1202,9 +1193,10 @@ UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
 COLD_START DC.B 'Cold start - brrr',CR,LF,NULL
 WARM_START DC.B 'Warm start - phew',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.125 (28/04/2021)',CR,LF,NULL		; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.126 (30/04/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
