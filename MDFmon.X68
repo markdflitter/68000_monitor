@@ -431,9 +431,6 @@ GET_INPUT
 	CMP.B #'p',D2
 	BEQ P
 
-	CMP.B #'m',D2
-	BEQ M
-
 	PRINT_CRLF D3,A0
  
 	CMP.B #'?',D2
@@ -802,36 +799,6 @@ P
 
 	BRA MAIN_LOOP
 	
-M
-	MOVE.L #0,D0										; D0 will be the length to read			   
-	MOVE.L #0,D1										; D1 will be the address to read 
-
-	FOR D2 = #0 TO #7 DO								; read 4 bytes, we'll split into 2 byte address (MS) and 2 byte length (LS)
-		LSL.L #4,D1										; make what we have so far more significant
-		WAIT_CHAR D3,D4									; next character -> D2
-		HEX2BIN D3,D3,A0								; convert to binary -> D2
-		OR.B D3,D1
-	ENDF
-	PRINT_CRLF D2,A1
-
-	MOVE.W D1,D0										; extract the LSword for the length
-	LSR.L #8,D1											; extract the MSword for the address
-	LSR.L #8,D1
-
-	MOVE.L D1,A1
-	
-	MOVE.L D7,A0										; address accumulator -> target address register
-	;MOVE.L #0,D7										; we're not going to clear it, so we can do go
-
-	WHILE D0 <GT> #0 DO
-		SUB.L #2,D0
-
-		MOVE.B (A1),DISPLAY
-		MOVE.W (A1)+,(A0)+
-	ENDW
-	
-	BRA MAIN_LOOP
-
 X
 	LEA STATUS_REGISTER(PC),A2
 	PRINT_STR A2,D3
@@ -950,7 +917,6 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[z]',TAB,TAB,TAB,'zap memory',CR,LF
 		DC.B 'xxxxxxxx[l]xxxx',TAB,TAB,'load to EEPROM',CR,LF
 		DC.B 'xxxxxxxx[p]xxxx',TAB,TAB,'patch EEPROM',CR,LF
-		DC.B 'xxxxxxxx[m]xxxxxxxx',TAB,'monitor to RAM',CR,LF
 		DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
 		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
 		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF
