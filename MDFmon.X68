@@ -1021,10 +1021,10 @@ WAIT_NOT_BUSY2
 	BTST #7,D0
 	BNE WAIT_NOT_BUSY2
 	
-	;WRITE_8 #1,#$2,D0		; read 1 sector
+	WRITE_8 #1,#$2,D0		; read 1 sector - this is important, otherwise the disk transfer doesn't finish
 	WRITE_8 D2,#$3,D0		; block next
-	;WRITE_8 #2,#$4,D0
-	;WRITE_8 #0,#$5,D0	
+	WRITE_8 #2,#$4,D0		; skip these to save space
+	WRITE_8 #0,#$5,D0	
 	WRITE_8 #$20,#$7,D0
 
 WAIT_NOT_BUSY_AGAIN2
@@ -1040,7 +1040,7 @@ WAIT_DRQ2
 	PRINT_CHAR #'.',D1
 	MOVE.L D3,A0
 	FOR D7 = #$0 TO #255 DO
-		READ_16 #0,D0,D1	
+		READ_16 #0,D0,D1
 		MOVE.W D0,(A0)+
 	ENDF
 	MOVE.L A0,D3
@@ -1161,7 +1161,7 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.133 (16/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.134 (16/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
