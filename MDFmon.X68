@@ -1038,6 +1038,7 @@ B
 	READ_32 #IDE_DATA_REGISTER, D4, D1		; start -> D4
 	READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D5
 	READ_32 #IDE_DATA_REGISTER, D7, D1		; read entry point into address accumulator
+	SUB.L D4,D5								; work out num bytes
 
 	PRINT_CHAR #'.',D0
 	MOVE.L D4, A0
@@ -1047,8 +1048,9 @@ B
 	ENDF
 	MOVE.L A0,D4
 	ADD.L #1,D3
+	SUB.L #500,D5
 	
-	WHILE D4 <LT> D5 DO
+	WHILE D5 <GT> 0 DO
 		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
 
 		PRINT_CHAR #'.', D1
@@ -1059,6 +1061,7 @@ B
 		ENDF
 		MOVE.L A0, D4		
 		ADD.L #1,D3
+		SUB.L #512,D5
 	ENDW
 
 	PRINT_CRLF D3,A3
