@@ -418,7 +418,7 @@ SET_READ_ADDRESS MACRO
 	WRITE_8 \3, #IDE_LBA_0_7_REGISTER, \2
 	LSR.L #8, \3
 	WRITE_8 \3, #IDE_LBA_8_15_REGISTER, \2
-	LSR.L #8, \3
+	LSR.L #8, \3								
 	WRITE_8 \3, #IDE_LBA_16_23_REGISTER, \2
 	LSR.L #8, \3
 	READ_8 #IDE_DRIVESEL_REGISTER, \4, \2
@@ -897,8 +897,6 @@ L
 				
 	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
-	LEA LOADING(PC),A2
-	PRINT_STR A2,D2
 		
 	MOVE.L A1,D2
 	PRINT_REG D2,D3,D4,D5,A2
@@ -1028,37 +1026,34 @@ B
 	
 	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
 	WAIT_DRIVE_READY D0, D1
-	
-	READ_8 #IDE_DRIVESEL_REGISTER, D0, D1
-	
+		
 	MOVE.L #513,D3
-
-	SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2		
-
-	READ_32 #IDE_DATA_REGISTER, D4, D1		; start -> D4
-	READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D5
-	READ_32 #IDE_DATA_REGISTER, D7, D1		; read entry point into address accumulator
-	SUB.L D4, D5							; work out num bytes
-	MOVE.L D4, A0							; set up target
-
-	PRINT_CHAR #'.',D0
-	FOR D6 = #6 TO #255 DO
-		READ_16 #IDE_DATA_REGISTER, D0, D1
-		MOVE.W D0,(A0)+
-		SUB.L #2,D5
-	ENDF
-	ADD.L #1,D3
 	
-	WHILE D5 <GT> 0 DO
+	MOVE.L #1, D4							; flag for first iteration
+	MOVE.L #1, D5							; sentinel to prime the loop
+	WHILE D5 <GT> #0 DO
 		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
-
 		PRINT_CHAR #'.', D1
-		FOR D6 = #$0 TO #255 DO
-			READ_16 #IDE_DATA_REGISTER, D0,D1
+		
+		IF D4 <EQ> #1 THEN
+			READ_32 #IDE_DATA_REGISTER, D2, D1		; start -> D2
+			MOVE.L D2, A0							; set up target			
+			READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D5
+			SUB.L D2, D5							; work out num bytes
+			READ_32 #IDE_DATA_REGISTER, D7, D1		; read entry point into address accumulator
+			MOVE.L #6, D2							; words read so far
+		ELSE
+			MOVE.L #0, D2							; words read so far
+		ENDI
+			
+		FOR D6 = D2 TO #255 DO
+			READ_16 #IDE_DATA_REGISTER, D0, D1
 			MOVE.W D0,(A0)+
-			SUB.L #2,D5
+			SUB.L #2, D5
 		ENDF
-		ADD.L #1,D3
+		
+		ADD.L #1, D3								; next block
+		MOVE.L #0, D4								; not the first anymore
 	ENDW
 
 	PRINT_CRLF D3,A3
@@ -1066,7 +1061,7 @@ B
 	BRA MAIN_LOOP
 
 HEX_DIGIT
-	LSL.L #4,D7											; add the next digit in the next 4 bits
+	LSL.L #4,D7										; add the next digit in the next 4 bits
 	HEX2BIN D2,D2,A0
 	OR.B D2,D7  
 	BRA GET_INPUT
@@ -1107,7 +1102,6 @@ CONTINUE
 		
 ILLEGAL_HANDLER
 	MOVE.B #7,DISPLAY	
-	
 	MOVE.L #4,A0
 	JMP (A0)
 		
@@ -1169,9 +1163,9 @@ READING DC.B 'reading ',NULL
 WRITING DC.B 'writing ',NULL
 FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
-UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
+UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.135 (17/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.138 (17/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
 
