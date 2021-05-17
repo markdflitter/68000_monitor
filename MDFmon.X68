@@ -1038,15 +1038,14 @@ B
 	READ_32 #IDE_DATA_REGISTER, D4, D1		; start -> D4
 	READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D5
 	READ_32 #IDE_DATA_REGISTER, D7, D1		; read entry point into address accumulator
-	SUB.L D4,D5								; work out num bytes
+	SUB.L D4, D5							; work out num bytes
+	MOVE.L D4, A0							; set up target
 
 	PRINT_CHAR #'.',D0
-	MOVE.L D4, A0
 	FOR D6 = #6 TO #255 DO
 		READ_16 #IDE_DATA_REGISTER, D0, D1
 		MOVE.W D0,(A0)+
 	ENDF
-	MOVE.L A0,D4
 	ADD.L #1,D3
 	SUB.L #500,D5
 	
@@ -1054,12 +1053,10 @@ B
 		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
 
 		PRINT_CHAR #'.', D1
-		MOVE.L D4, A0
 		FOR D6 = #$0 TO #255 DO
 			READ_16 #IDE_DATA_REGISTER, D0,D1
 			MOVE.W D0,(A0)+
 		ENDF
-		MOVE.L A0, D4		
 		ADD.L #1,D3
 		SUB.L #512,D5
 	ENDW
