@@ -312,7 +312,7 @@ WAIT_FOR_COMPLETE\@
 ; \1 handler address, \2 = target address, \3 = working data register
 PROGRAM_VECTOR MACRO
 	ADD.L #2,\2
-	PROGRAM \1, (\2), \3								; write it
+	PROGRAM \1, (\2), \3							; write it
 	LSR.L #8,\1
 	LSR.L #8,\1
 	SUB.L #2,\2
@@ -371,9 +371,9 @@ READ_16 MACRO
 ; read ide data
 ; \1 = register to read, \2 = data register for result, \3 = working data register 
 READ_32 MACRO
-	READ_16 \1, \2, \3		; start -> D3
-	LSL.L #8,D3
-	LSL.L #8,D3
+	READ_16 \1, \2, \3
+	LSL.L #8, \2
+	LSL.L #8, \2
 	READ_16 \1, \2, \3
 	ENDM
 		
@@ -407,7 +407,7 @@ WAIT_DRIVE_DRQ MACRO
 LOOP\@
 	READ_IDE_STATUS \1, \2
 	BTST #IDE_STATUS_DRQ, \1
-	BNE LOOP\@
+	BEQ LOOP\@
 	ENDM
 	
 ; prepare to send a read command
@@ -1029,29 +1029,39 @@ B
 	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
 	WAIT_DRIVE_READY D0, D1
 	
+	READ_8 #IDE_DRIVESEL_REGISTER, D0, D1
+	
 	MOVE.L #513,D3
 
-	SEND_READ_COMMAND_AND_WAIT D3,D0,D1,D2
+	SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2		
 
-	READ_32 #IDE_DATA_REGISTER, D4, D1		; start -> D3	
-	READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D4
+	READ_32 #IDE_DATA_REGISTER, D4, D1		; start -> D4
+	PRINT_REG D4,D0,D1,D6,A2
+	PRINT_CRLF D6,A2
+
+	READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D5
+	PRINT_REG D5,D0,D1,D6,A2
+	PRINT_CRLF D6,A2
+
 	READ_32 #IDE_DATA_REGISTER, D7, D1		; read entry point into address accumulator
+	PRINT_REG D7,D0,D1,D6,A2
+	PRINT_CRLF D6,A2
 
-	PRINT_CHAR #'.',D0
+	PRINT_CHAR #'*',D0
 	MOVE.L D4, A0
-	FOR D7 = #6 TO #255 DO
-		READ_16 #IDE_DATA_REGISTER, D0,D1
+	FOR D6 = #6 TO #255 DO
+		READ_16 #IDE_DATA_REGISTER, D0, D1
 		MOVE.W D0,(A0)+
 	ENDF
 	MOVE.L A0,D4
 	ADD.L #1,D3
 	
 	WHILE D4 <LT> D5 DO
-		SEND_READ_COMMAND_AND_WAIT D3,D0,D1,D2
+		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
 
-		PRINT_CHAR #'.',D1
+		PRINT_CHAR #'*', D1
 		MOVE.L D4, A0
-		FOR D7 = #$0 TO #255 DO
+		FOR D6 = #$0 TO #255 DO
 			READ_16 #IDE_DATA_REGISTER, D0,D1
 			MOVE.W D0,(A0)+
 		ENDF
@@ -1169,9 +1179,11 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '*  Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.134 (16/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.135 (17/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 
 
