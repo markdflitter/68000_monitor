@@ -702,7 +702,6 @@ W
 	PRINT_CRLF D3,A0
 
 	MOVE.L D7,A0									; address accumulator -> address register
-	MOVE.L #0,D7									; clear the now used address accumulator
 
 	MOVE.L D5,(A0)									; write the data
 
@@ -725,7 +724,7 @@ W
 S
 	MOVE.L 0,A0										; start address -> A0
 	MOVE.L D7,A1									; grab the address accumulator (offset) into A1
-	
+	MOVE.L #0,D7
 	MOVE.L #0,D0									; count of records read -> D0
 		
 WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
@@ -987,7 +986,7 @@ P
 	PROGRAM D0,(A0),D2
 
 	PROTECT
-
+	
 	BRA MAIN_LOOP
 	
 X
@@ -1027,10 +1026,10 @@ B
 	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
 	WAIT_DRIVE_READY D0, D1
 		
-	MOVE.L #513,D3
-	
-	MOVE.L #1, D4							; flag for first iteration
-	MOVE.L #1, D5							; sentinel to prime the loop
+	MOVE.L D7,D3								; grab the address accumulator into D3 as block startb
+			
+	MOVE.L #1, D4								; flag for first iteration
+	MOVE.L #1, D5								; sentinel to prime the loop
 	WHILE D5 <GT> #0 DO
 		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
 		PRINT_CHAR #'.', D1
@@ -1046,7 +1045,7 @@ B
 			MOVE.L #0, D2							; words read so far
 		ENDI
 			
-		FOR D6 = D2 TO #255 DO
+		FOR.L D6 = D2 TO #255 DO
 			READ_16 #IDE_DATA_REGISTER, D0, D1
 			MOVE.W D0,(A0)+
 			SUB.L #2, D5
@@ -1141,7 +1140,7 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
 		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF
 		DC.B '[o]',TAB,TAB,TAB,'disable interrupts',CR,LF
-		DC.B '[b]',TAB,TAB,TAB,'boot from disk',CR,LF,NULL
+		DC.B 'xxxxxxxx[b]',TAB,TAB,'boot from disk',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
 UNREC	DC.B 'W: Unknown Srec type: ',NULL
@@ -1165,9 +1164,11 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.138 (17/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.140 (25/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 
 
