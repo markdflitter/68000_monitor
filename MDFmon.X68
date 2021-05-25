@@ -1030,7 +1030,7 @@ B
 			
 	MOVE.L #1, D4								; flag for first iteration
 	MOVE.L #1, D5								; sentinel to prime the loop
-	WHILE D5 <GT> #0 DO
+	WHILE.L D5 <GT> #0 DO
 		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
 		PRINT_CHAR #'.', D1
 		
@@ -1164,9 +1164,10 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.140 (25/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.141 (25/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
