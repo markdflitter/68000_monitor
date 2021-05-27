@@ -185,6 +185,16 @@ LOOP\@
 EXIT\@
 	ENDM
   
+; send the contents of a data register to the serial port as a 1 digit hex number
+; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 working address register
+PRINT_REG_4BIT MACRO
+	LEA BIN2HEX_LUT(PC),\4							; load the lookup table
+	MOVE.B \1,\3
+	ANDI.L #$F,\3
+	MOVE.B 0(\4,\3),\3								; use that as an index into the LUT
+	PRINT_CHAR \3,\2
+	ENDM
+
 ; send the contents of a data register to the serial port as a 8 digit hex number
 ; \1 = data register containing binary number, \2 = data register to use for status poll, \3 working data register, \4 counter register, \5 working address register
 PRINT_REG MACRO
@@ -283,7 +293,7 @@ DOWNLOAD_BYTE MACRO
 	WHILE.B \4 <GT> 0 DO
 		LSL.L #4,\1									; it's OK to do this first, because we are either starting from 0, 
 		DOWNLOAD \2									; or we are reading the next byte along, so need to shift up the previous one
-		PRINT_CHAR \2,\3
+		;PRINT_CHAR \2,\3
 		HEX2BIN \2,\2,\6
 		OR.B \2,\1
 		SUB.B #1,\4
@@ -642,14 +652,17 @@ GET_INPUT
 	CMP.B #'x',D2
 	BEQ X
 
-	CMP.B #'i',D2
-	BEQ I
+	CMP.B #'I',D2
+	BEQ EI
 
 	CMP.B #'o',D2
-	BEQ O
+	BEQ DI
 
 	CMP.B #'#',D2
 	BEQ HASH
+
+	CMP.B #'i',D2
+	BEQ I
 
 	CMP.B #'b',D2
 	BEQ B
@@ -732,18 +745,19 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	CMP.B #'S',D1									; found S?
 	BNE WAIT_FOR_SRECORD							; nope, keep waiting
 	
-	PRINT_CHAR #'S',D5								; print the S
+	PRINT_CHAR #'.',D5								; print a progress indicator
+	;PRINT_CHAR #'S',D5								; print the S
 	ADD.L #1,D0										; read another S record, increment count
 	
 	DOWNLOAD D1										; read the record identifier and echo it back
-	PRINT_CHAR D1,D5
+	;PRINT_CHAR D1,D5
 
 	MOVE.L #0,D2									; clear the checksum
 
 	DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4
 
 	IF.B D1 <EQ> #'0' THEN.L						; header, just ignore it
-		PRINT_CRLF D5,A4
+		;PRINT_CRLF D5,A4
 		BRA WAIT_FOR_SRECORD
 	ELSE
 		IF.B D1 <EQ> #'1' OR.B D1 <EQ> #'2' THEN.L	; 16 or 24 bit address data record
@@ -795,9 +809,9 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	ENDI
 
 	DOWNLOAD_BYTE D4,D5,D6,D7,D2,A4
-	PRINT_CRLF D5,A4
 
 	IF.B D2 <NE> #$FF THEN.L
+		PRINT_CRLF D5,A4
 		LEA CS_FAILURE(PC),A4						; warn for mismatched checksum
 		PRINT_STR A4,D5
 		PRINT_REG D0,D5,D3,D6,A4
@@ -810,6 +824,7 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	  BRA WAIT_FOR_SRECORD
 	ENDI
 DOWNLOAD_DONE
+	PRINT_CRLF D5,A4
 	PRINT_REG D0,D5,D6,D2,A1						; print out number of Srecords read
 	LEA READ(PC),A1
 	PRINT_STR A1,D5
@@ -1006,18 +1021,108 @@ X
 
 	BRA MAIN_LOOP
 		
-I
+EI
 	MOVE.B #8,DUART_IMR
 	AND.W #$F8FF,SR
 	BRA MAIN_LOOP
 	
-O
+DI
 	MOVE.B #0,DUART_IMR
 	OR.W #$0700,SR
 	BRA MAIN_LOOP
 		
 HASH
 	PROTECT
+	BRA MAIN_LOOP
+
+I
+	MOVE.B #(MC68230_PORT_C_READ | MC68230_PORT_C_WRITE | MC68230_PORT_C_CS), MC68230_PORT_C_DATA
+	
+	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
+	WAIT_DRIVE_READY D0, D1
+		
+	SEND_READ_COMMAND_AND_WAIT #0, D0, D1, D2
+
+	MOVE.L #0,D4								; words read from block
+
+	READ_32 #IDE_DATA_REGISTER, D2, D1			; num entries -> D2
+	ADD.L #2, D4
+			
+	MOVE.L #0, D3								; entries printed -> D3
+	
+	WHILE.L D4 <LT> #255 DO						; read the entire 256 words to complete the transfer, even though we don't care
+		IF D3 <LT> D2 THEN
+			READ_32 #IDE_DATA_REGISTER, D5, D1	; empty flag  -> D5
+			ADD.L #2, D4
+		
+			IF D5 <NE> #1 THEN
+				PRINT_REG_4BIT D3,D1,D6,A0
+				LEA INDEX_SEP(PC),A0
+				PRINT_STR A0,D1
+			ENDI
+			
+			READ_32 #IDE_DATA_REGISTER, D6, D1 ; strlen
+			ADD.L #2, D4
+			
+			FOR D6 = #0 TO #5 DO
+				READ_32 #IDE_DATA_REGISTER, D7, D1
+				ADD.L #2, D4
+							
+				IF D5 <NE> #1 THEN
+					ROL.l #8,D7					
+					PRINT_CHAR D7, D1
+					ROL.l #8,D7					
+					PRINT_CHAR D7, D1
+					ROL.l #8,D7					
+					PRINT_CHAR D7, D1
+					ROL.l #8,D7					
+					PRINT_CHAR D7, D1
+				ENDI
+			ENDF
+
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip index
+			ADD.L #2, D4
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip length
+			ADD.L #2, D4
+
+			IF D5 <NE> #1 THEN
+				LEA INDEX_SEP(PC),A0
+				PRINT_STR A0,D1
+				PRINT_REG D6,D1,D0,D7,A0
+			ENDI
+			
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip load address
+			ADD.L #2, D4
+			IF D5 <NE> #1 THEN
+				LEA INDEX_SEP(PC),A0
+				PRINT_STR A0,D1
+				PRINT_REG D6,D1,D0,D7,A0
+			ENDI
+
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip go address
+			ADD.L #2, D4		
+			IF D5 <NE> #1 THEN
+				LEA INDEX_SEP(PC),A0
+				PRINT_STR A0,D1
+				PRINT_REG D6,D1,D0,D7,A0
+			ENDI
+
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip start block
+			ADD.L #2, D4		
+			IF D5 <NE> #1 THEN
+				LEA INDEX_SEP(PC),A0
+				PRINT_STR A0,D1
+				PRINT_REG D6,D1,D0,D7,A0
+				PRINT_CRLF D1,A1
+			ENDI
+		
+			ADD.L #1, D3
+		ELSE
+			READ_16 #IDE_DATA_REGISTER, D6, D1	; ignore
+			ADD.L #1, D4	
+		ENDI
+	ENDW
+	
 	BRA MAIN_LOOP
 	
 B
@@ -1138,8 +1243,9 @@ HELP	DC.B '[?]',TAB,TAB,TAB,'help',CR,LF
 		DC.B 'xxxxxxxx[p]xxxxxxxx',TAB,'patch EEPROM',CR,LF
 		DC.B '#',TAB,TAB,TAB,'write protect EEPROM',CR,LF
 		DC.B '[x]',TAB,TAB,TAB,'print registers',CR,LF
-		DC.B '[i]',TAB,TAB,TAB,'enable interrupts',CR,LF
+		DC.B '[I]',TAB,TAB,TAB,'enable interrupts',CR,LF
 		DC.B '[o]',TAB,TAB,TAB,'disable interrupts',CR,LF
+		DC.B '[i]',TAB,TAB,TAB,'index the disk',CR,LF
 		DC.B 'xxxxxxxx[b]',TAB,TAB,'boot from disk',CR,LF,NULL
 HUH	 DC.B 'Huh?',CR,LF,NULL
 READ	DC.B ' S records read, start address = ',NULL
@@ -1156,6 +1262,7 @@ to		DC.B ' -> ',NULL
 for		DC.B ' for ',NULL
 STACK_POINTER DC.B 'SP: ',NULL
 STATUS_REGISTER DC.B 'SR: ',NULL
+INDEX_SEP DC.B ' : ',NULL
 TICK DC.B 'tick',CR,LF,NULL
 BUS_ERROR DC.B '* Bus/address error ',NULL
 READING DC.B 'reading ',NULL
@@ -1164,9 +1271,12 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.141 (25/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.142 (27/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
+
 
 
 
