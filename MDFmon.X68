@@ -1050,7 +1050,7 @@ I
 			
 	MOVE.L #0, D3								; entries printed -> D3
 	
-	WHILE.L D4 <LT> #255 DO						; read the entire 256 words to complete the transfer, even though we don't care
+	WHILE.L D4 <LT> #256 DO						; read the entire 256 words to complete the transfer, even though we don't care
 		IF D3 <LT> D2 THEN
 			READ_32 #IDE_DATA_REGISTER, D5, D1	; empty flag  -> D5
 			ADD.L #2, D4
@@ -1123,6 +1123,8 @@ I
 		ENDI
 	ENDW
 	
+	MOVE.L #0,D7
+	
 	BRA MAIN_LOOP
 	
 B
@@ -1131,26 +1133,100 @@ B
 	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
 	WAIT_DRIVE_READY D0, D1
 		
-	MOVE.L D7,D3								; grab the address accumulator into D3 as block startb
+	SEND_READ_COMMAND_AND_WAIT #0, D0, D1, D2
+	
+	MOVE.L #0,D4								; words read from block
+
+	READ_32 #IDE_DATA_REGISTER, D2, D1			; num entries -> D2
+	ADD.L #2, D4
+
+	MOVE.L D7,D2								; move the one we want into D2
 			
+	MOVE.L #0,D3								; entries read -> D3
+	
+	WHILE.L D4 <LT> #256 DO					; read the entire 256 words to complete the transfer, even though we don't care
+		IF D3 <LE> D2 THEN
+			READ_32 #IDE_DATA_REGISTER, D5, D1	; empty flag  -> D5
+			ADD.L #2, D4
+					
+			READ_32 #IDE_DATA_REGISTER, D6, D1 ; strlen
+			ADD.L #2, D4
+			IF D3 <EQ> D2 THEN
+				IF D5 <NE> #1 THEN
+					LEA BOOT(PC),A0
+					PRINT_STR A0,D1
+				ENDI
+			ENDI
+			
+			FOR D6 = #0 TO #5 DO
+				READ_32 #IDE_DATA_REGISTER, D7, D1
+				ADD.L #2, D4
+				IF D3 <EQ> D2 THEN
+					IF D5 <NE> #1 THEN
+						
+						ROL.l #8,D7					
+						PRINT_CHAR D7, D1
+						ROL.l #8,D7					
+						PRINT_CHAR D7, D1
+						ROL.l #8,D7					
+						PRINT_CHAR D7, D1
+						ROL.l #8,D7					
+						PRINT_CHAR D7, D1
+					ENDI
+				ENDI
+			ENDF
+
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip index
+			ADD.L #2, D4
+			
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; length -> D5
+			ADD.L #2, D4
+			
+			IF D5 <NE> #1 THEN			; skip empty
+				MOVE.L D6, D5
+			ELSE
+				MOVE.L #0, D5
+			ENDI		
+			
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; load address -> A0
+			ADD.L #2, D4
+			MOVE.L D6, A0
+
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; go address -> D7
+			ADD.L #2, D4		
+			MOVE.L D6, D7
+
+			READ_32 #IDE_DATA_REGISTER, D6, D1	; start block -> D6
+			ADD.L #2, D4	
+		
+			ADD.L #1, D3
+		ELSE
+			READ_16 #IDE_DATA_REGISTER, D0, D1	; ignore
+			ADD.L #1, D4	
+		ENDI
+	ENDW
+	
+	IF D5 <EQ> #0 THEN
+		LEA	NOT_FOUND(PC),A0
+		PRINT_STR A0,D1
+		
+		BRA MAIN_LOOP
+	ENDI
+				
+	MOVE.L D6, D3
+	
+	;MOVE.L A0,D5
+	;PRINT_REG D5,D1,D0,D7,A0
+	;PRINT_CRLF D1,A0
+
+	;BRA MAIN_LOOP	
+	
 	MOVE.L #1, D4								; flag for first iteration
-	MOVE.L #1, D5								; sentinel to prime the loop
 	WHILE.L D5 <GT> #0 DO
 		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
 		PRINT_CHAR #'.', D1
-		
-		IF D4 <EQ> #1 THEN
-			READ_32 #IDE_DATA_REGISTER, D2, D1		; start -> D2
-			MOVE.L D2, A0							; set up target			
-			READ_32 #IDE_DATA_REGISTER, D5, D1		; end -> D5
-			SUB.L D2, D5							; work out num bytes
-			READ_32 #IDE_DATA_REGISTER, D7, D1		; read entry point into address accumulator
-			MOVE.L #6, D2							; words read so far
-		ELSE
-			MOVE.L #0, D2							; words read so far
-		ENDI
 			
-		FOR.L D6 = D2 TO #255 DO
+		FOR.L D2 = #0 TO #255 DO
 			READ_16 #IDE_DATA_REGISTER, D0, D1
 			MOVE.W D0,(A0)+
 			SUB.L #2, D5
@@ -1160,9 +1236,9 @@ B
 		MOVE.L #0, D4								; not the first anymore
 	ENDW
 
-	PRINT_CRLF D3,A3
+	PRINT_CRLF D3,A3	
 	
-	BRA MAIN_LOOP
+	BRA MAIN_LOOP	
 
 HEX_DIGIT
 	LSL.L #4,D7										; add the next digit in the next 4 bits
@@ -1263,6 +1339,8 @@ for		DC.B ' for ',NULL
 STACK_POINTER DC.B 'SP: ',NULL
 STATUS_REGISTER DC.B 'SR: ',NULL
 INDEX_SEP DC.B ' : ',NULL
+BOOT DC.B 'Booting ',NULL
+NOT_FOUND DC.B 'Not found',CR,LF,NULL
 TICK DC.B 'tick',CR,LF,NULL
 BUS_ERROR DC.B '* Bus/address error ',NULL
 READING DC.B 'reading ',NULL
@@ -1271,9 +1349,10 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.142 (27/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.145 (28/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
