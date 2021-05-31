@@ -662,7 +662,12 @@ GET_INPUT
 	BEQ HASH
 
 	CMP.B #'i',D2
-	BEQ I
+	MOVE.L #0, A5				; not boot
+	BEQ IB
+
+	CMP.B #'b',D2
+	MOVE.L #1, A5				; boot
+	BEQ IB
 
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
@@ -1032,7 +1037,12 @@ HASH
 	PROTECT
 	BRA MAIN_LOOP
 
-I
+IB
+	MOVE.L #0, A1	; length -> A1
+	MOVE.L #0, A2	; start address -> A2
+	MOVE.L #0, A3	; go address -> A3
+	MOVE.L #0, A4	; start block -> A4
+
 	MOVE.B #(MC68230_PORT_C_READ | MC68230_PORT_C_WRITE | MC68230_PORT_C_CS), MC68230_PORT_C_DATA
 	
 	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
@@ -1042,6 +1052,16 @@ I
 
 	READ_32 #IDE_DATA_REGISTER, D0, D7			; num entries in boot table -> D0
 	MOVE.L #0, D1								; current boot table index -> D1
+	
+	IF D7 <GT> D1 THEN							; check for off the end of the boot table
+		LEA NOT_FOUND(PC), A0
+		PRINT_STR A0, D7
+		BRA MAIN_LOOP
+	ENDI
+	
+	IF A5 <EQ> #1 THEN
+		MOVE.L D7, D1							; shorten the boot table to the selected entry	
+	ENDI
 
 	FOR.B D2 = #0 TO #9 DO						; 10 boot table entries / block, each of 48 bytes
 		FOR.B D3 = #0 TO #12 DO					; words read from this boot table entry -> D2
@@ -1071,7 +1091,23 @@ I
 					IF.B D3 <GT> #8 AND.B D3 <LT> #13 THEN
 						LEA INDEX_SEP(PC), A0
 						PRINT_STR A0, D7
-						PRINT_REG D4, D5, D6, D7, A0	
+						PRINT_REG D4, D5, D6, D7, A0
+
+						IF.B D3 <EQ> #9 THEN
+							MOVE.L D4, A1	; length -> A1
+						ENDI
+			
+						IF.B D3 <EQ> #10 THEN
+							MOVE.L D4, A2	; start address -> A2
+						ENDI
+
+						IF.B D3 <EQ> #11 THEN
+							MOVE.L D4, A3	; go address -> A3
+						ENDI
+
+						IF.B D3 <EQ> #12 THEN
+							MOVE.L D4, A4	; start block -> A4
+						ENDI
 					ENDI		
 					
 					MOVE.L A1, D5				; restore the empty flag into D5
@@ -1085,7 +1121,39 @@ I
 		
 		ADD.L #1,D1								; next boot table index
 	ENDF
+	
+	IF A5 <EQ> #1 THEN							; boot
+
+		IF A1 <EQ> #0 THEN						; check for boot from empty slot
+			LEA NOT_FOUND(PC), A0
+			PRINT_STR A0, D7
+			BRA MAIN_LOOP
+		ENDI
+
+		LEA BOOT(PC), A0
+		PRINT_STR A0, D7
+	
+		MOVE.L A1, D0							; length -> D5
+		MOVE.L A4, D1							; start block -> D3
+
+		WHILE.L D0 <GT> #0 DO
+			SEND_READ_COMMAND_AND_WAIT D1, D5, D6, D7
+			PRINT_CHAR #'.', D7
 			
+			FOR.L D2 = #0 TO #255 DO
+				READ_16 #IDE_DATA_REGISTER, D2, D7
+				MOVE.W D2,(A2)+
+				SUB.L #2, D0
+			ENDF
+		
+			ADD.L #1, D1						; next block
+		ENDW
+
+		PRINT_CRLF D3, A6	
+	
+		MOVE.L A3, D7							; set go address
+	ENDI
+	
 	BRA MAIN_LOOP
 
 HEX_DIGIT
@@ -1200,6 +1268,7 @@ SPURIOUS DC.B '* Spurious interrupt',NULL
 VERSION DC.B 'MDF-mon V1.146 (30/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
