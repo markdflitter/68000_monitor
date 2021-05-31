@@ -664,9 +664,6 @@ GET_INPUT
 	CMP.B #'i',D2
 	BEQ I
 
-	CMP.B #'b',D2
-	BEQ B
-
 	LEA HUH(PC),A0
 	PRINT_STR A0,D3
 
@@ -1043,205 +1040,56 @@ I
 		
 	SEND_READ_COMMAND_AND_WAIT #0, D0, D1, D2
 
-	MOVE.L #0,D4								; words read from block
+	READ_32 #IDE_DATA_REGISTER, D0, D7			; num entries in boot table -> D0
+	MOVE.L #0, D1								; current boot table index -> D1
 
-	READ_32 #IDE_DATA_REGISTER, D2, D1			; num entries -> D2
-	ADD.L #2, D4
-			
-	MOVE.L #0, D3								; entries printed -> D3
-	
-	WHILE.L D4 <LT> #256 DO						; read the entire 256 words to complete the transfer, even though we don't care
-		IF D3 <LT> D2 THEN
-			READ_32 #IDE_DATA_REGISTER, D5, D1	; empty flag  -> D5
-			ADD.L #2, D4
-		
-			IF D5 <NE> #1 THEN
-				PRINT_REG_4BIT D3,D1,D6,A0
-				LEA INDEX_SEP(PC),A0
-				PRINT_STR A0,D1
-			ENDI
-			
-			READ_32 #IDE_DATA_REGISTER, D6, D1 ; strlen
-			ADD.L #2, D4
-			
-			FOR D6 = #0 TO #5 DO
-				READ_32 #IDE_DATA_REGISTER, D7, D1
-				ADD.L #2, D4
-							
-				IF D5 <NE> #1 THEN
-					ROL.l #8,D7					
-					PRINT_CHAR D7, D1
-					ROL.l #8,D7					
-					PRINT_CHAR D7, D1
-					ROL.l #8,D7					
-					PRINT_CHAR D7, D1
-					ROL.l #8,D7					
-					PRINT_CHAR D7, D1
+	FOR.B D2 = #0 TO #9 DO						; 10 boot table entries / block, each of 48 bytes
+		FOR.B D3 = #0 TO #12 DO					; words read from this boot table entry -> D2
+			READ_32 #IDE_DATA_REGISTER, D4, D7	; get next word ->D4
+			IF.B D1 <LT> D0 THEN				; still in the boot table?
+
+				IF.B D3 <EQ> #0 THEN			; always handle the empty flag
+					MOVE.B D4, D5				; empty flag -> D5
 				ENDI
-			ENDF
-
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip index
-			ADD.L #2, D4
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip length
-			ADD.L #2, D4
-
-			IF D5 <NE> #1 THEN
-				LEA INDEX_SEP(PC),A0
-				PRINT_STR A0,D1
-				PRINT_REG D6,D1,D0,D7,A0
-			ENDI
-			
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip load address
-			ADD.L #2, D4
-			IF D5 <NE> #1 THEN
-				LEA INDEX_SEP(PC),A0
-				PRINT_STR A0,D1
-				PRINT_REG D6,D1,D0,D7,A0
-			ENDI
-
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip go address
-			ADD.L #2, D4		
-			IF D5 <NE> #1 THEN
-				LEA INDEX_SEP(PC),A0
-				PRINT_STR A0,D1
-				PRINT_REG D6,D1,D0,D7,A0
-			ENDI
-
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip start block
-			ADD.L #2, D4		
-			IF D5 <NE> #1 THEN
-				LEA INDEX_SEP(PC),A0
-				PRINT_STR A0,D1
-				PRINT_REG D6,D1,D0,D7,A0
-				PRINT_CRLF D1,A1
-			ENDI
-		
-			ADD.L #1, D3
-		ELSE
-			READ_16 #IDE_DATA_REGISTER, D6, D1	; ignore
-			ADD.L #1, D4	
-		ENDI
-	ENDW
-	
-	MOVE.L #0,D7
-	
-	BRA MAIN_LOOP
-	
-B
-	MOVE.B #(MC68230_PORT_C_READ | MC68230_PORT_C_WRITE | MC68230_PORT_C_CS), MC68230_PORT_C_DATA
-	
-	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
-	WAIT_DRIVE_READY D0, D1
-		
-	SEND_READ_COMMAND_AND_WAIT #0, D0, D1, D2
-	
-	MOVE.L #0,D4								; words read from block
-
-	READ_32 #IDE_DATA_REGISTER, D2, D1			; num entries -> D2
-	ADD.L #2, D4
-
-	MOVE.L D7,D2								; move the one we want into D2
-			
-	MOVE.L #0,D3								; entries read -> D3
-	
-	WHILE.L D4 <LT> #256 DO					; read the entire 256 words to complete the transfer, even though we don't care
-		IF D3 <LE> D2 THEN
-			READ_32 #IDE_DATA_REGISTER, D5, D1	; empty flag  -> D5
-			ADD.L #2, D4
-					
-			READ_32 #IDE_DATA_REGISTER, D6, D1 ; strlen
-			ADD.L #2, D4
-			IF D3 <EQ> D2 THEN
-				IF D5 <NE> #1 THEN
-					LEA BOOT(PC),A0
-					PRINT_STR A0,D1
-				ENDI
-			ENDI
-			
-			FOR D6 = #0 TO #5 DO
-				READ_32 #IDE_DATA_REGISTER, D7, D1
-				ADD.L #2, D4
-				IF D3 <EQ> D2 THEN
-					IF D5 <NE> #1 THEN
-						
-						ROL.l #8,D7					
-						PRINT_CHAR D7, D1
-						ROL.l #8,D7					
-						PRINT_CHAR D7, D1
-						ROL.l #8,D7					
-						PRINT_CHAR D7, D1
-						ROL.l #8,D7					
-						PRINT_CHAR D7, D1
-					ENDI
-				ENDI
-			ENDF
-
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; skip index
-			ADD.L #2, D4
-			
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; length -> D5
-			ADD.L #2, D4
-			
-			IF D5 <NE> #1 THEN			; skip empty
-				MOVE.L D6, D5
-			ELSE
-				MOVE.L #0, D5
-			ENDI		
-			
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; load address -> A0
-			ADD.L #2, D4
-			MOVE.L D6, A0
-
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; go address -> D7
-			ADD.L #2, D4		
-			MOVE.L D6, D7
-
-			READ_32 #IDE_DATA_REGISTER, D6, D1	; start block -> D6
-			ADD.L #2, D4	
-		
-			ADD.L #1, D3
-		ELSE
-			READ_16 #IDE_DATA_REGISTER, D0, D1	; ignore
-			ADD.L #1, D4	
-		ENDI
-	ENDW
-	
-	IF D5 <EQ> #0 THEN
-		LEA	NOT_FOUND(PC),A0
-		PRINT_STR A0,D1
-		
-		BRA MAIN_LOOP
-	ENDI
 				
-	MOVE.L D6, D3
-	
-	;MOVE.L A0,D5
-	;PRINT_REG D5,D1,D0,D7,A0
-	;PRINT_CRLF D1,A0
+				IF.B D5 <NE> #1 THEN			; not empty
+					MOVE.L D5, A1				; preserve the empty flag, we're gonna need D5
+					
+					IF.B D3 <EQ> #0 THEN		; first word in boot table, print the index
+						PRINT_REG_4BIT D1, D6, D7, A0	
+						LEA INDEX_SEP(PC), A0
+						PRINT_STR A0, D7
+					ENDI
+							
+					IF.B D3 <GT> #1 AND.B D3 <LT> #8 THEN	; str, print it
+						FOR.B D6 = #0 TO #3 DO
+							ROL.L #8, D4					
+							PRINT_CHAR D4, D7
+						ENDF
+					ENDI
 
-	;BRA MAIN_LOOP	
-	
-	MOVE.L #1, D4								; flag for first iteration
-	WHILE.L D5 <GT> #0 DO
-		SEND_READ_COMMAND_AND_WAIT D3, D0, D1, D2
-		PRINT_CHAR #'.', D1
-			
-		FOR.L D2 = #0 TO #255 DO
-			READ_16 #IDE_DATA_REGISTER, D0, D1
-			MOVE.W D0,(A0)+
-			SUB.L #2, D5
+					IF.B D3 <GT> #8 AND.B D3 <LT> #13 THEN
+						LEA INDEX_SEP(PC), A0
+						PRINT_STR A0, D7
+						PRINT_REG D4, D5, D6, D7, A0	
+					ENDI		
+					
+					MOVE.L A1, D5				; restore the empty flag into D5
+				ENDI
+			ENDI			
 		ENDF
-		
-		ADD.L #1, D3								; next block
-		MOVE.L #0, D4								; not the first anymore
-	ENDW
 
-	PRINT_CRLF D3,A3	
-	
-	BRA MAIN_LOOP	
+		IF.B D5 <NE> #1 THEN					; not empty
+			PRINT_CRLF D7, A0
+		ENDI
+		
+		ADD.L #1,D1								; next boot table index
+	ENDF
+			
+	BRA MAIN_LOOP
 
 HEX_DIGIT
-	LSL.L #4,D7										; add the next digit in the next 4 bits
+	LSL.L #4,D7									; add the next digit in the next 4 bits
 	HEX2BIN D2,D2,A0
 	OR.B D2,D7  
 	BRA GET_INPUT
@@ -1349,9 +1197,11 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.145 (28/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.146 (30/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 
 
