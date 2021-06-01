@@ -1036,124 +1036,128 @@ DI
 HASH
 	PROTECT
 	BRA MAIN_LOOP
-
 IB
-	MOVE.L #0, A1	; length -> A1
-	MOVE.L #0, A2	; start address -> A2
-	MOVE.L #0, A3	; go address -> A3
-	MOVE.L #0, A4	; start block -> A4
-
 	MOVE.B #(MC68230_PORT_C_READ | MC68230_PORT_C_WRITE | MC68230_PORT_C_CS), MC68230_PORT_C_DATA
 	
 	WRITE_8 #IDE_DRIVESEL_MASTER, #IDE_DRIVESEL_REGISTER, D0
 	WAIT_DRIVE_READY D0, D1
 		
 	SEND_READ_COMMAND_AND_WAIT #0, D0, D1, D2
-
-	READ_32 #IDE_DATA_REGISTER, D0, D7			; num entries in boot table -> D0
+	
+	FOR D1 = #0 to #7 DO
+		READ_32 #IDE_DATA_REGISTER, D0, D6		; num entries in boot table -> D0 (it's written 8 times to fill the block up)
+	ENDF
 	MOVE.L #0, D1								; current boot table index -> D1
-	
-	IF D7 <GT> D1 THEN							; check for off the end of the boot table
-		LEA NOT_FOUND(PC), A0
-		PRINT_STR A0, D7
-		BRA MAIN_LOOP
-	ENDI
-	
-	IF A5 <EQ> #1 THEN
-		MOVE.L D7, D1							; shorten the boot table to the selected entry	
-	ENDI
+						
+	IF A5 <EQ> #1 THEN							; if we are booting...
+		AND.L #$F,D7							; consider bottom 4 bits of address accumulator only
+		IF D7 <GE> D0 THEN						; don't boot if off the end of the boot table
+			MOVE.L #2, A5
+		ENDI
 
+		MOVE.L D7, D0							; then shorten the boot table to the selected entry	
+		ADD.L #1, D0
+	ENDI
+	
+	MOVE.L #0, A1
 	FOR.B D2 = #0 TO #9 DO						; 10 boot table entries / block, each of 48 bytes
-		FOR.B D3 = #0 TO #12 DO					; words read from this boot table entry -> D2
+		MOVE.B #1, D5							; assume empty
+		FOR.B D3 = #0 TO #11 DO					; words read from this boot table entry -> D2
 			READ_32 #IDE_DATA_REGISTER, D4, D7	; get next word ->D4
 			IF.B D1 <LT> D0 THEN				; still in the boot table?
-
 				IF.B D3 <EQ> #0 THEN			; always handle the empty flag
 					MOVE.B D4, D5				; empty flag -> D5
 				ENDI
 				
-				IF.B D5 <NE> #1 THEN			; not empty
-					MOVE.L D5, A1				; preserve the empty flag, we're gonna need D5
+				IF.B D5 <NE> #1 THEN			; not empty			
+					IF A5 <EQ> #0 THEN			; not booting, so print
+						IF.B D3 <EQ> #0 THEN	; first word in boot table, print the index
+							PRINT_REG_4BIT D1, D6, D7, A0	
+							LEA INDEX_SEP(PC), A0
+							PRINT_STR A0, D7
+						ENDI
+
+						IF.B D3 <GT> #1 AND.B D3 <LT> #7 THEN	; str, print it
+							FOR.B D6 = #0 TO #3 DO
+								ROL.L #8, D4					
+								PRINT_CHAR D4, D7
+							ENDF
+						ENDI
 					
-					IF.B D3 <EQ> #0 THEN		; first word in boot table, print the index
-						PRINT_REG_4BIT D1, D6, D7, A0	
-						LEA INDEX_SEP(PC), A0
-						PRINT_STR A0, D7
+						IF.B D3 <GT> #7 AND.B D3 <LT> #12 THEN
+							MOVE.L D5, A6		; preserve the empty flag, we're gonna use D5
+							LEA INDEX_SEP(PC), A0
+							PRINT_STR A0, D7
+							PRINT_REG D4, D5, D6, D7, A0
+							MOVE.L A6, D5		; restore the empty flag into D5
+						ENDI
 					ENDI
-							
-					IF.B D3 <GT> #1 AND.B D3 <LT> #8 THEN	; str, print it
-						FOR.B D6 = #0 TO #3 DO
-							ROL.L #8, D4					
-							PRINT_CHAR D4, D7
-						ENDF
-					ENDI
-
-					IF.B D3 <GT> #8 AND.B D3 <LT> #13 THEN
-						LEA INDEX_SEP(PC), A0
-						PRINT_STR A0, D7
-						PRINT_REG D4, D5, D6, D7, A0
-
-						IF.B D3 <EQ> #9 THEN
-							MOVE.L D4, A1	; length -> A1
+					
+					IF A5 <EQ> #1 THEN			; save the params if we are booting
+						IF.B D3 <EQ> #8 THEN						
+							MOVE.L D4, A1		; length -> A1
 						ENDI
 			
+						IF.B D3 <EQ> #9 THEN
+							MOVE.L D4, A2		; start address -> A2
+						ENDI
+
 						IF.B D3 <EQ> #10 THEN
-							MOVE.L D4, A2	; start address -> A2
+							MOVE.L D4, A3		; go address -> A3
 						ENDI
 
 						IF.B D3 <EQ> #11 THEN
-							MOVE.L D4, A3	; go address -> A3
-						ENDI
-
-						IF.B D3 <EQ> #12 THEN
-							MOVE.L D4, A4	; start block -> A4
-						ENDI
-					ENDI		
-					
-					MOVE.L A1, D5				; restore the empty flag into D5
+							MOVE.L D4, A4		; start block -> A4
+						ENDI					
+					ENDI
+				ELSE
+					MOVE.L #0, A1
 				ENDI
 			ENDI			
 		ENDF
 
-		IF.B D5 <NE> #1 THEN					; not empty
-			PRINT_CRLF D7, A0
+		IF A5 <EQ> #0 THEN					; not booting?			
+			IF.B D5 <NE> #1 THEN			; not booting and not empty, so print crlf
+				PRINT_CRLF D7, A0
+			ENDI
 		ENDI
 		
-		ADD.L #1,D1								; next boot table index
+		ADD.L #1,D1							; next boot table index
 	ENDF
-	
-	IF A5 <EQ> #1 THEN							; boot
-
-		IF A1 <EQ> #0 THEN						; check for boot from empty slot
+						
+	IF A5 <NE> #0 THEN						; check for boot from empty slot
+		IF A5 <EQ> #2 OR A1 <EQ> #0  THEN 
 			LEA NOT_FOUND(PC), A0
 			PRINT_STR A0, D7
 			BRA MAIN_LOOP
 		ENDI
-
+	ENDI
+	
+	IF A5 <EQ> #1 THEN						; booting?
 		LEA BOOT(PC), A0
 		PRINT_STR A0, D7
 	
-		MOVE.L A1, D0							; length -> D5
-		MOVE.L A4, D1							; start block -> D3
-
+		MOVE.L A1, D0						; length -> D0				
+		MOVE.L A4, D1						; start block -> D1
+		
 		WHILE.L D0 <GT> #0 DO
 			SEND_READ_COMMAND_AND_WAIT D1, D5, D6, D7
 			PRINT_CHAR #'.', D7
 			
-			FOR.L D2 = #0 TO #255 DO
-				READ_16 #IDE_DATA_REGISTER, D2, D7
-				MOVE.W D2,(A2)+
+			FOR.L D3 = #0 TO #255 DO
+				READ_16 #IDE_DATA_REGISTER, D4, D7
+				MOVE.W D4,(A2)+
 				SUB.L #2, D0
 			ENDF
 		
-			ADD.L #1, D1						; next block
+			ADD.L #1, D1					; next block
 		ENDW
 
 		PRINT_CRLF D3, A6	
 	
 		MOVE.L A3, D7							; set go address
 	ENDI
-	
+
 	BRA MAIN_LOOP
 
 HEX_DIGIT
@@ -1255,7 +1259,7 @@ for		DC.B ' for ',NULL
 STACK_POINTER DC.B 'SP: ',NULL
 STATUS_REGISTER DC.B 'SR: ',NULL
 INDEX_SEP DC.B ' : ',NULL
-BOOT DC.B 'Booting ',NULL
+BOOT DC.B 'Booting',NULL
 NOT_FOUND DC.B 'Not found',CR,LF,NULL
 TICK DC.B 'tick',CR,LF,NULL
 BUS_ERROR DC.B '* Bus/address error ',NULL
@@ -1265,9 +1269,14 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.146 (30/05/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.149 (01/06/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
+
+
+
 
 
 
