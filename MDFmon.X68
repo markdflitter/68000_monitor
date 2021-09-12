@@ -2,7 +2,8 @@
 * Title			MDFmon 
 * Written by 	Mark Flitter
 * Date			March 2021
-* Description:	68000 monitor program
+* Description:	68000 monitor 
+
 *-----------------------------------------------------------
 
 	ORG  $0
@@ -913,8 +914,11 @@ L
 				
 	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
+	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
+	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
+	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
 		
 	MOVE.L A1,D2
@@ -936,6 +940,7 @@ L
 		SUB.L #2,D0
 
 		MOVE.L A0,D2
+		ANDI.B #$7,D2
 		MOVE.B D2,DISPLAY
 		PROGRAM (A1),(A0),D2
 				
@@ -958,10 +963,9 @@ L
 		MOVE.L (A1),D0	
 		ADD.L D1,D0
 		SUB.L #START,D0
-
+	
 		MOVE.L A0,D2
-		
-		MOVE.L A0,D2
+		ANDI.B #$7,D2
 		MOVE.B D2,DISPLAY
 		PROGRAM_VECTOR D0,A0,D2
 	ENDF
@@ -1273,9 +1277,11 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.150 (12/09/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.152 (12/09/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 
 
