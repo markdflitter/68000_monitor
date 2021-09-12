@@ -249,19 +249,15 @@ READ_CHAR MACRO
 DOWNLOAD MACRO
 WAIT_FOR_READY\@									; wait until the there is space to send
 
-;	MOVE.B DUART_SRA,\1								; check for command
-;	BTST #0,\1										; check for character
-;	BEQ CONTINUE\@									; nothing, continue
-
-;	READ_CHAR \1									; we're not going to do anything with it, just check for escape
-CONTINUE\@
-;	MOVE.B DUART_SRB,\1								; read download status register
 	MOVE.B DUART_SRA,\1								; read download status register
 	BTST #0,\1										; check for character
 	BEQ WAIT_FOR_READY\@							; nothing, check again
 	
-;	MOVE.B DUART_RXB,\1								; got a character, read it
 	MOVE.B DUART_RXA,\1								; got a character, read it
+	
+	CMP.B #$1B,\1									; check for escape and go to start
+	BEQ START
+
 	MOVE.B \1,DISPLAY								; echo to the display
 
 	ENDM
@@ -1277,9 +1273,10 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.152 (12/09/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.153 (12/09/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
