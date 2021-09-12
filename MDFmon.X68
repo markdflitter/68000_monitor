@@ -248,18 +248,39 @@ READ_CHAR MACRO
 DOWNLOAD MACRO
 WAIT_FOR_READY\@									; wait until the there is space to send
 
-	MOVE.B DUART_SRA,\1								; check for command
-	BTST #0,\1										; check for character
-	BEQ CONTINUE\@									; nothing, continue
+;	MOVE.B DUART_SRA,\1								; check for command
+;	BTST #0,\1										; check for character
+;	BEQ CONTINUE\@									; nothing, continue
 
-	READ_CHAR \1									; we're not going to do anything with it, just check for escape
+;	READ_CHAR \1									; we're not going to do anything with it, just check for escape
 CONTINUE\@
-	MOVE.B DUART_SRB,\1								; read download status register
+;	MOVE.B DUART_SRB,\1								; read download status register
+	MOVE.B DUART_SRA,\1								; read download status register
 	BTST #0,\1										; check for character
 	BEQ WAIT_FOR_READY\@							; nothing, check again
 	
-	MOVE.B DUART_RXB,\1								; got a character, read it
+;	MOVE.B DUART_RXB,\1								; got a character, read it
+	MOVE.B DUART_RXA,\1								; got a character, read it
 	MOVE.B \1,DISPLAY								; echo to the display
+
+	ENDM
+
+; read two hex digits from the download serial port and convert to a byte
+; \1 result register, \2 = data register for read char, \3 = register to use for status poll, \4 = working data register, \5 = checksum register, \6 = working address register
+DOWNLOAD_BYTE MACRO
+	MOVE.B #2,\4
+	WHILE.B \4 <GT> 0 DO
+		LSL.L #4,\1									; it's OK to do this first, because we are either starting from 0, 
+		DOWNLOAD \2									; or we are reading the next byte along, so need to shift up the previous one
+		;PRINT_CHAR \2,\3
+		HEX2BIN \2,\2,\6
+		OR.B \2,\1
+		SUB.B #1,\4
+	ENDW
+
+	MOVE.L #0,\2									; rextract latest byte of address and add into checksum
+	MOVE.B \1,\2
+	ADD.L \1,\5
 
 	ENDM
 
@@ -284,27 +305,6 @@ PROTECT MACRO
 	MOVE.W #$5555,$1554
 	MOVE.W #$A0A0,$2AAA
 	ENDM
-
-
-; read two hex digits from the download serial port and convert to a byte
-; \1 result register, \2 = data register for read char, \3 = register to use for status poll, \4 = working data register, \5 = checksum register, \6 = working address register
-DOWNLOAD_BYTE MACRO
-	MOVE.B #2,\4
-	WHILE.B \4 <GT> 0 DO
-		LSL.L #4,\1									; it's OK to do this first, because we are either starting from 0, 
-		DOWNLOAD \2									; or we are reading the next byte along, so need to shift up the previous one
-		;PRINT_CHAR \2,\3
-		HEX2BIN \2,\2,\6
-		OR.B \2,\1
-		SUB.B #1,\4
-	ENDW
-
-	MOVE.L #0,\2									; rextract latest byte of address and add into checksum
-	MOVE.B \1,\2
-	ADD.L \1,\5
-
-	ENDM
-
 ; write word to EEPROM
 ; \1 word to write, \2 = target address, \3 = working data register
 PROGRAM MACRO
@@ -913,6 +913,9 @@ L
 				
 	LEA LOADING(PC),A2
 	PRINT_STR A2,D2
+	PRINT_STR A2,D2
+	PRINT_STR A2,D2
+	PRINT_STR A2,D2
 		
 	MOVE.L A1,D2
 	PRINT_REG D2,D3,D4,D5,A2
@@ -932,7 +935,8 @@ L
 	WHILE D0 <GT> #0 DO
 		SUB.L #2,D0
 
-		MOVE.B (A1),DISPLAY
+		MOVE.L A0,D2
+		MOVE.B D2,DISPLAY
 		PROGRAM (A1),(A0),D2
 				
 		ADD.L #2,A0
@@ -1269,9 +1273,10 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.149 (01/06/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.150 (12/09/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 
