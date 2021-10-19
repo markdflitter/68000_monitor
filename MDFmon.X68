@@ -752,9 +752,10 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 	;PRINT_CHAR D1,D5
 
 	MOVE.L #0,D2									; clear the checksum
+	MOVE.L #0,D3
 
 	DOWNLOAD_BYTE D3,D5,D6,D7,D2,A4
-
+	
 	IF.B D1 <EQ> #'0' THEN.L						; header, just ignore it
 		;PRINT_CRLF D5,A4
 		BRA WAIT_FOR_SRECORD
@@ -774,7 +775,7 @@ WAIT_FOR_SRECORD									; wait for the start of a record, indicated by 'S'
 			MOVE.L D4,A2							; put the address in an address register
 			ADD.L A1,A2								; add in the offset
 
-			WHILE.B D3 <GT> #0 DO					; read the data bytes
+			WHILE.B D3 <HI> #0 DO					; read the data bytes
 				DOWNLOAD_BYTE D1,D5,D6,D7,D2,A4		; read it
  
 				MOVE.B D1,(A2)+						; store it!
@@ -1273,9 +1274,11 @@ FROM DC.B ' from ',NULL
 UNHANDLED DC.B '* Unhandled interrupt',NULL
 UNINITIALISED DC.B '* Unitialised interrupt vector',NULL
 SPURIOUS DC.B '* Spurious interrupt',NULL
-VERSION DC.B 'MDF-mon V1.153 (12/09/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.156 (20/10/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
+
 
 
 
