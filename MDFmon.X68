@@ -248,11 +248,11 @@ READ_CHAR MACRO
 DOWNLOAD MACRO
 WAIT_FOR_READY\@									; wait until the there is space to send
 
-	MOVE.B DUART_SRA,\1								; read download status register
+	MOVE.B DUART_SRB,\1								; read download status register
 	BTST #0,\1										; check for character
 	BEQ WAIT_FOR_READY\@							; nothing, check again
 	
-	MOVE.B DUART_RXA,\1								; got a character, read it
+	MOVE.B DUART_RXB,\1								; got a character, read it
 	
 	CMP.B #$1B,\1									; check for escape and go to start
 	BEQ START
@@ -1134,9 +1134,10 @@ STATUS_REGISTER DC.B 'SR: ',NULL
 INDEX_SEP DC.B ' : ',NULL
 BOOT DC.B 'Booting',NULL
 NOT_FOUND DC.B 'Not found',CR,LF,NULL
-VERSION DC.B 'MDF-mon V1.158 (29/10/2021)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
+VERSION DC.B 'MDF-mon V1.159 (18/12/2022)',CR,LF,NULL	; this is the last line on purpose, so if it prints, we can be sure we got it all
 END		DC.B 0
 	END	START				    						; last line of source
+
 
 
 

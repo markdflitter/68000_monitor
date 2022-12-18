@@ -1,6 +1,6 @@
 00000008 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 29/10/2021 07:30:44
+Created On: 18/12/2022 13:11:44
 
 00000000                             1  *------------------------------------------------------------
 00000000                             2  * Title         MDFmon 
@@ -252,11 +252,11 @@ Created On: 29/10/2021 07:30:44
 00000000                           248  DOWNLOAD MACRO
 00000000                           249  WAIT_FOR_READY\@                                    ; wait until the there is space to send
 00000000                           250  
-00000000                           251      MOVE.B DUART_SRA,\1                             ; read download status register
+00000000                           251      MOVE.B DUART_SRB,\1                             ; read download status register
 00000000                           252      BTST #0,\1                                      ; check for character
 00000000                           253      BEQ WAIT_FOR_READY\@                            ; nothing, check again
 00000000                           254      
-00000000                           255      MOVE.B DUART_RXA,\1                             ; got a character, read it
+00000000                           255      MOVE.B DUART_RXB,\1                             ; got a character, read it
 00000000                           256      
 00000000                           257      CMP.B #$1B,\1                                   ; check for escape and go to start
 00000000                           258      BEQ START
@@ -1202,11 +1202,11 @@ Created On: 29/10/2021 07:30:44
 00000506                          1198m     DOWNLOAD D1
 00000506                          1199m WAIT_FOR_READY_54                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000506                          1200m 
-00000506  1239 00C00003           1201m     MOVE.B DUART_SRA,D1                             ; READ DOWNLOAD STATUS REGISTER
+00000506  1239 00C00013           1201m     MOVE.B DUART_SRB,D1                             ; READ DOWNLOAD STATUS REGISTER
 0000050C  0801 0000               1202m     BTST #0,D1                                      ; CHECK FOR CHARACTER
 00000510  67F4                    1203m     BEQ WAIT_FOR_READY_54                           ; NOTHING, CHECK AGAIN
 00000512                          1204m     
-00000512  1239 00C00007           1205m     MOVE.B DUART_RXA,D1                             ; GOT A CHARACTER, READ IT
+00000512  1239 00C00017           1205m     MOVE.B DUART_RXB,D1                             ; GOT A CHARACTER, READ IT
 00000518                          1206m     
 00000518  B23C 001B               1207m     CMP.B #$1B,D1                                   ; CHECK FOR ESCAPE AND GO TO START
 0000051C  6700 FAEA               1208m     BEQ START
@@ -1236,11 +1236,11 @@ Created On: 29/10/2021 07:30:44
 00000542                          1232m     DOWNLOAD D1                                     ; read the record identifier and echo it back
 00000542                          1233m WAIT_FOR_READY_56                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000542                          1234m 
-00000542  1239 00C00003           1235m     MOVE.B DUART_SRA,D1                             ; READ DOWNLOAD STATUS REGISTER
+00000542  1239 00C00013           1235m     MOVE.B DUART_SRB,D1                             ; READ DOWNLOAD STATUS REGISTER
 00000548  0801 0000               1236m     BTST #0,D1                                      ; CHECK FOR CHARACTER
 0000054C  67F4                    1237m     BEQ WAIT_FOR_READY_56                           ; NOTHING, CHECK AGAIN
 0000054E                          1238m     
-0000054E  1239 00C00007           1239m     MOVE.B DUART_RXA,D1                             ; GOT A CHARACTER, READ IT
+0000054E  1239 00C00017           1239m     MOVE.B DUART_RXB,D1                             ; GOT A CHARACTER, READ IT
 00000554                          1240m     
 00000554  B23C 001B               1241m     CMP.B #$1B,D1                                   ; CHECK FOR ESCAPE AND GO TO START
 00000558  6700 FAAE               1242m     BEQ START
@@ -1263,11 +1263,11 @@ Created On: 29/10/2021 07:30:44
 00000574                          1259mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 00000574                          1260mm WAIT_FOR_READY_58                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000574                          1261mm 
-00000574  1A39 00C00003           1262mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+00000574  1A39 00C00013           1262mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 0000057A  0805 0000               1263mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 0000057E  67F4                    1264mm     BEQ WAIT_FOR_READY_58                           ; NOTHING, CHECK AGAIN
 00000580                          1265mm     
-00000580  1A39 00C00007           1266mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+00000580  1A39 00C00017           1266mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 00000586                          1267mm     
 00000586  BA3C 001B               1268mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 0000058A  6700 FA7C               1269mm     BEQ START
@@ -1321,11 +1321,11 @@ Created On: 29/10/2021 07:30:44
 000005E2                          1317mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 000005E2                          1318mm WAIT_FOR_READY_61                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000005E2                          1319mm 
-000005E2  1A39 00C00003           1320mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+000005E2  1A39 00C00013           1320mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 000005E8  0805 0000               1321mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 000005EC  67F4                    1322mm     BEQ WAIT_FOR_READY_61                           ; NOTHING, CHECK AGAIN
 000005EE                          1323mm     
-000005EE  1A39 00C00007           1324mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+000005EE  1A39 00C00017           1324mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 000005F4                          1325mm     
 000005F4  BA3C 001B               1326mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 000005F8  6700 FA0E               1327mm     BEQ START
@@ -1361,11 +1361,11 @@ Created On: 29/10/2021 07:30:44
 0000062E                          1357mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 0000062E                          1358mm WAIT_FOR_READY_64                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 0000062E                          1359mm 
-0000062E  1A39 00C00003           1360mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+0000062E  1A39 00C00013           1360mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 00000634  0805 0000               1361mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 00000638  67F4                    1362mm     BEQ WAIT_FOR_READY_64                           ; NOTHING, CHECK AGAIN
 0000063A                          1363mm     
-0000063A  1A39 00C00007           1364mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+0000063A  1A39 00C00017           1364mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 00000640                          1365mm     
 00000640  BA3C 001B               1366mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 00000644  6700 F9C2               1367mm     BEQ START
@@ -1406,11 +1406,11 @@ Created On: 29/10/2021 07:30:44
 00000684                          1402mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 00000684                          1403mm WAIT_FOR_READY_67                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 00000684                          1404mm 
-00000684  1A39 00C00003           1405mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+00000684  1A39 00C00013           1405mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 0000068A  0805 0000               1406mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 0000068E  67F4                    1407mm     BEQ WAIT_FOR_READY_67                           ; NOTHING, CHECK AGAIN
 00000690                          1408mm     
-00000690  1A39 00C00007           1409mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+00000690  1A39 00C00017           1409mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 00000696                          1410mm     
 00000696  BA3C 001B               1411mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 0000069A  6700 F96C               1412mm     BEQ START
@@ -1456,11 +1456,11 @@ Created On: 29/10/2021 07:30:44
 000006DC                          1452mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 000006DC                          1453mm WAIT_FOR_READY_70                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000006DC                          1454mm 
-000006DC  1A39 00C00003           1455mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+000006DC  1A39 00C00013           1455mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 000006E2  0805 0000               1456mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 000006E6  67F4                    1457mm     BEQ WAIT_FOR_READY_70                           ; NOTHING, CHECK AGAIN
 000006E8                          1458mm     
-000006E8  1A39 00C00007           1459mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+000006E8  1A39 00C00017           1459mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 000006EE                          1460mm     
 000006EE  BA3C 001B               1461mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 000006F2  6700 F914               1462mm     BEQ START
@@ -1512,11 +1512,11 @@ Created On: 29/10/2021 07:30:44
 0000073E                          1508mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 0000073E                          1509mm WAIT_FOR_READY_73                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 0000073E                          1510mm 
-0000073E  1A39 00C00003           1511mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+0000073E  1A39 00C00013           1511mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 00000744  0805 0000               1512mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 00000748  67F4                    1513mm     BEQ WAIT_FOR_READY_73                           ; NOTHING, CHECK AGAIN
 0000074A                          1514mm     
-0000074A  1A39 00C00007           1515mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+0000074A  1A39 00C00017           1515mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 00000750                          1516mm     
 00000750  BA3C 001B               1517mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 00000754  6700 F8B2               1518mm     BEQ START
@@ -1552,11 +1552,11 @@ Created On: 29/10/2021 07:30:44
 0000078A                          1548mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 0000078A                          1549mm WAIT_FOR_READY_76                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 0000078A                          1550mm 
-0000078A  1A39 00C00003           1551mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+0000078A  1A39 00C00013           1551mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 00000790  0805 0000               1552mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 00000794  67F4                    1553mm     BEQ WAIT_FOR_READY_76                           ; NOTHING, CHECK AGAIN
 00000796                          1554mm     
-00000796  1A39 00C00007           1555mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+00000796  1A39 00C00017           1555mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 0000079C                          1556mm     
 0000079C  BA3C 001B               1557mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 000007A0  6700 F866               1558mm     BEQ START
@@ -1592,11 +1592,11 @@ Created On: 29/10/2021 07:30:44
 000007D6                          1588mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 000007D6                          1589mm WAIT_FOR_READY_79                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000007D6                          1590mm 
-000007D6  1A39 00C00003           1591mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+000007D6  1A39 00C00013           1591mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 000007DC  0805 0000               1592mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 000007E0  67F4                    1593mm     BEQ WAIT_FOR_READY_79                           ; NOTHING, CHECK AGAIN
 000007E2                          1594mm     
-000007E2  1A39 00C00007           1595mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+000007E2  1A39 00C00017           1595mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 000007E8                          1596mm     
 000007E8  BA3C 001B               1597mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 000007EC  6700 F81A               1598mm     BEQ START
@@ -1730,11 +1730,11 @@ Created On: 29/10/2021 07:30:44
 000008A2                          1726mm         DOWNLOAD D5                                 ; OR WE ARE READING THE NEXT BYTE ALONG, SO NEED TO SHIFT UP THE PREVIOUS ONE
 000008A2                          1727mm WAIT_FOR_READY_91                                   ; WAIT UNTIL THE THERE IS SPACE TO SEND
 000008A2                          1728mm 
-000008A2  1A39 00C00003           1729mm     MOVE.B DUART_SRA,D5                             ; READ DOWNLOAD STATUS REGISTER
+000008A2  1A39 00C00013           1729mm     MOVE.B DUART_SRB,D5                             ; READ DOWNLOAD STATUS REGISTER
 000008A8  0805 0000               1730mm     BTST #0,D5                                      ; CHECK FOR CHARACTER
 000008AC  67F4                    1731mm     BEQ WAIT_FOR_READY_91                           ; NOTHING, CHECK AGAIN
 000008AE                          1732mm     
-000008AE  1A39 00C00007           1733mm     MOVE.B DUART_RXA,D5                             ; GOT A CHARACTER, READ IT
+000008AE  1A39 00C00017           1733mm     MOVE.B DUART_RXB,D5                             ; GOT A CHARACTER, READ IT
 000008B4                          1734mm     
 000008B4  BA3C 001B               1735mm     CMP.B #$1B,D5                                   ; CHECK FOR ESCAPE AND GO TO START
 000008B8  6700 F74E               1736mm     BEQ START
@@ -4126,7 +4126,7 @@ Created On: 29/10/2021 07:30:44
 00001D83= 20 3A 20 00             4122  INDEX_SEP DC.B ' : ',NULL
 00001D87= 42 6F 6F 74 69 6E ...   4123  BOOT DC.B 'Booting',NULL
 00001D8F= 4E 6F 74 20 66 6F ...   4124  NOT_FOUND DC.B 'Not found',CR,LF,NULL
-00001D9B= 4D 44 46 2D 6D 6F ...   4125  VERSION DC.B 'MDF-mon V1.158 (29/10/2021)',CR,LF,NULL   ; this is the last line on purpose, so if it prints, we can be sure we got it all
+00001D9B= 4D 44 46 2D 6D 6F ...   4125  VERSION DC.B 'MDF-mon V1.159 (18/12/2022)',CR,LF,NULL   ; this is the last line on purpose, so if it prints, we can be sure we got it all
 00001DB9= 00                      4126  END     DC.B 0
 00001DBA                          4127      END START                                           ; last line of source
 
